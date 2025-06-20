@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veo 3 Prompt Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Veo 3 Prompt Generator</h1>
+            <p>Buat prompt video yang detail dan terstruktur untuk Google Veo.</p>
+        </header>
+        <form id="prompt-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="subjek">1. Subjek</label>
+                    <input type="text" id="subjek" placeholder="Contoh: seekor anjing golden retriever">
+                </div>
+                <div class="form-group">
+                    <label for="aksi">2. Aksi</label>
+                    <input type="text" id="aksi" placeholder="Contoh: bermain lempar tangkap di taman">
+                </div>
+                <div class="form-group">
+                    <label for="ekspresi">3. Ekspresi</label>
+                    <input type="text" id="ekspresi" placeholder="Contoh: dengan wajah gembira dan antusias">
+                </div>
+                <div class="form-group">
+                    <label for="tempat">4. Tempat</label>
+                    <input type="text" id="tempat" placeholder="Contoh: di sebuah taman kota yang hijau">
+                </div>
+                <div class="form-group">
+                    <label for="waktu">5. Waktu</label>
+                    <select id="waktu"></select>
+                </div>
+                <div class="form-group">
+                    <label for="gerakan-kamera">6. Gerakan Kamera</label>
+                    <select id="gerakan-kamera"></select>
+                </div>
+                <div class="form-group">
+                    <label for="pencahayaan">7. Pencahayaan</label>
+                    <select id="pencahayaan"></select>
+                </div>
+                <div class="form-group">
+                    <label for="gaya-video">8. Gaya Video</label>
+                    <select id="gaya-video"></select>
+                </div>
+                <div class="form-group">
+                    <label for="suasana-video">9. Suasana Video</label>
+                    <select id="suasana-video"></select>
+                </div>
+                <div class="form-group">
+                    <label for="suara-musik">10. Suara atau Musik</label>
+                    <input type="text" id="suara-musik" placeholder="Contoh: diiringi musik orkestra yang megah">
+                </div>
+                <div class="form-group full-width">
+                    <label for="kalimat-diucapkan">11. Kalimat yang Diucapkan (Dialog)</label>
+                    <input type="text" id="kalimat-diucapkan" placeholder="Contoh: 'Ayo, tangkap bolanya!'">
+                </div>
+                <div class="form-group full-width">
+                    <label for="detail-tambahan">12. Detail Tambahan</label>
+                    <textarea id="detail-tambahan" rows="3" placeholder="Contoh: Ada beberapa orang berjalan santai di latar belakang, daun-daun berguguran."></textarea>
+                </div>
+            </div>
+            <button type="submit">Buat Prompt</button>
+        </form>
+
+        <div id="hasil-container" class="hidden">
+            <h2>Hasil Prompt</h2>
+            <div class="hasil-grid">
+                <div class="hasil-kolom">
+                    <h3>Bahasa Indonesia (Dapat Diedit)</h3>
+                    <textarea id="hasil-indonesia" rows="10"></textarea>
+                </div>
+                <div class="hasil-kolom">
+                    <h3>Bahasa Inggris (Final)</h3>
+                    <textarea id="hasil-inggris" rows="10" readonly></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 
