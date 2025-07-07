@@ -1,195 +1,338 @@
-document.addEventListener('DOMContentLoaded', () => {
+const translations = {
+    "nama_karakter": "character's name",
+    "kewarganegaraan": "nationality",
+    "karakteristik_subjek": "subject characteristics",
+    "aksi_utama": "main action",
+    "emosi": "emotion",
+    "lokasi": "location",
+    "suara_lingkungan": "ambient sound",
+    "background_music": "background music",
+    "detail_tambahan": "additional details",
+    "karakter_dialog": "dialogue characters",
+    "isi_dialog": "dialogue content",
+    "mood_suara": "sound mood",
 
-    const data = {
-        waktu: [
-            { value: 'golden hour', text: 'Golden Hour (Jam Emas)' },
-            { value: 'blue hour', text: 'Blue Hour (Jam Biru)' },
-            { value: 'midday', text: 'Midday (Tengah Hari)' },
-            { value: 'afternoon', text: 'Afternoon (Sore Hari)' },
-            { value: 'night', text: 'Night (Malam Hari)' },
-            { value: 'dawn', text: 'Dawn (Fajar)' },
-            { value: 'dusk', text: 'Dusk (Senja)' },
-        ],
-        gerakanKamera: [
-            // Gerakan Umum
-            { value: 'static shot', text: 'Static Shot (Diam)' },
-            { value: 'pan right', text: 'Pan Right (Geser Kanan)' },
-            { value: 'pan left', text: 'Pan Left (Geser Kiri)' },
-            { value: 'tilt up', text: 'Tilt Up (Miring ke Atas)' },
-            { value: 'tilt down', text: 'Tilt Down (Miring ke Bawah)' },
-            { value: 'dolly in', text: 'Dolly In (Maju)' },
-            { value: 'dolly out', text: 'Dolly Out (Mundur)' },
-            { value: 'zoom in', text: 'Zoom In (Perbesar)' },
-            { value: 'zoom out', text: 'Zoom Out (Perkecil)' },
-            { value: 'crane up', text: 'Crane Up (Naik)' },
-            { value: 'crane down', text: 'Crane Down (Turun)' },
-            { value: 'tracking shot', text: 'Tracking Shot (Mengikuti Objek)' },
-            // Higgsfield.ai Motions
-            { value: '3D rotation', text: '3D Rotation (Rotasi 3D)' },
-            { value: 'slow motion', text: 'Slow Motion (Gerak Lambat)' },
-            { value: 'fast forward', text: 'Fast Forward (Gerak Cepat)' },
-            { value: 'rewind', text: 'Rewind (Putar Balik)' },
-            { value: 'shake', text: 'Shake (Guncangan)' },
-            { value: 'dutch angle', text: 'Dutch Angle (Sudut Miring)' },
-            { value: 'orbit', text: 'Orbit (Mengorbit)' },
-            { value: 'arc', text: 'Arc (Gerakan Melengkung)' },
-            { value: 'spiral in', text: 'Spiral In (Spiral ke Dalam)' },
-            { value: 'spiral out', text: 'Spiral Out (Spiral ke Luar)' },
-            { value: 'vertigo effect', text: 'Vertigo Effect (Efek Vertigo)' },
-        ],
-        pencahayaan: [
-            { value: 'cinematic lighting', text: 'Cinematic Lighting (Pencahayaan Sinematik)' },
-            { value: 'soft light', text: 'Soft Light (Cahaya Lembut)' },
-            { value: 'hard light', text: 'Hard Light (Cahaya Keras)' },
-            { value: 'natural light', text: 'Natural Light (Cahaya Alami)' },
-            { value: 'Rembrandt lighting', text: 'Rembrandt Lighting' },
-            { value: 'backlight', text: 'Backlight (Cahaya dari Belakang)' },
-            { value: 'neon lights', text: 'Neon Lights (Lampu Neon)' },
-            { value: 'dramatic lighting', text: 'Dramatic Lighting (Pencahayaan Dramatis)' },
-        ],
-        gayaVideo: [
-            { value: 'cinematic', text: 'Cinematic (Sinematik)' },
-            { value: 'hyperrealistic', text: 'Hyperrealistic (Sangat Realistis)' },
-            { value: 'documentary', text: 'Documentary (Dokumenter)' },
-            { value: 'vintage film', text: 'Vintage Film (Film Jadul)' },
-            { value: '3D animation', text: '3D Animation (Animasi 3D)' },
-            { value: 'anime', text: 'Anime' },
-            { value: 'fantasy', text: 'Fantasy (Fantasi)' },
-            { value: 'sci-fi', text: 'Sci-fi (Fiksi Ilmiah)' },
-            { value: 'vlog', text: 'Vlog' },
-        ],
-        suasanaVideo: [
-            { value: 'epic', text: 'Epic (Epik)' },
-            { value: 'dreamy', text: 'Dreamy (Seperti Mimpi)' },
-            { value: 'mysterious', text: 'Mysterious (Misterius)' },
-            { value: 'cheerful', text: 'Cheerful (Ceria)' },
-            { value: 'romantic', text: 'Romantic (Romantis)' },
-            { value: 'tense', text: 'Tense (Tegang)' },
-            { value: 'calm', text: 'Calm (Tenang)' },
-            { value: 'nostalgic', text: 'Nostalgic (Nostalgia)' },
-        ]
-    };
+    "pagi hari yang cerah": "bright morning",
+    "siang hari yang terik": "scorching noon",
+    "sore hari menjelang senja": "late afternoon nearing dusk",
+    "malam hari yang tenang": "peaceful night",
+    "dini hari berkabut": "foggy early morning",
 
-    function populateSelect(selectId, dataArray) {
-        const select = document.getElementById(selectId);
-        // Tambahkan opsi default yang tidak bisa dipilih
-        const defaultOption = document.createElement('option');
-        defaultOption.textContent = `Pilih ${select.previousElementSibling.textContent.split('. ')[1]}...`;
-        defaultOption.value = '';
-        defaultOption.disabled = true;
-        defaultOption.selected = true;
-        select.appendChild(defaultOption);
+    "cerah dan berawan": "clear and cloudy",
+    "hujan deras": "heavy rain",
+    "bersalju": "snowy",
+    "berkabut tebal": "dense fog",
+    "berangin kencang": "strong winds",
+    "badai petir": "thunderstorm",
 
-        dataArray.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item.value;
-            option.textContent = item.text;
-            option.dataset.indo = item.text.split(' (')[0];
-            select.appendChild(option);
-        });
+    "musim semi": "spring",
+    "musim panas": "summer",
+    "musim gugur": "autumn",
+    "musim dingin": "winter",
+
+    "realistis dan sinematik": "realistic and cinematic",
+    "gaya dokumenter": "documentary style",
+    "futuristik dan berteknologi tinggi": "futuristic and high-tech",
+    "vintage dengan efek VHS": "vintage with VHS effect",
+    "animasi 3D": "3D animation",
+    "gaya lukisan": "painterly style",
+    "gaya seni piksel": "pixel art style",
+
+    "Bullet Time": "Bullet Time",
+    "Crash Zoom-in": "Crash Zoom-in",
+    "Dolly Zoom-in": "Dolly Zoom-in",
+    "Robo Arm": "Robo Arm",
+    "Super Dolly-in": "Super Dolly-in",
+    "Focus Change": "Focus Change",
+    "360 Orbit": "360 Orbit",
+    "FPV Drone": "FPV Drone",
+    "Through Object-in": "Through Object-in",
+    "Crane-up": "Crane-up",
+    "Lazy Susan": "Lazy Susan",
+    "Action Run": "Action Run",
+    "Handheld": "Handheld",
+    "Dutch Angle": "Dutch Angle",
+    "Car Grip": "Car Grip",
+    "Levitation": "Levitation",
+    "Hyperlapse": "Hyperlapse",
+    "Low Shutter": "Low Shutter",
+    "Fisheye": "Fisheye",
+    "Lens Flare": "Lens Flare",
+    "Rap Flex": "Rap Flex",
+    "Pan": "Pan",
+    "Tilt": "Tilt",
+    "Zoom In": "Zoom In",
+    "Zoom Out": "Zoom Out",
+    "Dolly In": "Dolly In",
+    "Dolly Out": "Dolly Out",
+    "Tracking Shot": "Tracking Shot",
+    "Crane Shot": "Crane Shot",
+    "Pedestal": "Pedestal",
+    "Reveal": "Reveal",
+    "Static": "Static",
+    "Whip Pan": "Whip Pan",
+    "Arc Shot": "Arc Shot",
+    "POV": "POV",
+    "Rack Focus": "Rack Focus",
+
+    "eye-level": "eye-level",
+    "low angle": "low angle",
+    "high angle": "high angle",
+    "bird's eye view": "bird's eye view",
+    "worm's eye view": "worm's eye view",
+    "dutch angle": "dutch angle",
+    "over-the-shoulder": "over-the-shoulder",
+    "point of view": "point of view",
+
+    "fokus tajam pada subjek utama": "sharp focus on main subject",
+    "fokus dangkal dengan latar belakang blur": "shallow focus with blurred background",
+    "fokus dalam pada seluruh adegan": "deep focus on entire scene",
+
+    "cahaya alami yang lembut": "soft natural light",
+    "pencahayaan studio yang dramatis": "dramatic studio lighting",
+    "siluet saat matahari terbenam": "silhouette at sunset",
+    "cahaya neon yang vibrant": "vibrant neon light",
+    "pencahayaan remang-remang": "dim lighting",
+    "cahaya terang dan cerah": "bright and clear light",
+    "cahaya kontras tinggi": "high contrast lighting",
+
+    "hangat dan cerah": "warm and bright",
+    "dingin dan gelap": "cool and dark",
+    "monokromatik": "monochromatic",
+    "vibrant dan saturasi tinggi": "vibrant and high saturation",
+    "pudar dan nostalgik": "desaturated and nostalgic",
+    "gradasi warna alami": "natural color grading",
+
+    "tanpa dialog": "no dialogue",
+    "informatif": "informative",
+    "natural dialog": "natural dialogue",
+    "monolog": "monologue",
+    "interview": "interview",
+    
+    "Happy": "Happy",
+    "Sad": "Sad",
+    "Cheerful": "Cheerful",
+    "Angry": "Angry",
+    "Tense": "Tense",
+    "Calm": "Calm",
+    "Excited": "Excited",
+    "Mysterious": "Mysterious",
+
+    "4K Ultra HD": "4K Ultra HD",
+    "Full HD": "Full HD",
+    "Cinematic 8K": "Cinematic 8K",
+    "VFX Quality": "VFX Quality",
+    "Photorealistic": "Photorealistic",
+
+    "6 Detik": "6 Seconds",
+    "7 Detik": "7 Seconds",
+    "8 Detik": "8 Seconds",
+
+    "LANDSCAPE 16:9": "LANDSCAPE 16:9",
+    "PORTRAIT 9:16": "PORTRAIT 9:16"
+};
+
+function getTranslation(key) {
+    return translations[key.toLowerCase()] || key;
+}
+
+let characterCount = 1;
+let promptHistory = [];
+
+function generatePrompt() {
+    // Save current prompts to history before generating new ones
+    const currentIDPrompt = document.getElementById('prompt_indonesia').value;
+    const currentENPrompt = document.getElementById('prompt_english').value;
+    if (currentIDPrompt || currentENPrompt) {
+        promptHistory.push({ id: currentIDPrompt, en: currentENPrompt });
     }
 
-    populateSelect('waktu', data.waktu);
-    populateSelect('gerakan-kamera', data.gerakanKamera);
-    populateSelect('pencahayaan', data.pencahayaan);
-    populateSelect('gaya-video', data.gayaVideo);
-    populateSelect('suasana-video', data.suasanaVideo);
-
-    const form = document.getElementById('prompt-form');
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        const getSelectedData = (id) => {
-            const select = document.getElementById(id);
-            if (select.selectedIndex <= 0) return { value: '', indo: '' };
-            const selectedOption = select.options[select.selectedIndex];
-            return {
-                value: selectedOption.value,
-                indo: selectedOption.dataset.indo || selectedOption.textContent
-            };
-        };
-
-        const inputs = {
-            subjek: document.getElementById('subjek').value.trim(),
-            aksi: document.getElementById('aksi').value.trim(),
-            ekspresi: document.getElementById('ekspresi').value.trim(),
-            tempat: document.getElementById('tempat').value.trim(),
-            waktu: getSelectedData('waktu'),
-            gerakanKamera: getSelectedData('gerakan-kamera'),
-            pencahayaan: getSelectedData('pencahayaan'),
-            gayaVideo: getSelectedData('gaya-video'),
-            suasanaVideo: getSelectedData('suasana-video'),
-            suaraMusik: document.getElementById('suara-musik').value.trim(),
-            kalimatDiucapkan: document.getElementById('kalimat-diucapkan').value.trim(),
-            detailTambahan: document.getElementById('detail-tambahan').value.trim()
-        };
-
-        // Generate Indonesian Prompt
-        let promptIndo = `Sebuah video dengan gaya ${inputs.gayaVideo.indo || 'sinematik'}`;
-        if (inputs.subjek) promptIndo += ` menampilkan ${inputs.subjek}`;
-        if (inputs.aksi) promptIndo += ` yang sedang ${inputs.aksi}`;
-        if (inputs.ekspresi) promptIndo += ` ${inputs.ekspresi}`;
-        if (inputs.tempat) promptIndo += `, berlokasi di ${inputs.tempat}`;
-        if (inputs.waktu.indo) promptIndo += `, pada waktu ${inputs.waktu.indo}`;
-        promptIndo += `.`;
-
-        promptIndo += ` Video ini memiliki suasana yang ${inputs.suasanaVideo.indo || 'menarik'}`;
-        if (inputs.pencahayaan.indo) promptIndo += ` dengan ${inputs.pencahayaan.indo}`;
-        promptIndo += `.`;
-
-        if (inputs.gerakanKamera.indo) {
-            promptIndo += ` Kamera bergerak dengan gerakan ${inputs.gerakanKamera.indo}.`;
-        }
-
-        if (inputs.suaraMusik) {
-            promptIndo += ` Terdengar ${inputs.suaraMusik}.`;
-        }
-        
-        if (inputs.kalimatDiucapkan) {
-            promptIndo += ` Seseorang mengucapkan: "${inputs.kalimatDiucapkan}".`;
-        }
-
-        if (inputs.detailTambahan) {
-            promptIndo += ` Detail tambahan: ${inputs.detailTambahan}`;
-        }
-
-        // Generate English Prompt
-        let promptEng = `${inputs.gayaVideo.value || 'cinematic'} style video`;
-        if (inputs.subjek) promptEng += ` of a ${inputs.subjek}`;
-        if (inputs.aksi) promptEng += ` ${inputs.aksi}`;
-        if (inputs.ekspresi) promptEng += ` ${inputs.ekspresi}`;
-        if (inputs.tempat) promptEng += `, set in ${inputs.tempat}`;
-        if (inputs.waktu.value) promptEng += `, during ${inputs.waktu.value}`;
-        promptEng += `.`;
-
-        promptEng += ` The video has a ${inputs.suasanaVideo.value || 'compelling'} mood,`;
-        if (inputs.pencahayaan.value) promptEng += ` with ${inputs.pencahayaan.value}`;
-        promptEng += `.`;
-
-        if (inputs.gerakanKamera.value) {
-            promptEng += ` The camera uses a ${inputs.gerakanKamera.value} motion.`;
-        }
-
-        if (inputs.suaraMusik) {
-            promptEng += ` Accompanied by ${inputs.suaraMusik}.`;
-        }
-
-        if (inputs.kalimatDiucapkan) {
-            // Sesuai permintaan, bagian ini tidak diterjemahkan
-            promptEng += ` Someone says: "${inputs.kalimatDiucapkan}".`;
-        }
-        
-        if (inputs.detailTambahan) {
-            promptEng += ` Additional details: ${inputs.detailTambahan}`;
-        }
-        
-        // Final polish for English prompt
-        promptEng = promptEng.replace(/ ,/g, ',').replace(/ \./g, '.').trim();
-
-
-        document.getElementById('hasil-indonesia').value = promptIndo;
-        document.getElementById('hasil-inggris').value = promptEng;
-        
-        document.getElementById('hasil-container').classList.remove('hidden');
+    // DETAIL SUBJEK
+    const charactersData = [];
+    document.querySelectorAll('.character-group').forEach((group, index) => {
+        const charData = {};
+        charData.namaKarakter = group.querySelector('.character-name').value;
+        charData.kewarganegaraan = group.querySelector('.character-nationality').value;
+        charData.karakteristikSubjek = group.querySelector('.character-characteristics').value;
+        charData.aksiUtama = group.querySelector('.character-action').value;
+        charData.emosi = group.querySelector('.character-emotion').value;
+        charactersData.push(charData);
     });
-}); 
+
+    // LATAR
+    const lokasi = document.getElementById('lokasi').value;
+    const waktu = document.getElementById('waktu').value;
+    const cuaca = document.getElementById('cuaca').value;
+    const musim = document.getElementById('musim').value;
+
+    // KAMERA
+    const gayaKamera = document.getElementById('gaya_kamera').value;
+    const pergerakanKamera = document.getElementById('pergerakan_kamera').value;
+    const sudutKamera = document.getElementById('sudut_kamera').value;
+    const fokus = document.getElementById('fokus').value;
+    const pencahayaanKamera = document.getElementById('pencahayaan_kamera').value;
+    const gradasiWarna = document.getElementById('gradasi_warna').value;
+
+    // AUDIO
+    const dialogType = document.getElementById('dialog_type').value;
+    const karakterDialog = document.getElementById('karakter_dialog').value;
+    const isiDialog = document.getElementById('isi_dialog').value; // This is raw, not translated
+    const moodSuara = document.getElementById('mood_suara').value;
+    const suaraLingkungan = document.getElementById('suara_lingkungan').value;
+    const backgroundMusic = document.getElementById('background_music').value;
+
+    // KUALITAS VIDEO & DURASI
+    const kualitasVideo = document.getElementById('kualitas_video').value;
+    const durasiVideo = document.getElementById('durasi_video').value;
+    const rasioVideo = document.getElementById('rasio_video').value;
+
+    // DETAIL TAMBAHAN
+    const detailTambahan = document.getElementById('detail_tambahan').value;
+
+    // Prompt Bahasa Indonesia
+    let promptID = [];
+    promptID.push(`Video berfokus pada:`);
+    charactersData.forEach(char => {
+        if (char.namaKarakter) promptID.push(`- Nama Karakter: ${char.namaKarakter}`);
+        if (char.kewarganegaraan) promptID.push(`  Kewarganegaraan: ${char.kewarganegaraan}`);
+        if (char.karakteristikSubjek) promptID.push(`  Karakteristik Subjek: ${char.karakteristikSubjek}`);
+        if (char.aksiUtama) promptID.push(`  Aksi Utama: ${char.aksiUtama}`);
+        if (char.emosi) promptID.push(`  Emosi: ${char.emosi}`);
+    });
+    
+    promptID.push(`\nLatar Adegan:`);
+    if (lokasi) promptID.push(`- Lokasi: ${lokasi}`);
+    if (waktu) promptID.push(`- Waktu: ${waktu}`);
+    if (cuaca) promptID.push(`- Cuaca: ${cuaca}`);
+    if (musim) promptID.push(`- Musim: ${musim}`);
+
+    promptID.push(`\nPengaturan Kamera:`);
+    if (gayaKamera) promptID.push(`- Gaya: ${gayaKamera}`);
+    if (pergerakanKamera) promptID.push(`- Pergerakan Kamera: ${pergerakanKamera}`);
+    if (sudutKamera) promptID.push(`- Sudut Kamera: ${sudutKamera}`);
+    if (fokus) promptID.push(`- Fokus: ${fokus}`);
+    if (pencahayaanKamera) promptID.push(`- Pencahayaan: ${pencahayaanKamera}`);
+    if (gradasiWarna) promptID.push(`- Gradasi Warna: ${gradasiWarna}`);
+
+    promptID.push(`\nElemen Audio:`);
+    if (dialogType) promptID.push(`- Dialog: ${dialogType}`);
+    if (karakterDialog) promptID.push(`- Karakter Dialog: ${karakterDialog}`);
+    if (isiDialog) promptID.push(`- Isi Dialog:\n${isiDialog.split('\n').map(line => `  - ${line}`).join('\n')}`); // Format per baris
+    if (moodSuara) promptID.push(`- Mood Suara: ${moodSuara}`);
+    if (suaraLingkungan) promptID.push(`- Suara Lingkungan: ${suaraLingkungan}`);
+    if (backgroundMusic) promptID.push(`- Background Music: ${backgroundMusic}`);
+
+    promptID.push(`\nSpesifikasi Video:`);
+    if (kualitasVideo) promptID.push(`- Kualitas Video: ${kualitasVideo}`);
+    if (durasiVideo) promptID.push(`- Durasi Video: ${durasiVideo}`);
+    if (rasioVideo) promptID.push(`- Rasio Video: ${rasioVideo}`);
+
+    if (detailTambahan) {
+        promptID.push(`\nDetail Tambahan: ${detailTambahan}`);
+    }
+
+    document.getElementById('prompt_indonesia').value = promptID.join('\n').trim();
+
+    // Prompt Bahasa Inggris
+    let promptEN = [];
+    promptEN.push(`Video focusing on:`);
+    charactersData.forEach(char => {
+        if (char.namaKarakter) promptEN.push(`- Character's Name: ${getTranslation(char.namaKarakter)}`);
+        if (char.kewarganegaraan) promptEN.push(`  Nationality: ${getTranslation(char.kewarganegaraan)}`);
+        if (char.karakteristikSubjek) promptEN.push(`  Subject Characteristics: ${getTranslation(char.karakteristikSubjek)}`);
+        if (char.aksiUtama) promptEN.push(`  Main Action: ${getTranslation(char.aksiUtama)}`);
+        if (char.emosi) promptEN.push(`  Emotion: ${getTranslation(char.emosi)}`);
+    });
+    
+    promptEN.push(`\nScene Setting:`);
+    if (lokasi) promptEN.push(`- Location: ${getTranslation(lokasi)}`);
+    if (waktu) promptEN.push(`- Time: ${getTranslation(waktu)}`);
+    if (cuaca) promptEN.push(`- Weather: ${getTranslation(cuaca)}`);
+    if (musim) promptEN.push(`- Season: ${getTranslation(musim)}`);
+
+    promptEN.push(`\nCamera Settings:`);
+    if (gayaKamera) promptEN.push(`- Style: ${getTranslation(gayaKamera)}`);
+    if (pergerakanKamera) promptEN.push(`- Camera Movement: ${getTranslation(pergerakanKamera)}`);
+    if (sudutKamera) promptEN.push(`- Camera Angle: ${getTranslation(sudutKamera)}`);
+    if (fokus) promptEN.push(`- Focus: ${getTranslation(fokus)}`);
+    if (pencahayaanKamera) promptEN.push(`- Lighting: ${getTranslation(pencahayaanKamera)}`);
+    if (gradasiWarna) promptEN.push(`- Color Grading: ${getTranslation(gradasiWarna)}`);
+
+    promptEN.push(`\nAudio Elements:`);
+    if (dialogType) promptEN.push(`- Dialogue Type: ${getTranslation(dialogType)}`);
+    if (karakterDialog) promptEN.push(`- Dialogue Characters: ${getTranslation(karakterDialog)}`);
+    if (isiDialog) promptEN.push(`- Dialogue Content:\n${isiDialog.split('\n').map(line => `  - ${line}`).join('\n')}`); // This remains in original language
+    if (moodSuara) promptEN.push(`- Sound Mood: ${getTranslation(moodSuara)}`);
+    if (suaraLingkungan) promptEN.push(`- Ambient Sound: ${getTranslation(suaraLingkungan)}`);
+    if (backgroundMusic) promptEN.push(`- Background Music: ${getTranslation(backgroundMusic)}`);
+
+    promptEN.push(`\nVideo Specifications:`);
+    if (kualitasVideo) promptEN.push(`- Video Quality: ${getTranslation(kualitasVideo)}`);
+    if (durasiVideo) promptEN.push(`- Video Duration: ${getTranslation(durasiVideo)}`);
+    if (rasioVideo) promptEN.push(`- Aspect Ratio: ${getTranslation(rasioVideo)}`);
+
+    if (detailTambahan) {
+        promptEN.push(`\nAdditional Details: ${getTranslation(detailTambahan)}`);
+    }
+
+    document.getElementById('prompt_english').value = promptEN.join('\n').trim();
+}
+
+function addCharacterField() {
+    characterCount++;
+    const characterContainer = document.getElementById('character_inputs');
+    const newCharacterGroup = document.createElement('div');
+    newCharacterGroup.className = 'character-group';
+    newCharacterGroup.id = `character_group_${characterCount}`;
+    newCharacterGroup.innerHTML = `
+        <hr style="border-top: 1px dashed #30363d; margin: 20px 0;">
+        <label for="nama_karakter_${characterCount}">Nama Karakter #${characterCount}:</label>
+        <input type="text" id="nama_karakter_${characterCount}" class="character-name"><br>
+
+        <label for="kewarganegaraan_${characterCount}">Kewarganegaraan #${characterCount}:</label>
+        <input type="text" id="kewarganegaraan_${characterCount}" class="character-nationality"><br>
+
+        <label for="karakteristik_subjek_${characterCount}">Karakteristik Subjek #${characterCount}:</label>
+        <input type="text" id="karakteristik_subjek_${characterCount}" class="character-characteristics"><br>
+
+        <label for="aksi_utama_${characterCount}">Aksi Utama #${characterCount}:</label>
+        <input type="text" id="aksi_utama_${characterCount}" class="character-action"><br>
+
+        <label for="emosi_${characterCount}">Emosi #${characterCount}:</label>
+        <input type="text" id="emosi_${characterCount}" class="character-emotion" placeholder="Contoh: bahagia, sedih, marah"><br>
+    `;
+    characterContainer.appendChild(newCharacterGroup);
+}
+
+function resetInputFields() {
+    document.querySelectorAll('.input-column input[type="text"], .input-column textarea, .input-column select').forEach(input => {
+        if (input.tagName === 'SELECT') {
+            input.value = ''; // Reset select to first option (Pilih...)
+        } else {
+            input.value = ''; // Clear text inputs and textareas
+        }
+    });
+    // Reset character count and remove dynamically added character groups
+    characterCount = 1;
+    const characterContainer = document.getElementById('character_inputs');
+    while (characterContainer.children.length > 1) { // Keep the first character group
+        characterContainer.removeChild(characterContainer.lastChild);
+    }
+    document.getElementById('character_group_1').querySelectorAll('input').forEach(input => input.value = '');
+}
+
+function resetOutputFields() {
+    document.getElementById('prompt_indonesia').value = '';
+    document.getElementById('prompt_english').value = '';
+    promptHistory = []; // Clear history when output is reset manually
+}
+
+function undoPrompt() {
+    if (promptHistory.length > 0) {
+        const lastPrompt = promptHistory.pop();
+        document.getElementById('prompt_indonesia').value = lastPrompt.id;
+        document.getElementById('prompt_english').value = lastPrompt.en;
+    } else {
+        alert('Tidak ada riwayat prompt untuk di-undo.');
+    }
+} 
