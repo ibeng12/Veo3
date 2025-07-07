@@ -33,7 +33,7 @@ h2 {
     color: #58a6ff; /* Blue for section titles */
     margin-top: 30px;
     margin-bottom: 20px;
-    border-bottom: 2px solid #58a6ff; /* Changed border to blue */
+    border-bottom: 2px solid #58a6ff; /* Blue border */
     padding-bottom: 10px;
     font-size: 1.8em;
 }
@@ -42,6 +42,14 @@ h3 {
     margin-top: 25px;
     margin-bottom: 15px;
     font-size: 1.4em;
+    display: flex; /* Make h3 a flex container */
+    justify-content: space-between; /* Space out content and button */
+    align-items: center; /* Vertically align items */
+}
+h3 button.reset-btn {
+    margin-top: 0; /* Remove top margin for buttons inside h3 */
+    padding: 5px 10px; /* Smaller padding for reset buttons */
+    font-size: 0.9em; /* Smaller font size */
 }
 label {
     display: block;
@@ -106,17 +114,23 @@ button:hover {
 }
 
 /* Specific button colors */
-button[onclick="resetInputFields()"] {
-    background-color: #f0ad4e; /* Orange for Reset Input */
+button.reset-btn {
+    background-color: #f0ad4e; /* Orange/Yellow for Reset buttons */
 }
-button[onclick="resetInputFields()"]:hover {
-    background-color: #ec971f;
+button.reset-btn:hover {
+    background-color: #ec971f; /* Darker orange/yellow on hover */
+}
+button.remove-char-btn {
+    background-color: #d9534f; /* Red for Remove Character */
+}
+button.remove-char-btn:hover {
+    background-color: #c9302c; /* Darker red on hover */
 }
 button[onclick="resetOutputFields()"] {
-    background-color: #d9534f; /* Red for Reset Output */
+    background-color: #f0ad4e; /* Orange/Yellow for Reset Output */
 }
 button[onclick="resetOutputFields()"]:hover {
-    background-color: #c9302c;
+    background-color: #ec971f; /* Darker orange/yellow on hover */
 }
 button[onclick="undoPrompt()"] {
     background-color: #5bc0de; /* Light blue for Undo */
