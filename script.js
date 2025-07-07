@@ -191,88 +191,144 @@ function generatePrompt() {
 
     // Prompt Bahasa Indonesia
     let promptID = [];
-    promptID.push(`Video berfokus pada:`);
-    charactersData.forEach(char => {
-        if (char.namaKarakter) promptID.push(`- Nama Karakter: ${char.namaKarakter}`);
-        if (char.kewarganegaraan) promptID.push(`  Kewarganegaraan: ${char.kewarganegaraan}`);
-        if (char.karakteristikSubjek) promptID.push(`  Karakteristik Subjek: ${char.karakteristikSubjek}`);
-        if (char.aksiUtama) promptID.push(`  Aksi Utama: ${char.aksiUtama}`);
-        if (char.emosi) promptID.push(`  Emosi: ${char.emosi}`);
+    promptID.push(`Sebuah video sinematik yang mendalam, berfokus pada:`);
+    charactersData.forEach((char, index) => {
+        let charDesc = [];
+        if (char.namaKarakter) charDesc.push(`Karakter ${index + 1}: **${char.namaKarakter}**`);
+        if (char.kewarganegaraan) charDesc.push(`berkebangsaan ${char.kewarganegaraan}`);
+        if (char.karakteristikSubjek) charDesc.push(`dengan karakteristik ${char.karakteristikSubjek}`);
+        if (char.aksiUtama) charDesc.push(`melakukan aksi ${char.aksiUtama}`);
+        if (char.emosi) charDesc.push(`dengan ekspresi emosi ${char.emosi}`);
+        if (charDesc.length > 0) {
+            promptID.push(`- ${charDesc.join(', ')}.`);
+        }
     });
     
-    promptID.push(`\nLatar Adegan:`);
-    if (lokasi) promptID.push(`- Lokasi: ${lokasi}`);
-    if (waktu) promptID.push(`- Waktu: ${waktu}`);
-    if (cuaca) promptID.push(`- Cuaca: ${cuaca}`);
-    if (musim) promptID.push(`- Musim: ${musim}`);
+    promptID.push(`\n**Latar Adegan Detail:**`);
+    let latarDesc = [];
+    if (lokasi) latarDesc.push(`berlokasi di **${lokasi}**`);
+    if (waktu) latarDesc.push(`pada ${waktu}`);
+    if (cuaca) latarDesc.push(`dengan cuaca ${cuaca}`);
+    if (musim) latarDesc.push(`di musim ${musim}`);
+    if (latarDesc.length > 0) {
+        promptID.push(`- Adegan ini ${latarDesc.join(', ')}.`);
+    } else {
+        promptID.push(`- Latar adegan yang detail dan imersif.`);
+    }
 
-    promptID.push(`\nPengaturan Kamera:`);
-    if (gayaKamera) promptID.push(`- Gaya: ${gayaKamera}`);
-    if (pergerakanKamera) promptID.push(`- Pergerakan Kamera: ${pergerakanKamera}`);
-    if (sudutKamera) promptID.push(`- Sudut Kamera: ${sudutKamera}`);
-    if (fokus) promptID.push(`- Fokus: ${fokus}`);
-    if (pencahayaanKamera) promptID.push(`- Pencahayaan: ${pencahayaanKamera}`);
-    if (gradasiWarna) promptID.push(`- Gradasi Warna: ${gradasiWarna}`);
+    promptID.push(`\n**Pengaturan Kamera & Visual yang Canggih:**`);
+    let kameraDesc = [];
+    if (gayaKamera) kameraDesc.push(`dengan gaya kamera **${gayaKamera}**`);
+    if (pergerakanKamera) kameraDesc.push(`pergerakan kamera ${pergerakanKamera}`);
+    if (sudutKamera) kameraDesc.push(`dari sudut ${sudutKamera}`);
+    if (fokus) kameraDesc.push(`dengan fokus ${fokus}`);
+    if (pencahayaanKamera) kameraDesc.push(`pencahayaan ${pencahayaanKamera}`);
+    if (gradasiWarna) kameraDesc.push(`serta gradasi warna ${gradasiWarna}`);
+    if (kameraDesc.length > 0) {
+        promptID.push(`- Video diambil ${kameraDesc.join(', ')}.`);
+    } else {
+        promptID.push(`- Pengaturan kamera yang inovatif untuk visual yang menawan.`);
+    }
 
-    promptID.push(`\nElemen Audio:`);
-    if (dialogType) promptID.push(`- Dialog: ${dialogType}`);
-    if (karakterDialog) promptID.push(`- Karakter Dialog: ${karakterDialog}`);
-    if (isiDialog) promptID.push(`- Isi Dialog:\n${isiDialog.split('\n').map(line => `  - ${line}`).join('\n')}`); // Format per baris
-    if (moodSuara) promptID.push(`- Mood Suara: ${moodSuara}`);
-    if (suaraLingkungan) promptID.push(`- Suara Lingkungan: ${suaraLingkungan}`);
-    if (backgroundMusic) promptID.push(`- Background Music: ${backgroundMusic}`);
+    promptID.push(`\n**Elemen Audio yang Kaya & Atmosferik:**`);
+    let audioDesc = [];
+    if (dialogType) audioDesc.push(`jenis dialog **${dialogType}**`);
+    if (karakterDialog) audioDesc.push(`oleh karakter **${karakterDialog}**`);
+    if (isiDialog) audioDesc.push(`dengan isi dialog:\n${isiDialog.split('\n').map(line => `    - ${line}`).join('\n')}`); // Indent dialog for clarity
+    if (moodSuara) audioDesc.push(`mood suara yang **${moodSuara}**`);
+    if (suaraLingkungan) audioDesc.push(`disertai suara lingkungan ${suaraLingkungan}`);
+    if (backgroundMusic) audioDesc.push(`dan musik latar ${backgroundMusic}`);
+    if (audioDesc.length > 0) {
+        promptID.push(`- Elemen audio meliputi ${audioDesc.join(', ')}.`);
+    } else {
+        promptID.push(`- Pengalaman audio yang imersif dan mendalam.`);
+    }
 
-    promptID.push(`\nSpesifikasi Video:`);
-    if (kualitasVideo) promptID.push(`- Kualitas Video: ${kualitasVideo}`);
-    if (durasiVideo) promptID.push(`- Durasi Video: ${durasiVideo}`);
-    if (rasioVideo) promptID.push(`- Rasio Video: ${rasioVideo}`);
+    promptID.push(`\n**Spesifikasi Teknis Video:**`);
+    let videoSpecDesc = [];
+    if (kualitasVideo) videoSpecDesc.push(`kualitas video **${kualitasVideo}**`);
+    if (durasiVideo) videoSpecDesc.push(`berdurasi ${durasiVideo}`);
+    if (rasioVideo) videoSpecDesc.push(`dengan rasio ${rasioVideo}`);
+    if (videoSpecDesc.length > 0) {
+        promptID.push(`- Video ini memiliki ${videoSpecDesc.join(', ')}.`);
+    } else {
+        promptID.push(`- Spesifikasi video yang dioptimalkan untuk hasil terbaik.`);
+    }
 
     if (detailTambahan) {
-        promptID.push(`\nDetail Tambahan: ${detailTambahan}`);
+        promptID.push(`\n**Detail Tambahan Penting:**\n- ${detailTambahan}`);
     }
 
     document.getElementById('prompt_indonesia').value = promptID.join('\n').trim();
 
     // Prompt Bahasa Inggris
     let promptEN = [];
-    promptEN.push(`Video focusing on:`);
-    charactersData.forEach(char => {
-        if (char.namaKarakter) promptEN.push(`- Character's Name: ${getTranslation(char.namaKarakter)}`);
-        if (char.kewarganegaraan) promptEN.push(`  Nationality: ${getTranslation(char.kewarganegaraan)}`);
-        if (char.karakteristikSubjek) promptEN.push(`  Subject Characteristics: ${getTranslation(char.karakteristikSubjek)}`);
-        if (char.aksiUtama) promptEN.push(`  Main Action: ${getTranslation(char.aksiUtama)}`);
-        if (char.emosi) promptEN.push(`  Emotion: ${getTranslation(char.emosi)}`);
+    promptEN.push(`A deeply cinematic video, focusing on:`);
+    charactersData.forEach((char, index) => {
+        let charDesc = [];
+        if (char.namaKarakter) charDesc.push(`Character ${index + 1}: **${getTranslation(char.namaKarakter)}**`);
+        if (char.kewarganegaraan) charDesc.push(`of ${getTranslation(char.kewarganegaraan)} nationality`);
+        if (char.karakteristikSubjek) charDesc.push(`with ${getTranslation(char.karakteristikSubjek)} characteristics`);
+        if (char.aksiUtama) charDesc.push(`performing the main action of ${getTranslation(char.aksiUtama)}`);
+        if (char.emosi) charDesc.push(`expressing ${getTranslation(char.emosi)} emotion`);
+        if (charDesc.length > 0) {
+            promptEN.push(`- ${charDesc.join(', ')}.`);
+        }
     });
     
-    promptEN.push(`\nScene Setting:`);
-    if (lokasi) promptEN.push(`- Location: ${getTranslation(lokasi)}`);
-    if (waktu) promptEN.push(`- Time: ${getTranslation(waktu)}`);
-    if (cuaca) promptEN.push(`- Weather: ${getTranslation(cuaca)}`);
-    if (musim) promptEN.push(`- Season: ${getTranslation(musim)}`);
+    promptEN.push(`\n**Detailed Scene Setting:**`);
+    let latarDescEN = [];
+    if (lokasi) latarDescEN.push(`located in **${getTranslation(lokasi)}**`);
+    if (waktu) latarDescEN.push(`at ${getTranslation(waktu)}`);
+    if (cuaca) latarDescEN.push(`with ${getTranslation(cuaca)} weather`);
+    if (musim) latarDescEN.push(`during ${getTranslation(musim)}`);
+    if (latarDescEN.length > 0) {
+        promptEN.push(`- The scene is ${latarDescEN.join(', ')}.`);
+    } else {
+        promptEN.push(`- A detailed and immersive scene setting.`);
+    }
 
-    promptEN.push(`\nCamera Settings:`);
-    if (gayaKamera) promptEN.push(`- Style: ${getTranslation(gayaKamera)}`);
-    if (pergerakanKamera) promptEN.push(`- Camera Movement: ${getTranslation(pergerakanKamera)}`);
-    if (sudutKamera) promptEN.push(`- Camera Angle: ${getTranslation(sudutKamera)}`);
-    if (fokus) promptEN.push(`- Focus: ${getTranslation(fokus)}`);
-    if (pencahayaanKamera) promptEN.push(`- Lighting: ${getTranslation(pencahayaanKamera)}`);
-    if (gradasiWarna) promptEN.push(`- Color Grading: ${getTranslation(gradasiWarna)}`);
+    promptEN.push(`\n**Advanced Camera & Visual Settings:**`);
+    let kameraDescEN = [];
+    if (gayaKamera) kameraDescEN.push(`with a **${getTranslation(gayaKamera)}** camera style`);
+    if (pergerakanKamera) kameraDescEN.push(`camera movement ${getTranslation(pergerakanKamera)}`);
+    if (sudutKamera) kameraDescEN.push(`from a ${getTranslation(sudutKamera)} angle`);
+    if (fokus) kameraDescEN.push(`with ${getTranslation(fokus)} focus`);
+    if (pencahayaanKamera) kameraDescEN.push(`lighting ${getTranslation(pencahayaanKamera)}`);
+    if (gradasiWarna) kameraDescEN.push(`and color grading ${getTranslation(gradasiWarna)}`);
+    if (kameraDescEN.length > 0) {
+        promptEN.push(`- The video is captured ${kameraDescEN.join(', ')}.`);
+    } else {
+        promptEN.push(`- Innovative camera settings for captivating visuals.`);
+    }
 
-    promptEN.push(`\nAudio Elements:`);
-    if (dialogType) promptEN.push(`- Dialogue Type: ${getTranslation(dialogType)}`);
-    if (karakterDialog) promptEN.push(`- Dialogue Characters: ${getTranslation(karakterDialog)}`);
-    if (isiDialog) promptEN.push(`- Dialogue Content:\n${isiDialog.split('\n').map(line => `  - ${line}`).join('\n')}`); // This remains in original language
-    if (moodSuara) promptEN.push(`- Sound Mood: ${getTranslation(moodSuara)}`);
-    if (suaraLingkungan) promptEN.push(`- Ambient Sound: ${getTranslation(suaraLingkungan)}`);
-    if (backgroundMusic) promptEN.push(`- Background Music: ${getTranslation(backgroundMusic)}`);
+    promptEN.push(`\n**Rich & Atmospheric Audio Elements:**`);
+    let audioDescEN = [];
+    if (dialogType) audioDescEN.push(`dialogue type **${getTranslation(dialogType)}**`);
+    if (karakterDialog) audioDescEN.push(`by characters **${getTranslation(karakterDialog)}**`);
+    if (isiDialog) audioDescEN.push(`with dialogue content:\n    ${isiDialog.split('\n').map(line => `- ${line}`).join('\n')}`); // Keep dialogue untranslated and indent
+    if (moodSuara) audioDescEN.push(`a sound mood of **${getTranslation(moodSuara)}**`);
+    if (suaraLingkungan) audioDescEN.push(`accompanied by ambient sound ${getTranslation(suaraLingkungan)}`);
+    if (backgroundMusic) audioDescEN.push(`and background music ${getTranslation(backgroundMusic)}`);
+    if (audioDescEN.length > 0) {
+        promptEN.push(`- Audio elements include ${audioDescEN.join(', ')}.`);
+    } else {
+        promptEN.push(`- Immersive and profound audio experience.`);
+    }
 
-    promptEN.push(`\nVideo Specifications:`);
-    if (kualitasVideo) promptEN.push(`- Video Quality: ${getTranslation(kualitasVideo)}`);
-    if (durasiVideo) promptEN.push(`- Video Duration: ${getTranslation(durasiVideo)}`);
-    if (rasioVideo) promptEN.push(`- Aspect Ratio: ${getTranslation(rasioVideo)}`);
+    promptEN.push(`\n**Video Technical Specifications:**`);
+    let videoSpecDescEN = [];
+    if (kualitasVideo) videoSpecDescEN.push(`video quality **${getTranslation(kualitasVideo)}**`);
+    if (durasiVideo) videoSpecDescEN.push(`with duration ${getTranslation(durasiVideo)}`);
+    if (rasioVideo) videoSpecDescEN.push(`and aspect ratio ${getTranslation(rasioVideo)}`);
+    if (videoSpecDescEN.length > 0) {
+        promptEN.push(`- The video features ${videoSpecDescEN.join(', ')}.`);
+    } else {
+        promptEN.push(`- Optimized video specifications for the best results.`);
+    }
 
     if (detailTambahan) {
-        promptEN.push(`\nAdditional Details: ${getTranslation(detailTambahan)}`);
+        promptEN.push(`\n**Important Additional Details:**\n- ${getTranslation(detailTambahan)}`);
     }
 
     document.getElementById('prompt_english').value = promptEN.join('\n').trim();
@@ -287,20 +343,20 @@ function addCharacterField() {
     newCharacterGroup.innerHTML = `
         <hr style="border-top: 1px dashed #30363d; margin: 20px 0;">
         <label for="nama_karakter_${characterCount}">Nama Karakter #${characterCount}:</label>
-        <input type="text" id="nama_karakter_${characterCount}" class="character-name"><br>
+        <input type="text" id="nama_karakter_${characterCount}" class="character-name" placeholder="Contoh: seorang ksatria, seorang detektif"><br>
 
         <label for="kewarganegaraan_${characterCount}">Kewarganegaraan #${characterCount}:</label>
-        <input type="text" id="kewarganegaraan_${characterCount}" class="character-nationality"><br>
+        <input type="text" id="kewarganegaraan_${characterCount}" class="character-nationality" placeholder="Contoh: Indonesia, Jepang"><br>
 
         <label for="karakteristik_subjek_${characterCount}">Karakteristik Subjek #${characterCount}:</label>
-        <input type="text" id="karakteristik_subjek_${characterCount}" class="character-characteristics"><br>
+        <input type="text" id="karakteristik_subjek_${characterCount}" class="character-characteristics" placeholder="Contoh: berani, cerdas, pemalu, humoris"><br>
 
         <label for="aksi_utama_${characterCount}">Aksi Utama #${characterCount}:</label>
-        <input type="text" id="aksi_utama_${characterCount}" class="character-action"><br>
+        <input type="text" id="aksi_utama_${characterCount}" class="character-action" placeholder="Contoh: berlari, melompat, berbicara, bertarung"><br>
 
         <label for="emosi_${characterCount}">Emosi #${characterCount}:</label>
-        <input type="text" id="emosi_${characterCount}" class="character-emotion" placeholder="Contoh: bahagia, sedih, marah"><br>
-        <button type="button" onclick="removeCharacterField('character_group_${characterCount}')" style="background-color: #d9534f; margin-top: 10px;">Hapus Karakter</button>
+        <input type="text" id="emosi_${characterCount}" class="character-emotion" placeholder="Contoh: bahagia, sedih, marah, terkejut"><br>
+        <button type="button" onclick="removeCharacterField('character_group_${characterCount}')" class="remove-char-btn" style="margin-top: 10px;">Hapus Karakter</button>
     `;
     characterContainer.appendChild(newCharacterGroup);
 }
@@ -312,21 +368,26 @@ function removeCharacterField(id) {
     }
 }
 
-function resetInputFields() {
-    document.querySelectorAll('.input-column input[type="text"], .input-column textarea, .input-column select').forEach(input => {
+// General function to reset a section
+function resetSection(sectionId) {
+    document.querySelectorAll(`#${sectionId} input[type="text"], #${sectionId} textarea, #${sectionId} select`).forEach(input => {
         if (input.tagName === 'SELECT') {
-            input.value = ''; // Reset select to first option (Pilih...)
+            input.value = '';
         } else {
-            input.value = ''; // Clear text inputs and textareas
+            input.value = '';
         }
     });
-    // Reset character count and remove dynamically added character groups
-    characterCount = 1;
-    const characterContainer = document.getElementById('character_inputs');
-    while (characterContainer.children.length > 1) { // Keep the first character group
-        characterContainer.removeChild(characterContainer.lastChild);
+
+    if (sectionId === 'character_inputs') {
+        // Reset character count and remove dynamically added character groups
+        characterCount = 1;
+        const characterContainer = document.getElementById('character_inputs');
+        while (characterContainer.children.length > 1) { // Keep the first character group
+            characterContainer.removeChild(characterContainer.lastChild);
+        }
+        // Clear the initial character group too
+        document.getElementById('character_group_1').querySelectorAll('input').forEach(input => input.value = '');
     }
-    document.getElementById('character_group_1').querySelectorAll('input').forEach(input => input.value = '');
 }
 
 function resetOutputFields() {
