@@ -300,8 +300,16 @@ function addCharacterField() {
 
         <label for="emosi_${characterCount}">Emosi #${characterCount}:</label>
         <input type="text" id="emosi_${characterCount}" class="character-emotion" placeholder="Contoh: bahagia, sedih, marah"><br>
+        <button type="button" onclick="removeCharacterField('character_group_${characterCount}')" style="background-color: #d9534f; margin-top: 10px;">Hapus Karakter</button>
     `;
     characterContainer.appendChild(newCharacterGroup);
+}
+
+function removeCharacterField(id) {
+    const elementToRemove = document.getElementById(id);
+    if (elementToRemove) {
+        elementToRemove.remove();
+    }
 }
 
 function resetInputFields() {

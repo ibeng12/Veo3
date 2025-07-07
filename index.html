@@ -29,43 +29,23 @@
 
                     <label for="emosi_1">Emosi:</label>
                     <input type="text" id="emosi_1" class="character-emotion" placeholder="Contoh: bahagia, sedih, marah"><br>
+                    <button type="button" onclick="removeCharacterField('character_group_1')" style="background-color: #d9534f; margin-top: 10px;">Hapus Karakter</button>
                 </div>
             </div>
             <button type="button" onclick="addCharacterField()">+ Tambah Karakter</button><br><br>
             
             <h3>LATAR</h3>
             <label for="lokasi">Lokasi:</label>
-            <input type="text" id="lokasi"><br>
+            <input type="text" id="lokasi" placeholder="Contoh: di hutan lebat, di tengah kota"><br>
 
             <label for="waktu">Waktu:</label>
-            <select id="waktu">
-                <option value="">Pilih Waktu</option>
-                <option value="pagi hari yang cerah">Pagi hari yang cerah</option>
-                <option value="siang hari yang terik">Siang hari yang terik</option>
-                <option value="sore hari menjelang senja">Sore hari menjelang senja</option>
-                <option value="malam hari yang tenang">Malam hari yang tenang</option>
-                <option value="dini hari berkabut">Dini hari berkabut</option>
-            </select><br>
+            <input type="text" id="waktu" placeholder="Contoh: pagi hari yang cerah, malam hari yang tenang"><br>
 
             <label for="cuaca">Cuaca:</label>
-            <select id="cuaca">
-                <option value="">Pilih Cuaca</option>
-                <option value="cerah dan berawan">Cerah dan berawan</option>
-                <option value="hujan deras">Hujan deras</option>
-                <option value="bersalju">Bersalju</option>
-                <option value="berkabut tebal">Berkabut tebal</option>
-                <option value="berangin kencang">Berangin kencang</option>
-                <option value="badai petir">Badai petir</option>
-            </select><br>
+            <input type="text" id="cuaca" placeholder="Contoh: cerah dan berawan, hujan deras"><br>
 
             <label for="musim">Musim:</label>
-            <select id="musim">
-                <option value="">Pilih Musim</option>
-                <option value="musim semi">Musim semi</option>
-                <option value="musim panas">Musim panas</option>
-                <option value="musim gugur">Musim gugur</option>
-                <option value="musim dingin">Musim dingin</option>
-            </select><br>
+            <input type="text" id="musim" placeholder="Contoh: musim semi, musim dingin"><br>
 
             <h3>KAMERA</h3>
             <label for="gaya_kamera">Gaya:</label>
@@ -167,15 +147,8 @@
             </select><br>
 
             <h3>AUDIO</h3>
-            <label for="dialog_type">Dialog:</label>
-            <select id="dialog_type">
-                <option value="">Pilih Jenis Dialog</option>
-                <option value="tanpa dialog">Tanpa dialog</option>
-                <option value="informatif">Informatif</option>
-                <option value="natural dialog">Natural dialog</option>
-                <option value="monolog">Monolog</option>
-                <option value="interview">Interview</option>
-            </select><br>
+            <label for="dialog_type">Jenis Dialog:</label>
+            <input type="text" id="dialog_type" placeholder="Contoh: tanpa dialog, monolog"><br>
 
             <label for="karakter_dialog">Karakter Dialog (pisahkan dengan koma jika lebih dari satu):</label>
             <input type="text" id="karakter_dialog" placeholder="Contoh: John, Jane"><br>
