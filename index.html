@@ -102,11 +102,13 @@ function generateMedia() {
             console.log('Response API:', data); // Debug
             resultDiv.innerHTML = '';
 
-            if (data && data.data) {
+            if (data && data.data && data.data.data) {
+                const mediaData = data.data.data;
+
                 // Tampilkan gambar jika ada
-                if (data.data.image_url) {
+                if (mediaData.image_url) {
                     const img = document.createElement('img');
-                    img.src = data.data.image_url;
+                    img.src = mediaData.image_url;
                     img.alt = prompt;
                     resultDiv.appendChild(img);
                 } else {
@@ -114,9 +116,9 @@ function generateMedia() {
                 }
 
                 // Tampilkan video jika ada
-                if (data.data.video_url) {
+                if (mediaData.video_url) {
                     const video = document.createElement('video');
-                    video.src = data.data.video_url;
+                    video.src = mediaData.video_url;
                     video.controls = true;
                     resultDiv.appendChild(video);
                 } else {
