@@ -88,23 +88,22 @@ function generateMedia() {
     // Tampilkan indikator loading
     resultDiv.innerHTML = '<p class="loading">Memproses, harap tunggu...</p>';
 
-    const apiKey = 'MELvQtx7BG';
+    const apiKey = 'MELvQtx7BG'; // Pastikan ini sudah benar
     const url = `https://api.ibeng.my.id/api/ai/veo3?query=${encodeURIComponent(prompt)}&apikey=${apiKey}`;
 
     fetch(url)
         .then(response => {
-            // Periksa response status
             if (!response.ok) {
-                throw new Error('Response dari server gagal: ' + response.status);
+                throw new Error('Gagal mendapatkan response dari server: ' + response.status);
             }
             return response.json();
         })
         .then(data => {
-            console.log('Response API:', data); // Debug data
+            console.log('Response API:', data); // Debug
             resultDiv.innerHTML = '';
 
             if (data && data.data) {
-                // Pastikan struktur data sesuai response API
+                // Tampilkan gambar jika ada
                 if (data.data.image_url) {
                     const img = document.createElement('img');
                     img.src = data.data.image_url;
@@ -114,6 +113,7 @@ function generateMedia() {
                     resultDiv.innerHTML += '<p style="color:red;">Gambar tidak ditemukan.</p>';
                 }
 
+                // Tampilkan video jika ada
                 if (data.data.video_url) {
                     const video = document.createElement('video');
                     video.src = data.data.video_url;
@@ -127,8 +127,8 @@ function generateMedia() {
             }
         })
         .catch(error => {
-            console.error('Error saat fetch:', error);
-            resultDiv.innerHTML = '<p style="color:red;">Terjadi kesalahan saat memanggil API: ' + error.message + '</p>';
+            console.error('Error:', error);
+            resultDiv.innerHTML = '<p style="color:red;">Terjadi kesalahan: ' + error.message + '</p>';
         });
 }
 </script>
