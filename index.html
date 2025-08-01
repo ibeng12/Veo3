@@ -1,254 +1,57 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Veo 3 Prompt Generator by AI Generator</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <title>Prompt VEO 3</title>
 </head>
 <body>
-    <h1>Veo 3 Prompt Generator by AI Generator</h1>
-    <div class="container">
-        <div class="input-column">
-            <h2>Input Prompt (Bahasa Indonesia)</h2>
-
-            <h3 id="section_detail_subjek">DETAIL SUBJEK <button type="button" onclick="resetSection('character_inputs')" class="reset-btn">Reset Bagian</button></h3>
-            <div id="character_inputs">
-                <div class="character-group" id="character_group_1">
-                    <label for="nama_karakter_1">Nama Karakter:</label>
-                    <input type="text" id="nama_karakter_1" class="character-name" placeholder="Contoh: seorang ksatria, seorang detektif"><br>
-
-                    <label for="kewarganegaraan_1">Kewarganegaraan:</label>
-                    <input type="text" id="kewarganegaraan_1" class="character-nationality" placeholder="Contoh: Indonesia, Jepang"><br>
-
-                    <label for="karakteristik_subjek_1">Karakteristik Subjek:</label>
-                    <input type="text" id="karakteristik_subjek_1" class="character-characteristics" placeholder="Contoh: berani, cerdas, pemalu, humoris"><br>
-
-                    <label for="aksi_utama_1">Aksi Utama:</label>
-                    <input type="text" id="aksi_utama_1" class="character-action" placeholder="Contoh: berlari, melompat, berbicara, bertarung"><br>
-
-                    <label for="emosi_1">Emosi:</label>
-                    <input type="text" id="emosi_1" class="character-emotion" placeholder="Contoh: bahagia, sedih, marah, terkejut"><br>
-                    <button type="button" onclick="removeCharacterField('character_group_1')" class="remove-char-btn" style="margin-top: 10px;">Hapus Karakter</button>
-                </div>
-            </div>
-            <button type="button" onclick="addCharacterField()">+ Tambah Karakter</button><br><br>
-            
-            <h3 id="section_latar">LATAR <button type="button" onclick="resetSection('latar_inputs')" class="reset-btn">Reset Bagian</button></h3>
-            <div id="latar_inputs">
-                <label for="lokasi">Lokasi:</label>
-                <input type="text" id="lokasi" placeholder="Contoh: di hutan lebat, di tengah kota, di puncak gunung"><br>
-
-                <label for="waktu">Waktu:</label>
-                <select id="waktu">
-                    <option value="">Pilih Waktu</option>
-                    <option value="pagi hari yang cerah">Pagi hari yang cerah</option>
-                    <option value="siang hari yang terik">Siang hari yang terik</option>
-                    <option value="sore hari menjelang senja">Sore hari menjelang senja</option>
-                    <option value="malam hari yang tenang">Malam hari yang tenang</option>
-                    <option value="dini hari berkabut">Dini hari berkabut</option>
-                </select><br>
-
-                <label for="cuaca">Cuaca:</label>
-                <select id="cuaca">
-                    <option value="">Pilih Cuaca</option>
-                    <option value="cerah dan berawan">Cerah dan berawan</option>
-                    <option value="hujan deras">Hujan deras</option>
-                    <option value="bersalju">Bersalju</option>
-                    <option value="berkabut tebal">Berkabut tebal</option>
-                    <option value="berangin kencang">Berangin kencang</option>
-                    <option value="badai petir">Badai petir</option>
-                </select><br>
-
-                <label for="musim">Musim:</label>
-                <select id="musim">
-                    <option value="">Pilih Musim</option>
-                    <option value="musim semi">Musim semi</option>
-                    <option value="musim panas">Musim panas</option>
-                    <option value="musim gugur">Musim gugur</option>
-                    <option value="musim dingin">Musim dingin</option>
-                </select><br>
-            </div>
-
-            <h3 id="section_kamera">KAMERA <button type="button" onclick="resetSection('kamera_inputs')" class="reset-btn">Reset Bagian</button></h3>
-            <div id="kamera_inputs">
-                <label for="gaya_kamera">Gaya:</label>
-                <select id="gaya_kamera">
-                    <option value="">Pilih Gaya Kamera</option>
-                    <option value="realistis dan sinematik">Realistis dan sinematik</option>
-                    <option value="gaya dokumenter">Gaya dokumenter</option>
-                    <option value="futuristik dan berteknologi tinggi">Futuristik dan berteknologi tinggi</option>
-                    <option value="vintage dengan efek VHS">Vintage dengan efek VHS</option>
-                    <option value="animasi 3D">Animasi 3D</option>
-                    <option value="gaya lukisan">Gaya lukisan</option>
-                    <option value="gaya seni piksel">Gaya seni piksel</option>
-                </select><br>
-
-                <label for="pergerakan_kamera">Pergerakan Kamera:</label>
-                <select id="pergerakan_kamera">
-                    <option value="">Pilih Pergerakan Kamera</option>
-                    <option value="Bullet Time">Bullet Time (Waktu Peluru)</option>
-                    <option value="Crash Zoom-in">Crash Zoom-in (Pembesaran Mendadak)</option>
-                    <option value="Dolly Zoom-in">Dolly Zoom-in (Pembesaran Dolly)</option>
-                    <option value="Robo Arm">Robo Arm (Lengan Robot)</option>
-                    <option value="Super Dolly-in">Super Dolly-in (Pembesaran Super Dolly)</option>
-                    <option value="Focus Change">Focus Change (Perubahan Fokus)</option>
-                    <option value="360 Orbit">360 Orbit (Orbit 360 Derajat)</option>
-                    <option value="FPV Drone">FPV Drone (Drone Sudut Pandang Orang Pertama)</option>
-                    <option value="Through Object-in">Through Object-in (Melalui Objek)</option>
-                    <option value="Crane-up">Crane-up (Derek Naik)</option>
-                    <option value="Lazy Susan">Lazy Susan (Meja Putar)</option>
-                    <option value="Action Run">Action Run (Lari Aksi)</option>
-                    <option value="Handheld">Handheld (Genggam)</option>
-                    <option value="Dutch Angle">Dutch Angle (Sudut Belanda)</option>
-                    <option value="Car Grip">Car Grip (Pegangan Mobil)</option>
-                    <option value="Levitation">Levitation (Melayang)</option>
-                    <option value="Hyperlapse">Hyperlapse (Hiperlaps)</option>
-                    <option value="Low Shutter">Low Shutter (Rana Lambat)</option>
-                    <option value="Fisheye">Fisheye (Mata Ikan)</option>
-                    <option value="Lens Flare">Lens Flare (Kilatan Lensa)</option>
-                    <option value="Rap Flex">Rap Flex (Fleksibel Rap)</option>
-                    <option value="Pan">Pan (Geser Horizontal)</option>
-                    <option value="Tilt">Tilt (Geser Vertikal)</option>
-                    <option value="Zoom In">Zoom In (Perbesar)</option>
-                    <option value="Zoom Out">Zoom Out (Perkecil)</option>
-                    <option value="Dolly In">Dolly In (Maju Dolly)</option>
-                    <option value="Dolly Out">Dolly Out (Mundur Dolly)</option>
-                    <option value="Tracking Shot">Tracking Shot (Mengikuti Subjek)</option>
-                    <option value="Crane Shot">Crane Shot (Angkat/Turun Derek)</option>
-                    <option value="Pedestal">Pedestal (Gerak Vertikal)</option>
-                    <option value="Reveal">Reveal (Mengungkap)</option>
-                    <option value="Static">Static (Diam)</option>
-                    <option value="Whip Pan">Whip Pan (Geser Cepat)</option>
-                    <option value="Arc Shot">Arc Shot (Mengelilingi Subjek)</option>
-                    <option value="POV">POV (Sudut Pandang)</option>
-                    <option value="Rack Focus">Rack Focus (Pergeseran Fokus)</option>
-                </select><br>
-
-                <label for="sudut_kamera">Sudut Kamera:</label>
-                <select id="sudut_kamera">
-                    <option value="">Pilih Sudut Kamera</option>
-                    <option value="eye-level">Eye-level (Setinggi mata)</option>
-                    <option value="low angle">Low angle (Sudut rendah)</option>
-                    <option value="high angle">High angle (Sudut tinggi)</option>
-                    <option value="bird's eye view">Bird's eye view (Sudut pandang mata burung)</option>
-                    <option value="worm's eye view">Worm's eye view (Sudut pandang mata cacing)</option>
-                    <option value="dutch angle">Dutch angle (Sudut Belanda)</option>
-                    <option value="over-the-shoulder">Over-the-shoulder (Atas bahu)</option>
-                    <option value="point of view">Point of view (Sudut pandang subjek)</option>
-                </select><br>
-
-                <label for="fokus">Fokus:</label>
-                <select id="fokus">
-                    <option value="">Pilih Fokus</option>
-                    <option value="fokus tajam pada subjek utama">Fokus tajam pada subjek utama</option>
-                    <option value="fokus dangkal dengan latar belakang blur">Fokus dangkal dengan latar belakang blur</option>
-                    <option value="fokus dalam pada seluruh adegan">Fokus dalam pada seluruh adegan</option>
-                </select><br>
-
-                <label for="pencahayaan_kamera">Pencahayaan:</label>
-                <select id="pencahayaan_kamera">
-                    <option value="">Pilih Pencahayaan</option>
-                    <option value="cahaya alami yang lembut">Cahaya alami yang lembut</option>
-                    <option value="pencahayaan studio yang dramatis">Pencahayaan studio yang dramatis</option>
-                    <option value="siluet saat matahari terbenam">Siluet saat matahari terbenam</option>
-                    <option value="cahaya neon yang vibrant">Cahaya neon yang vibrant</option>
-                    <option value="pencahayaan remang-remang">Pencahayaan remang-remang</option>
-                    <option value="cahaya terang dan cerah">Cahaya terang dan cerah</option>
-                    <option value="cahaya kontras tinggi">Cahaya kontras tinggi</option>
-                </select><br>
-
-                <label for="gradasi_warna">Gradasi Warna:</label>
-                <select id="gradasi_warna">
-                    <option value="">Pilih Gradasi Warna</option>
-                    <option value="hangat dan cerah">Hangat dan cerah</option>
-                    <option value="dingin dan gelap">Dingin dan gelap</option>
-                    <option value="monokromatik">Monokromatik</option>
-                    <option value="vibrant dan saturasi tinggi">Vibrant dan saturasi tinggi</option>
-                    <option value="pudar dan nostalgik">Pudar dan nostalgik</option>
-                    <option value="gradasi warna alami">Gradasi warna alami</option>
-                </select><br>
-            </div>
-
-            <h3 id="section_audio">AUDIO <button type="button" onclick="resetSection('audio_inputs')" class="reset-btn">Reset Bagian</button></h3>
-            <div id="audio_inputs">
-                <label for="dialog_type">Dialog:</label>
-                <select id="dialog_type">
-                    <option value="">Pilih Jenis Dialog</option>
-                    <option value="tanpa dialog">Tanpa dialog</option>
-                    <option value="informatif">Informatif</option>
-                    <option value="natural dialog">Natural dialog</option>
-                    <option value="monolog">Monolog</option>
-                    <option value="interview">Interview</option>
-                </select><br>
-
-                <label for="karakter_dialog">Karakter Dialog (pisahkan dengan koma jika lebih dari satu):</label>
-                <input type="text" id="karakter_dialog" placeholder="Contoh: John, Jane"><br>
-
-                <label for="isi_dialog">Isi Dialog (sertakan nama karakter di awal setiap baris):</label>
-                <textarea id="isi_dialog" rows="5" placeholder="Contoh:
-John: Halo, bagaimana kabarmu?
-Jane: Aku baik-baik saja."></textarea><br>
-
-                <label for="mood_suara">Mood Suara (pisahkan dengan koma):</label>
-                <input type="text" id="mood_suara" placeholder="Contoh: Happy, Cheerful, Tense, Mysterious"><br>
-
-                <label for="suara_lingkungan">Suara Lingkungan:</label>
-                <input type="text" id="suara_lingkungan" placeholder="Contoh: gemericik air, suara kota, kicauan burung"><br>
-
-                <label for="background_music">Background Music:</label>
-                <input type="text" id="background_music" placeholder="Contoh: musik orkestra epik, melodi piano yang tenang"><br>
-            </div>
-
-            <h3 id="section_video_durasi">KUALITAS VIDEO & DURASI <button type="button" onclick="resetSection('video_durasi_inputs')" class="reset-btn">Reset Bagian</button></h3>
-            <div id="video_durasi_inputs">
-                <label for="kualitas_video">Kualitas Video:</label>
-                <select id="kualitas_video">
-                    <option value="">Pilih Kualitas Video</option>
-                    <option value="4K Ultra HD">4K Ultra HD</option>
-                    <option value="Full HD">Full HD</option>
-                    <option value="Cinematic 8K">Cinematic 8K</option>
-                    <option value="VFX Quality">VFX Quality</option>
-                    <option value="Photorealistic">Photorealistic</option>
-                </select><br>
-
-                <label for="durasi_video">Durasi Video:</label>
-                <select id="durasi_video">
-                    <option value="">Pilih Durasi Video</option>
-                    <option value="6 Detik">6 Detik</option>
-                    <option value="7 Detik">7 Detik</option>
-                    <option value="8 Detik">8 Detik</option>
-                </select><br>
-
-                <label for="rasio_video">RASIO VIDEO:</label>
-                <select id="rasio_video">
-                    <option value="">Pilih Rasio Video</option>
-                    <option value="LANDSCAPE 16:9">LANDSCAPE 16:9</option>
-                    <option value="PORTRAIT 9:16">PORTRAIT 9:16</option>
-                </select><br>
-            </div>
-            
-            <h3 id="section_detail_tambahan">DETAIL TAMBAHAN <button type="button" onclick="resetSection('detail_tambahan_inputs')" class="reset-btn">Reset Bagian</button></h3>
-            <div id="detail_tambahan_inputs">
-                <label for="detail_tambahan">Detail Tambahan:</label>
-                <textarea id="detail_tambahan" rows="5" placeholder="Masukkan detail tambahan yang relevan untuk prompt."></textarea><br>
-            </div>
-
-            <button type="button" onclick="generatePrompt()">Generate Prompt</button>
-        </div>
-
-        <div class="output-column">
-            <h2>Output Prompt</h2>
-            <label for="prompt_indonesia">Prompt Bahasa Indonesia (Bisa Diedit):</label>
-            <textarea id="prompt_indonesia" rows="15"></textarea><br>
-
-            <label for="prompt_english">Final Prompt (English):</label>
-            <textarea id="prompt_english" rows="15" readonly></textarea><br>
-            <button type="button" onclick="resetOutputFields()">Reset Output</button>
-            <button type="button" onclick="undoPrompt()">Undo</button>
-        </div>
+    <h1>Generate Gambar dan Video dengan VEO 3</h1>
+    <input type="text" id="promptInput" placeholder="Masukkan prompt" style="width: 300px;" />
+    <button onclick="generateMedia()">Generate</button>
+    <div id="result" style="margin-top:20px;">
+        <!-- Gambar dan video hasil akan muncul di sini -->
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        function generateMedia() {
+            const prompt = document.getElementById('promptInput').value;
+            const apiKey = 'MELvQtx7BG';
+            const url = `https://api.ibeng.my.id/api/ai/veo3?query=${encodeURIComponent(prompt)}&apikey=${apiKey}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const resultDiv = document.getElementById('result');
+                    resultDiv.innerHTML = '';
+
+                    if (data && data.data) {
+                        // Tampilkan gambar
+                        if (data.data.image_url) {
+                            const img = document.createElement('img');
+                            img.src = data.data.image_url;
+                            img.alt = prompt;
+                            img.style.maxWidth = '100%';
+                            resultDiv.appendChild(img);
+                        }
+
+                        // Tampilkan video
+                        if (data.data.video_url) {
+                            const video = document.createElement('video');
+                            video.src = data.data.video_url;
+                            video.controls = true;
+                            video.style.maxWidth = '100%';
+                            video.style.marginTop = '20px';
+                            resultDiv.appendChild(video);
+                        }
+                    } else {
+                        resultDiv.innerHTML = 'Gagal mendapatkan data dari API.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('result').innerHTML = 'Terjadi kesalahan saat memanggil API.';
+                });
+        }
+    </script>
 </body>
-</html> 
+</html>
