@@ -22,7 +22,13 @@
         border-radius: 8px;
         box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    input[type="text"] {
+    label {
+        display: block;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    select, input[type="text"] {
         width: 100%;
         padding: 10px 15px;
         font-size: 16px;
@@ -70,7 +76,20 @@
 <body>
 <h1>Generate Gambar dan Video dengan VEO 3</h1>
 <div class="container">
+    <!-- Pilihan modul -->
+    <label for="modulSelect">Pilih Modul:</label>
+    <select id="modulSelect">
+        <option value="veo3">VEO 3</option>
+        <option value="veo3-fast">VEO 3 Fast</option>
+        <!-- Tambahkan modul lain sesuai kebutuhan -->
+        <!-- <option value="modulLain">Modul Lain</option> -->
+    </select>
+
+    <!-- Input prompt -->
+    <label for="promptInput">Masukkan Prompt:</label>
     <input type="text" id="promptInput" placeholder="Masukkan prompt" />
+
+    <!-- Tombol generate -->
     <button onclick="generateMedia()">Generate</button>
     <div id="result"></div>
 </div>
@@ -80,6 +99,9 @@ function generateMedia() {
     const prompt = document.getElementById('promptInput').value.trim();
     const resultDiv = document.getElementById('result');
 
+    // Pilih modul dari dropdown
+    const modul = document.getElementById('modulSelect').value;
+
     if (!prompt) {
         alert('Silakan masukkan prompt terlebih dahulu.');
         return;
@@ -88,8 +110,10 @@ function generateMedia() {
     // Tampilkan indikator loading
     resultDiv.innerHTML = '<p class="loading">Memproses, harap tunggu...</p>';
 
-    const apiKey = 'MELvQtx7BG'; // Pastikan ini sudah benar
-    const url = `https://api.ibeng.my.id/api/ai/veo3?query=${encodeURIComponent(prompt)}&apikey=${apiKey}`;
+    const apiKey = 'MELvQtx7BG';
+
+    // Sesuaikan URL API berdasarkan modul yang dipilih
+    const url = `https://api.ibeng.my.id/api/ai/${modul}?query=${encodeURIComponent(prompt)}&apikey=${apiKey}`;
 
     fetch(url)
         .then(response => {
