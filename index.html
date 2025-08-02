@@ -2,141 +2,220 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8" />
-<title>Gabungkan Gambar dan Prompt</title>
+<title>Gambar + Prompt Jadi Satu</title>
 <style>
 body {
-  font-family: Arial, sans-serif;
-  background: #f4f4f4;
-  margin: 0; padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
 }
-h1 { text-align: center; }
-.container { max-width: 700px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; }
-label { display: block; margin-top: 10px; font-weight: bold; }
-input[type="text"], input[type="file"] { width: 100%; padding: 10px; margin-top: 5px; }
-button { margin-top: 10px; width: 100%; padding: 12px; background: #4CAF50; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
-button:hover { background: #45a049; }
-#result { margin-top: 20px; text-align: center; }
-#canvas { display: none; }
+h1 {
+    text-align: center;
+    color: #333;
+}
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+label {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+select, input[type="text"], input[type="file"] {
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+button {
+    margin-top: 10px;
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+button:hover {
+    background-color: #45a049;
+}
+#result {
+    margin-top: 20px;
+    text-align: center;
+}
+#result img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+#result video {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+.loading {
+    font-size: 16px;
+    color: #555;
+}
 </style>
 </head>
 <body>
-
-<h1>Gabungkan Gambar dan Prompt</h1>
+<h1>Gambar + Prompt Jadi Satu</h1>
 <div class="container">
 
-  <label for="imageUpload">Upload Gambar:</label>
-  <input type="file" id="imageUpload" accept="image/*" />
+    <!-- Pilihan modul -->
+    <label for="modulSelect">Pilih Modul:</label>
+    <select id="modulSelect">
+        <option value="veo3">VEO 3</option>
+        <option value="veo3-fast">VEO 3 Fast</option>
+    </select>
 
-  <label for="promptInput">Masukkan Prompt:</label>
-  <input type="text" id="promptInput" placeholder="Masukkan prompt" />
+    <!-- Upload gambar -->
+    <label for="imageUpload">Upload Gambar:</label>
+    <input type="file" id="imageUpload" accept="image/*" />
+    <button onclick="uploadGambar()">Upload Gambar</button>
+    <div id="uploadStatus"></div>
 
-  <button onclick="prepareImage()">Gabungkan dan Generate</button>
+    <!-- Input prompt -->
+    <label for="promptInput">Masukkan Prompt (otomatis diisi URL gambar jika upload):</label>
+    <input type="text" id="promptInput" placeholder="Masukkan prompt" />
 
-  <div id="result"></div>
-
-  <!-- Canvas untuk gabungkan gambar dan teks -->
-  <canvas id="canvas"></canvas>
+    <!-- Generate -->
+    <button onclick="generateMedia()">Generate</button>
+    <div id="result"></div>
 
 </div>
 
 <script>
-let uploadedImage = new Image();
+let uploadedImageUrl = ''; // Variabel global untuk simpan URL gambar upload
 
-function prepareImage() {
-  const fileInput = document.getElementById('imageUpload');
-  const file = fileInput.files[0];
-  const prompt = document.getElementById('promptInput').value.trim();
+function uploadGambar() {
+    const fileInput = document.getElementById('imageUpload');
+    const uploadStatus = document.getElementById('uploadStatus');
 
-  if (!file) {
-    alert('Pilih gambar dulu!');
-    return;
-  }
-  if (!prompt) {
-    alert('Masukkan prompt!');
-    return;
-  }
-
-  // Baca gambar file
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    uploadedImage.src = e.target.result;
-    uploadedImage.onload = function() {
-      // Setelah gambar siap, gabungkan
-      drawImageWithText();
+    const file = fileInput.files[0];
+    if (!file) {
+        alert('Silakan pilih file gambar terlebih dahulu.');
+        return;
     }
-  }
-  reader.readAsDataURL(file);
-}
 
-function drawImageWithText() {
-  const canvas = document.getElementById('canvas');
-  const ctx = canvas.getContext('2d');
+    uploadStatus.innerHTML = 'Mengunggah gambar...';
 
-  // ukuran canvas sama dengan gambar
-  canvas.width = uploadedImage.width;
-  canvas.height = uploadedImage.height + 50; // tambah space buat teks
+    const formData = new FormData();
+    formData.append('file', file);
 
-  // gambar di canvas
-  ctx.drawImage(uploadedImage, 0, 0);
-
-  // overlay teks prompt di bawah gambar
-  ctx.fillStyle = 'white';
-  ctx.fillRect(0, uploadedImage.height, uploadedImage.width, 50);
-
-  ctx.font = '20px Arial';
-  ctx.fillStyle = 'black';
-  ctx.textAlign = 'center';
-  ctx.fillText(document.getElementById('promptInput').value.trim(), uploadedImage.width/2, uploadedImage.height + 30);
-
-  // tampilkan gambar gabungan
-  const dataURL = canvas.toDataURL();
-
-  // tampilkan di result
-  document.getElementById('result').innerHTML = `<img src="${dataURL}" />`;
-
-  // panggil API generate dengan gambar gabungan
-  generateFromImage(dataURL);
-}
-
-// fungsi generate dari API
-function generateFromImage(imageData) {
-  const resultDiv = document.getElementById('result');
-  resultDiv.innerHTML += '<p class="loading">Memproses, harap tunggu...</p>';
-
-  // Contoh API
-  const apiUrl = `https://api.ibeng.my.id/api/ai/veo3?query=${encodeURIComponent(imageData)}&apikey=MELvQtx7BG`;
-
-  fetch(apiUrl)
-    .then(res => res.json())
-    .then(data => {
-      resultDiv.innerHTML = '';
-
-      // tampilkan gambar gabungan dulu
-      const img = document.createElement('img');
-      img.src = imageData;
-      resultDiv.appendChild(img);
-
-      // tampilkan hasil API
-      if (data && data.data && data.data.data) {
-        const media = data.data.data;
-        if (media.image_url) {
-          const img2 = document.createElement('img');
-          img2.src = media.image_url;
-          resultDiv.appendChild(img2);
-        }
-        if (media.video_url) {
-          const vid = document.createElement('video');
-          vid.src = media.video_url;
-          vid.controls = true;
-          resultDiv.appendChild(vid);
-        }
-      }
+    fetch('https://fgsi.koyeb.app/api/upload/uploadMtyun', {
+        method: 'POST',
+        headers: {
+            'apikey': 'fgsiapi-1afccfd1-6d'
+        },
+        body: formData
     })
-    .catch(err => {
-      resultDiv.innerHTML = 'Gagal generate: ' + err.message;
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(errData => {
+                throw new Error('Gagal upload gambar: ' + (errData.message || response.status));
+            }).catch(() => {
+                throw new Error('Gagal upload gambar: ' + response.status);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.status && data.data && data.data.url) {
+            uploadedImageUrl = data.data.url; // Simpan URL gambar
+            // otomatis isi prompt dengan URL gambar, bisa diubah manual
+            document.getElementById('promptInput').value = uploadedImageUrl;
+            uploadStatus.innerHTML = 'Gambar berhasil diupload dan URL dimasukkan ke prompt.';
+        } else {
+            throw new Error('Respon tidak valid dari API upload.');
+        }
+    })
+    .catch(error => {
+        uploadStatus.innerHTML = 'Error: ' + error.message;
+        console.error(error);
     });
+}
+
+function generateMedia() {
+    const promptField = document.getElementById('promptInput');
+    let prompt = promptField.value.trim();
+
+    const resultDiv = document.getElementById('result');
+    const modul = document.getElementById('modulSelect').value;
+
+    if (!prompt) {
+        alert('Silakan masukkan prompt atau upload gambar terlebih dahulu.');
+        return;
+    }
+
+    resultDiv.innerHTML = '<p class="loading">Memproses, harap tunggu...</p>';
+
+    const apiKey = 'MELvQtx7BG';
+    const url = `https://api.ibeng.my.id/api/ai/${modul}?query=${encodeURIComponent(prompt)}&apikey=${apiKey}`;
+
+    fetch(url)
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(err => { throw new Error('Gagal dari API: ' + (err.message || res.status)); });
+            }
+            return res.json();
+        })
+        .then(data => {
+            resultDiv.innerHTML = '';
+
+            // Tampilkan gambar upload jika ada
+            if (uploadedImageUrl) {
+                const imgUpload = document.createElement('img');
+                imgUpload.src = uploadedImageUrl;
+                imgUpload.alt = 'Gambar Upload';
+                imgUpload.style.marginBottom = '10px';
+                resultDiv.appendChild(imgUpload);
+            }
+
+            // Tampilkan hasil dari API
+            if (data && data.data && data.data.data) {
+                const mediaData = data.data.data;
+
+                if (mediaData.image_url) {
+                    const img = document.createElement('img');
+                    img.src = mediaData.image_url;
+                    img.alt = prompt;
+                    resultDiv.appendChild(img);
+                }
+                if (mediaData.video_url) {
+                    const video = document.createElement('video');
+                    video.src = mediaData.video_url;
+                    video.controls = true;
+                    resultDiv.appendChild(video);
+                }
+            } else {
+                resultDiv.innerHTML += '<p style="color:red;">Data dari API tidak lengkap.</p>';
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('result').innerHTML = '<p style="color:red;">' + err.message + '</p>';
+        });
 }
 </script>
 
+<footer style="text-align:center; margin-top:40px; font-size:14px; color:#555;">
+    © 2025 Achmad Rizky.
+</footer>
 </body>
 </html>
