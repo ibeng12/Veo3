@@ -131,6 +131,7 @@ button:hover {
         <option value="veo3-fast">VEO 3 Fast</option>
         <option value="img2prompt">img2prompt (dari gambar)</option>
         <option value="changeclothes">AI Change Clothes</option>
+        <option value="cai">CAI (Chat AI)</option>
     </select>
 
     <!-- Upload gambar -->
@@ -227,6 +228,7 @@ function getSelectedModule() {
     return document.getElementById('modulSelect').value;
 }
 
+// Fungsi untuk mendapatkan prompt dari gambar (opsional, jika ingin otomatis)
 function fetchPromptFromImage() {
     if (!uploadedImageUrl) {
         alert('Silakan upload gambar terlebih dahulu.');
@@ -247,6 +249,7 @@ function fetchPromptFromImage() {
         });
 }
 
+// Fungsi utama generate
 function generateMedia() {
     const promptField = document.getElementById('promptInput');
     const prompt = promptField.value.trim();
@@ -256,6 +259,14 @@ function generateMedia() {
 
     spinner.style.display = 'block';
 
+    // Mode CAI (Chat AI)
+    if (module === 'cai') {
+        fetchCaiResponse();
+        spinner.style.display = 'none';
+        return;
+    }
+
+    // Mode Change Clothes
     if (module === 'changeclothes') {
         if (!uploadedImageUrl) {
             alert('Silakan upload gambar terlebih dahulu.');
@@ -266,6 +277,7 @@ function generateMedia() {
         return;
     }
 
+    // Mode img2prompt dari gambar
     if (module === 'img2prompt') {
         if (!uploadedImageUrl) {
             alert('Silakan upload gambar terlebih dahulu.');
@@ -280,6 +292,7 @@ function generateMedia() {
         return;
     }
 
+    // Mode otomatis dari gambar (autoPrompt)
     const isAutoPrompt = document.getElementById('autoPromptMode').checked;
     if (isAutoPrompt && uploadedImageUrl && !prompt) {
         fetchPromptFromImage()
@@ -296,9 +309,11 @@ function generateMedia() {
         return;
     }
 
+    // Mode default (gambar, prompt dari input)
     callApiGenerate(prompt);
 }
 
+// Fungsi untuk memanggil API utama
 function callApiGenerate(finalPrompt) {
     const resultDiv = document.getElementById('result');
     resultDiv.innerHTML = '<p style="color:#555;">Memproses, harap tunggu...</p>';
@@ -306,36 +321,34 @@ function callApiGenerate(finalPrompt) {
     const module = getSelectedModule();
     const apiKey = 'MELvQtx7BG';
 
-    if (module === 'changeclothes') {
-        return;
+    // Jika bukan CAI, panggil API sesuai modul
+    if (module !== 'cai') {
+        const url = `https://api.ibeng.my.id/api/ai/${module}?query=${encodeURIComponent(finalPrompt)}&apikey=${apiKey}`;
+
+        fetch(url)
+            .then(res => {
+                if (!res.ok) {
+                    return res.json().then(err => { throw new Error('Gagal dari API: ' + (err.message || res.status)); });
+                }
+                return res.json();
+            })
+            .then(data => {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                resultDiv.innerHTML = '';
+
+                // Tampilkan video jika ada
+                if (data && data.data && data.data.data && data.data.data.video_url) {
+                    const video = document.createElement('video');
+                    video.src = data.data.data.video_url;
+                    video.controls = true;
+                    resultDiv.appendChild(video);
+                }
+            })
+            .catch(err => {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                resultDiv.innerHTML = '<p style="color:#999;">' + err.message + '</p>';
+            });
     }
-
-    const url = `https://api.ibeng.my.id/api/ai/${module}?query=${encodeURIComponent(finalPrompt)}&apikey=${apiKey}`;
-
-    fetch(url)
-        .then(res => {
-            if (!res.ok) {
-                return res.json().then(err => { throw new Error('Gagal dari API: ' + (err.message || res.status)); });
-            }
-            return res.json();
-        })
-        .then(data => {
-            document.getElementById('loadingSpinner').style.display = 'none';
-            resultDiv.innerHTML = '';
-
-            // Hapus gambar upload dari hasil
-            // Jika ada video, tampilkan
-            if (data && data.data && data.data.data && data.data.data.video_url) {
-                const video = document.createElement('video');
-                video.src = data.data.data.video_url;
-                video.controls = true;
-                resultDiv.appendChild(video);
-            }
-        })
-        .catch(err => {
-            document.getElementById('loadingSpinner').style.display = 'none';
-            resultDiv.innerHTML = '<p style="color:#999;">' + err.message + '</p>';
-        });
 }
 
 // API Change Clothes
@@ -366,6 +379,37 @@ function fetchChangeClothes(imageUrl, prompt) {
         .catch(err => {
             document.getElementById('loadingSpinner').style.display = 'none';
             resultDiv.innerHTML = '<p style="color:#999;">' + err.message + '</p>';
+        });
+}
+
+// Fungsi untuk API CAI (Chat AI)
+function fetchCaiResponse() {
+    const message = document.getElementById('promptInput').value.trim();
+    if (!message) {
+        alert('Silakan masukkan pesan untuk CAI.');
+        return;
+    }
+
+    const apiUrl = `https://api.ibeng.my.id/api/ai/cai?message=${encodeURIComponent(message)}&chat_id=&custom=&apikey=MELvQtx7BG`;
+
+    fetch(apiUrl)
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(err => { throw new Error('Gagal dari API CAI: ' + (err.message || res.status)); });
+            }
+            return res.json();
+        })
+        .then(data => {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+            if (data && data.status === 'Success' && data.result && data.result.text) {
+                resultDiv.innerHTML = '<p>' + data.result.text + '</p>';
+            } else {
+                resultDiv.innerHTML = '<p style="color:#999;">Tidak ada respons dari CAI.</p>';
+            }
+        })
+        .catch(err => {
+            document.getElementById('result').innerHTML = '<p style="color:#999;">' + err.message + '</p>';
         });
 }
 </script>
