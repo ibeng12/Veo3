@@ -93,10 +93,10 @@ button:hover {
     <!-- Preview gambar upload -->
     <div id="gambarPreview" style="margin-top:10px;"></div>
 
-    <!-- Checkbox untuk Mode img2prompt -->
-    <label>
-        <input type="checkbox" id="img2promptMode" />
-        Mode img2prompt (Ambil prompt dari gambar)
+    <!-- Toggle mode otomatis img2prompt -->
+    <label style="margin-top:10px;">
+        <input type="checkbox" id="autoPromptMode" />
+        Otomatis Ambil Prompt dari Gambar (img2prompt)
     </label>
 
     <!-- Input prompt manual -->
@@ -112,7 +112,7 @@ button:hover {
 </div>
 
 <script>
-let uploadedImageUrl = ''; // Simpan URL gambar upload
+let uploadedImageUrl = ''; // menyimpan URL gambar upload
 
 // Fungsi upload gambar
 function uploadGambar() {
@@ -150,8 +150,8 @@ function uploadGambar() {
     })
     .then(data => {
         if (data && data.status && data.data && data.data.url) {
-            uploadedImageUrl = data.data.url; // simpan URL
-            // Tampilkan gambar preview
+            uploadedImageUrl = data.data.url;
+            // tampilkan preview
             gambarPreviewDiv.innerHTML = '';
             const imgPreview = document.createElement('img');
             imgPreview.src = uploadedImageUrl;
@@ -159,7 +159,11 @@ function uploadGambar() {
             imgPreview.style.maxWidth = '100%';
             imgPreview.style.borderRadius = '8px';
             gambarPreviewDiv.appendChild(imgPreview);
-            uploadStatus.innerHTML = 'Gambar berhasil diupload. Sekarang isi prompt dan klik Generate.';
+            uploadStatus.innerHTML = 'Gambar berhasil diupload. Jika mode otomatis aktif, prompt akan diambil dari gambar.';
+            // Jika mode otomatis aktif, otomatis panggil API img2prompt
+            if (document.getElementById('autoPromptMode').checked) {
+                fetchPromptFromImage();
+            }
         } else {
             throw new Error('Respon tidak valid dari API upload.');
         }
@@ -170,30 +174,30 @@ function uploadGambar() {
     });
 }
 
-// Fungsi untuk mendapatkan prompt dari gambar
-function getPromptFromImage() {
-    return new Promise((resolve, reject) => {
-        if (!uploadedImageUrl) {
-            reject(new Error('Silakan upload gambar terlebih dahulu.'));
-            return;
-        }
-        const apiUrl = `https://api.ibeng.my.id/api/ai/img2prompt?url=${encodeURIComponent(uploadedImageUrl)}&apikey=MELvQtx7BG`;
-        fetch(apiUrl)
-            .then(res => {
-                if (!res.ok) {
-                    return res.json().then(err => { throw new Error('Gagal mendapatkan prompt: ' + (err.message || res.status)); });
-                }
-                return res.json();
-            })
-            .then(data => {
-                if (data && data.status === 'Success' && data.data && data.data.prompt) {
-                    resolve(data.data.prompt);
-                } else {
-                    reject(new Error('Respon tidak valid dari API img2prompt.'));
-                }
-            })
-            .catch(err => reject(err));
-    });
+// Fungsi untuk panggil API img2prompt dan isi prompt
+function fetchPromptFromImage() {
+    if (!uploadedImageUrl) {
+        alert('Silakan upload gambar terlebih dahulu.');
+        return;
+    }
+    const apiUrl = `https://api.ibeng.my.id/api/ai/img2prompt?url=${encodeURIComponent(uploadedImageUrl)}&apikey=MELvQtx7BG`;
+    fetch(apiUrl)
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(err => { throw new Error('Gagal mendapatkan prompt: ' + (err.message || res.status)); });
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (data && data.status === 'Success' && data.data && data.data.prompt) {
+                document.getElementById('promptInput').value = data.data.prompt;
+            } else {
+                alert('Gagal mendapatkan prompt dari gambar.');
+            }
+        })
+        .catch(err => {
+            alert('Error saat mengambil prompt: ' + err.message);
+        });
 }
 
 // Fungsi generate
@@ -202,18 +206,14 @@ function generateMedia() {
     const prompt = promptField.value.trim();
     const resultDiv = document.getElementById('result');
     const modul = document.getElementById('modulSelect').value;
-    const isImg2promptMode = document.getElementById('img2promptMode').checked;
+    const isAutoPrompt = document.getElementById('autoPromptMode').checked;
 
-    resultDiv.innerHTML = '<p class="loading">Memproses, harap tunggu...</p>';
-
-    // Jika mode img2prompt aktif, ambil prompt dari API
-    if (isImg2promptMode) {
-        getPromptFromImage()
-            .then(fetchedPrompt => {
-                // Ganti prompt di input
-                promptField.value = fetchedPrompt;
-                // Lanjutkan generate dengan prompt ini
-                callApiGenerate(fetchedPrompt);
+    if (isAutoPrompt && uploadedImageUrl && !prompt) {
+        // Jika mode otomatis aktif dan prompt kosong, panggil API terlebih dahulu
+        fetchPromptFromImage()
+            .then(() => {
+                // Setelah prompt terisi otomatis, panggil API generate
+                callApiGenerate(promptField.value);
             })
             .catch(err => {
                 resultDiv.innerHTML = '<p style="color:red;">' + err.message + '</p>';
@@ -222,17 +222,15 @@ function generateMedia() {
         // Mode manual
         if (!prompt) {
             alert('Silakan masukkan prompt.');
-            resultDiv.innerHTML = '';
             return;
         }
         callApiGenerate(prompt);
     }
 
-    // Fungsi internal untuk panggil API generate
-    function callApiGenerate(promptToUse) {
+    function callApiGenerate(finalPrompt) {
         resultDiv.innerHTML = '<p class="loading">Memproses, harap tunggu...</p>';
         const apiKey = 'MELvQtx7BG';
-        const url = `https://api.ibeng.my.id/api/ai/${modul}?query=${encodeURIComponent(promptToUse)}&apikey=${apiKey}`;
+        const url = `https://api.ibeng.my.id/api/ai/${modul}?query=${encodeURIComponent(finalPrompt)}&apikey=${apiKey}`;
 
         fetch(url)
             .then(res => {
@@ -257,11 +255,10 @@ function generateMedia() {
                 // Tampilkan hasil dari API
                 if (data && data.data && data.data.data) {
                     const mediaData = data.data.data;
-
                     if (mediaData.image_url) {
                         const img = document.createElement('img');
                         img.src = mediaData.image_url;
-                        img.alt = promptToUse;
+                        img.alt = finalPrompt;
                         resultDiv.appendChild(img);
                     }
                     if (mediaData.video_url) {
