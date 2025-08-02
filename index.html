@@ -2,227 +2,151 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8" />
-<title>Generate Gambar dan Video VEO 3</title>
+<title>Gabungan Gambar Upload dan Prompt</title>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        margin: 0;
-        padding: 20px;
-    }
-    h1 {
-        text-align: center;
-        color: #333;
-    }
-    .container {
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    label {
-        display: block;
-        margin-top: 10px;
-        margin-bottom: 5px;
-        font-weight: bold;
-    }
-    select, input[type="text"], input[type="file"] {
-        width: 100%;
-        padding: 10px 15px;
-        font-size: 16px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box;
-    }
-    button {
-        margin-top: 10px;
-        width: 100%;
-        padding: 12px;
-        font-size: 16px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-    button:hover {
-        background-color: #45a049;
-    }
-    #result {
-        margin-top: 20px;
-        text-align: center;
-    }
-    #result img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 8px;
-        margin-bottom: 10px;
-    }
-    #result video {
-        max-width: 100%;
-        height: auto;
-        border-radius: 8px;
-        margin-top: 20px;
-    }
-    /* Loading indicator */
-    .loading {
-        font-size: 16px;
-        color: #555;
-    }
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0; padding: 20px;
+}
+h1 {
+  text-align: center; color: #333;
+}
+.container {
+  max-width: 600px; margin: 0 auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+label {
+  display: block; margin-top: 10px; margin-bottom: 5px; font-weight: bold;
+}
+input[type="text"], input[type="file"] {
+  width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
+}
+button {
+  width: 100%; padding: 12px; margin-top: 10px; background: #4CAF50; color: #fff; border: none; border-radius: 4px; cursor: pointer;
+}
+button:hover {
+  background: #45a049;
+}
+#result {
+  margin-top: 20px; text-align: center;
+}
+#result img {
+  max-width: 100%; height: auto; margin-bottom: 10px; border-radius: 8px;
+}
+#result video {
+  max-width: 100%; height: auto; border-radius: 8px; margin-top: 10px;
+}
 </style>
 </head>
 <body>
-<h1>Generate Gambar dan Video dengan VEO 3</h1>
+
+<h1>Upload Gambar & Input Prompt</h1>
 <div class="container">
 
-    <!-- Pilihan modul -->
-    <label for="modulSelect">Pilih Modul:</label>
-    <select id="modulSelect">
-        <option value="veo3">VEO 3</option>
-        <option value="veo3-fast">VEO 3 Fast</option>
-    </select>
+  <label for="imageUpload">Upload Gambar Baru:</label>
+  <input type="file" id="imageUpload" accept="image/*" />
 
-    <!-- Input prompt -->
-    <label for="promptInput">Masukkan Prompt:</label>
-    <input type="text" id="promptInput" placeholder="Masukkan prompt" />
+  <button onclick="uploadGambar()">Upload Gambar</button>
+  <div id="uploadStatus"></div>
 
-    <!-- Upload gambar -->
-    <label for="imageUpload">Upload Gambar Baru:</label>
-    <input type="file" id="imageUpload" accept="image/*" />
-    <button onclick="uploadGambar()">Upload Gambar</button>
-    <div id="uploadStatus"></div>
+  <label for="prompt">Masukkan Prompt:</label>
+  <input type="text" id="prompt" placeholder="Isi prompt" />
 
-    <!-- Tombol generate -->
-    <button onclick="generateMedia()">Generate</button>
-    <div id="result"></div>
+  <button onclick="generate()">Generate</button>
+
+  <div id="result"></div>
+
 </div>
 
 <script>
-let uploadedImageUrl = ''; // Variabel global untuk menyimpan URL gambar upload
+let uploadedImageUrl = ''; // Variabel global untuk simpan URL gambar
 
 function uploadGambar() {
-    const fileInput = document.getElementById('imageUpload');
-    const uploadStatus = document.getElementById('uploadStatus');
+  const fileInput = document.getElementById('imageUpload');
+  const statusDiv = document.getElementById('uploadStatus');
+  const file = fileInput.files[0];
+  if (!file) {
+    alert('Pilih gambar terlebih dahulu.');
+    return;
+  }
+  statusDiv.innerHTML = 'Mengunggah gambar...';
 
-    const file = fileInput.files[0];
-    if (!file) {
-        alert('Silakan pilih file gambar terlebih dahulu.');
-        return;
+  const formData = new FormData();
+  formData.append('file', file);
+
+  fetch('https://fgsi.koyeb.app/api/upload/uploadMtyun', {
+    method: 'POST',
+    headers: {
+      'apikey': 'fgsiapi-1afccfd1-6d'
+    },
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status && data.data && data.data.url) {
+      uploadedImageUrl = data.data.url;
+      document.getElementById('prompt').value = uploadedImageUrl; // otomatis isi prompt
+      statusDiv.innerHTML = 'Gambar berhasil diupload dan URL dimasukkan ke prompt.';
+    } else {
+      throw new Error('Respon tidak valid dari API upload.');
     }
-
-    uploadStatus.innerHTML = 'Mengunggah gambar...';
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    fetch('https://fgsi.koyeb.app/api/upload/uploadMtyun', {
-        method: 'POST',
-        headers: {
-            'apikey': 'fgsiapi-1afccfd1-6d'
-        },
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(errData => {
-                throw new Error('Gagal upload gambar: ' + (errData.message || response.status));
-            }).catch(() => {
-                throw new Error('Gagal upload gambar: ' + response.status);
-            });
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data && data.status && data.data && data.data.url) {
-            uploadedImageUrl = data.data.url;
-            document.getElementById('promptInput').value = uploadedImageUrl; // otomatis isi prompt
-            uploadStatus.innerHTML = 'Gambar berhasil diupload dan URL dimasukkan ke prompt.';
-        } else {
-            throw new Error('Respon tidak valid dari API upload.');
-        }
-    })
-    .catch(error => {
-        uploadStatus.innerHTML = 'Error: ' + error.message;
-        console.error(error);
-    });
+  })
+  .catch(err => {
+    statusDiv.innerHTML = 'Gagal upload: ' + err.message;
+  });
 }
 
-function generateMedia() {
-    const prompt = document.getElementById('promptInput').value.trim();
-    const resultDiv = document.getElementById('result');
+function generate() {
+  const prompt = document.getElementById('prompt').value.trim();
+  const resultDiv = document.getElementById('result');
 
-    const modul = document.getElementById('modulSelect').value;
+  if (!prompt) {
+    alert('Isi prompt dulu.');
+    return;
+  }
 
-    if (!prompt) {
-        alert('Silakan masukkan prompt terlebih dahulu.');
-        return;
+  resultDiv.innerHTML = 'Memproses, tunggu sebentar...';
+
+  const apiKey = 'MELvQtx7BG'; // API key
+  const url = `https://api.ibeng.my.id/api/ai/veo3?query=${encodeURIComponent(prompt)}&apikey=${apiKey}`;
+
+  fetch(url)
+  .then(res => res.json())
+  .then(data => {
+    resultDiv.innerHTML = '';
+
+    // Tampilkan gambar upload jika ada
+    if (uploadedImageUrl) {
+      const imgUpload = document.createElement('img');
+      imgUpload.src = uploadedImageUrl;
+      imgUpload.alt = 'Gambar Upload';
+      resultDiv.appendChild(imgUpload);
     }
 
-    resultDiv.innerHTML = '<p class="loading">Memproses, harap tunggu...</p>';
-
-    const apiKey = 'MELvQtx7BG';
-    const url = `https://api.ibeng.my.id/api/ai/${modul}?query=${encodeURIComponent(prompt)}&apikey=${apiKey}`;
-
-    fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(errData => {
-                    throw new Error('Gagal mendapatkan response dari server: ' + (errData.message || response.status));
-                }).catch(() => {
-                    throw new Error('Gagal mendapatkan response dari server: ' + response.status);
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Response API:', data);
-            resultDiv.innerHTML = '';
-
-            // Jika gambar upload sebelumnya ada, tampilkan dulu
-            if (uploadedImageUrl) {
-                const imgUploaded = document.createElement('img');
-                imgUploaded.src = uploadedImageUrl;
-                imgUploaded.alt = 'Gambar Upload';
-                imgUploaded.style.marginBottom = '10px';
-                resultDiv.appendChild(imgUploaded);
-            }
-
-            if (data && data.data && data.data.data) {
-                const mediaData = data.data.data;
-
-                if (mediaData.image_url) {
-                    const img = document.createElement('img');
-                    img.src = mediaData.image_url;
-                    img.alt = prompt;
-                    resultDiv.appendChild(img);
-                } else {
-                    resultDiv.innerHTML += '<p style="color:red;">Gambar tidak ditemukan.</p>';
-                }
-
-                if (mediaData.video_url) {
-                    const video = document.createElement('video');
-                    video.src = mediaData.video_url;
-                    video.controls = true;
-                    resultDiv.appendChild(video);
-                } else {
-                    resultDiv.innerHTML += '<p style="color:red;">Video tidak ditemukan.</p>';
-                }
-            } else {
-                resultDiv.innerHTML += '<p style="color:red;">Gagal mendapatkan data dari API.</p>';
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            resultDiv.innerHTML = '<p style="color:red;">Terjadi kesalahan: ' + error.message + '</p>';
-        });
+    // Tampilkan hasil generate
+    if (data && data.data && data.data.data) {
+      const media = data.data.data;
+      if (media.image_url) {
+        const img = document.createElement('img');
+        img.src = media.image_url;
+        img.alt = prompt;
+        resultDiv.appendChild(img);
+      }
+      if (media.video_url) {
+        const video = document.createElement('video');
+        video.src = media.video_url;
+        video.controls = true;
+        resultDiv.appendChild(video);
+      }
+    } else {
+      resultDiv.innerHTML += 'Gagal mendapatkan data.';
+    }
+  })
+  .catch(err => {
+    resultDiv.innerHTML = 'Error: ' + err.message;
+  });
 }
 </script>
 
-<footer style="text-align:center; margin-top:40px; font-size:14px; color:#555;">
-    © 2025 Achmad Rizky.
-</footer>
 </body>
 </html>
