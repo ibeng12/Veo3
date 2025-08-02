@@ -82,9 +82,23 @@ button:hover {
     border-radius: 8px;
     margin-top: 20px;
 }
-.loading {
+/* Gambar upload kecil */
+#gambarPreview img {
+    max-width: 100px; /* kecilkan gambar */
+    height: auto;
+    border-radius: 4px;
+    display: block;
+    margin: 10px auto;
+}
+/* Kotak prompt lebih besar */
+#promptInput {
+    width: 100%;
+    height: 80px;
+    padding: 10px;
     font-size: 16px;
-    color: #555;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    resize: vertical;
 }
 </style>
 </head>
@@ -98,7 +112,7 @@ button:hover {
         <option value="veo3">VEO 3</option>
         <option value="veo3-fast">VEO 3 Fast</option>
         <option value="img2prompt">img2prompt (dari gambar)</option>
-        <option value="changeclothes">AI Change Clothes</option> <!-- Modul baru -->
+        <option value="changeclothes">AI Change Clothes</option>
     </select>
 
     <!-- Upload gambar -->
@@ -107,8 +121,8 @@ button:hover {
 
     <div id="uploadStatus"></div>
 
-    <!-- Preview gambar upload -->
-    <div id="gambarPreview" style="margin-top:10px;"></div>
+    <!-- Preview gambar upload kecil -->
+    <div id="gambarPreview"></div>
 
     <!-- Toggle mode otomatis img2prompt -->
     <label style="margin-top:10px;">
@@ -116,9 +130,9 @@ button:hover {
         Otomatis Ambil Prompt dari Gambar (img2prompt)
     </label>
 
-    <!-- Input prompt manual -->
-    <label for="promptInput">Masukkan Prompt:</label>
-    <input type="text" id="promptInput" placeholder="Masukkan prompt" />
+    <!-- Input prompt manual, kotak besar -->
+    <label for="promptInput" style="margin-top:10px;">Masukkan Prompt:</label>
+    <textarea id="promptInput" placeholder="Masukkan prompt" rows="4"></textarea>
 
     <!-- Tombol Generate -->
     <button id="generateBtn" onclick="generateMedia()">START</button>
@@ -171,13 +185,12 @@ function uploadGambar() {
     .then(data => {
         if (data && data.status === true && data.data && data.data.url) {
             uploadedImageUrl = data.data.url;
-            // tampilkan preview
+            // tampilkan preview kecil
             gambarPreviewDiv.innerHTML = '';
             const imgPreview = document.createElement('img');
             imgPreview.src = uploadedImageUrl;
             imgPreview.alt = 'Gambar Upload';
-            imgPreview.style.maxWidth = '100%';
-            imgPreview.style.borderRadius = '8px';
+            // styling kecil otomatis dari CSS
             gambarPreviewDiv.appendChild(imgPreview);
             uploadStatus.innerHTML = 'Gambar berhasil diupload.';
             // Jika mode otomatis aktif dan modul img2prompt, otomatis panggil API prompt
@@ -237,19 +250,19 @@ function generateMedia() {
     console.log('Generate dipanggil');
     spinner.style.display = 'block'; // tampilkan spinner
 
-    // Jika module adalah 'changeclothes', panggil API khusus
+    // Jika modulnya changeclothes
     if (module === 'changeclothes') {
         if (!uploadedImageUrl) {
             alert('Silakan upload gambar terlebih dahulu.');
             spinner.style.display = 'none';
             return;
         }
-        const promptChangeClothes = prompt || 'Change clothes'; // bisa disesuaikan
+        const promptChangeClothes = prompt || 'Change clothes'; 
         fetchChangeClothes(uploadedImageUrl, promptChangeClothes);
         return;
     }
 
-    // Jika module adalah 'img2prompt'
+    // Jika modulnya img2prompt
     if (module === 'img2prompt') {
         if (!uploadedImageUrl) {
             alert('Silakan upload gambar terlebih dahulu.');
@@ -260,22 +273,18 @@ function generateMedia() {
             .then(() => {
                 callApiGenerate(promptField.value);
             })
-            .catch(() => {
-                spinner.style.display = 'none';
-            });
+            .catch(() => { spinner.style.display = 'none'; });
         return;
     }
 
-    // Jika mode otomatis aktif dan prompt kosong, otomatis ambil prompt dari gambar
+    // Jika mode otomatis aktif dan prompt kosong
     const isAutoPrompt = document.getElementById('autoPromptMode').checked;
     if (isAutoPrompt && uploadedImageUrl && !prompt) {
         fetchPromptFromImage()
             .then(() => {
                 callApiGenerate(document.getElementById('promptInput').value);
             })
-            .catch(() => {
-                spinner.style.display = 'none';
-            });
+            .catch(() => { spinner.style.display = 'none'; });
         return;
     }
 
@@ -290,7 +299,7 @@ function generateMedia() {
     callApiGenerate(prompt);
 }
 
-// Fungsi panggil API generate gambar/video
+// Fungsi API generate
 function callApiGenerate(finalPrompt) {
     const resultDiv = document.getElementById('result');
     resultDiv.innerHTML = '<p class="loading">Memproses, harap tunggu...</p>';
@@ -299,7 +308,7 @@ function callApiGenerate(finalPrompt) {
     const apiKey = 'MELvQtx7BG';
 
     if (module === 'changeclothes') {
-        // Sudah di-handle di generateMedia
+        // sudah di handle di generateMedia
         return;
     }
 
@@ -314,15 +323,14 @@ function callApiGenerate(finalPrompt) {
         })
         .then(data => {
             document.getElementById('loadingSpinner').style.display = 'none';
-
             resultDiv.innerHTML = '';
 
             if (uploadedImageUrl) {
                 const imgUpload = document.createElement('img');
                 imgUpload.src = uploadedImageUrl;
                 imgUpload.alt = 'Gambar Upload';
-                imgUpload.style.maxWidth = '100%';
-                imgUpload.style.borderRadius = '8px';
+                imgUpload.style.maxWidth = '100px'; // kecil
+                imgUpload.style.borderRadius = '4px';
                 resultDiv.appendChild(imgUpload);
             }
 
@@ -368,11 +376,12 @@ function fetchChangeClothes(imageUrl, prompt) {
         .then(data => {
             document.getElementById('loadingSpinner').style.display = 'none';
             if (data && data.status === 'Success' && data.data) {
-                // Tampilkan gambar hasil
+                // tampilkan gambar hasil
                 resultDiv.innerHTML = '';
                 const img = document.createElement('img');
                 img.src = data.data;
                 img.alt = 'Change Clothes Result';
+                img.style.maxWidth = '100%';
                 resultDiv.appendChild(img);
             } else {
                 resultDiv.innerHTML = '<p style="color:red;">Gagal mendapatkan hasil dari API.</p>';
@@ -385,7 +394,7 @@ function fetchChangeClothes(imageUrl, prompt) {
 }
 </script>
 
-<!-- Spinner kecil ala Apple -->
+<!-- Spinner kecil -->
 <div id="loadingSpinner"></div>
 
 <footer style="text-align:center; margin-top:40px; font-size:14px; color:#555;">
