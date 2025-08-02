@@ -98,6 +98,7 @@ button:hover {
         <option value="veo3">VEO 3</option>
         <option value="veo3-fast">VEO 3 Fast</option>
         <option value="img2prompt">img2prompt (dari gambar)</option>
+        <option value="ai-changeclothes">AI Change Clothes</option> <!-- Modul tambahan -->
     </select>
 
     <!-- Upload gambar -->
@@ -120,7 +121,7 @@ button:hover {
     <input type="text" id="promptInput" placeholder="Masukkan prompt" />
 
     <!-- Tombol Generate -->
-    <button id="generateBtn" onclick="generateMedia()">Generate</button>
+    <button id="generateBtn" onclick="generateMedia()">START</button>
 
     <!-- Loading spinner -->
     <div id="loadingSpinner"></div>
@@ -133,7 +134,6 @@ button:hover {
 <script>
 let uploadedImageUrl = ''; // Menyimpan URL gambar upload
 
-// Fungsi upload gambar
 function uploadGambar() {
     const fileInput = document.getElementById('imageUpload');
     const uploadStatus = document.getElementById('uploadStatus');
@@ -193,12 +193,10 @@ function uploadGambar() {
     });
 }
 
-// Mendapatkan modul yang dipilih
 function getSelectedModule() {
     return document.getElementById('modulSelect').value;
 }
 
-// Fungsi mengambil prompt otomatis dari gambar
 function fetchPromptFromImage() {
     if (!uploadedImageUrl) {
         alert('Silakan upload gambar terlebih dahulu.');
@@ -225,7 +223,6 @@ function fetchPromptFromImage() {
         });
 }
 
-// Fungsi utama generate
 function generateMedia() {
     const promptField = document.getElementById('promptInput');
     const prompt = promptField.value.trim();
@@ -234,29 +231,25 @@ function generateMedia() {
     const spinner = document.getElementById('loadingSpinner');
 
     console.log('Generate dipanggil');
-    // Tampilkan spinner saat proses
     spinner.style.display = 'block';
 
-    // Jika module adalah 'img2prompt'
     if (module === 'img2prompt') {
         if (!uploadedImageUrl) {
             alert('Silakan upload gambar terlebih dahulu.');
-            spinner.style.display = 'none'; // sembunyikan spinner
+            spinner.style.display = 'none';
             return;
         }
-        // Ambil prompt otomatis dari gambar dan langsung generate
         fetchPromptFromImage()
             .then(() => {
-                // Setelah prompt terisi otomatis, panggil generate gambar/video
-                callApiGenerate(promptField.value);
+                // Setelah prompt otomatis terisi, generate gambar/video
+                callApiGenerate(prompt);
             })
             .catch(() => {
-                spinner.style.display = 'none'; // sembunyikan spinner saat error
+                spinner.style.display = 'none';
             });
         return;
     }
 
-    // Jika mode otomatis aktif dan prompt kosong, otomatis ambil prompt dari gambar
     const isAutoPrompt = document.getElementById('autoPromptMode').checked;
     if (isAutoPrompt && uploadedImageUrl && !prompt) {
         fetchPromptFromImage()
@@ -264,23 +257,20 @@ function generateMedia() {
                 callApiGenerate(document.getElementById('promptInput').value);
             })
             .catch(() => {
-                spinner.style.display = 'none'; // sembunyikan spinner saat error
+                spinner.style.display = 'none';
             });
         return;
     }
 
-    // Jika prompt kosong di mode manual
     if (!prompt) {
         alert('Silakan masukkan prompt.');
-        spinner.style.display = 'none'; // sembunyikan spinner
+        spinner.style.display = 'none';
         return;
     }
 
-    // Generate gambar/video
     callApiGenerate(prompt);
 }
 
-// Fungsi panggil API generate gambar/video
 function callApiGenerate(finalPrompt) {
     const resultDiv = document.getElementById('result');
     resultDiv.innerHTML = '<p class="loading">Memproses, harap tunggu...</p>';
@@ -288,15 +278,53 @@ function callApiGenerate(finalPrompt) {
     const module = getSelectedModule();
     const apiKey = 'MELvQtx7BG';
 
-    // Jika mode 'img2prompt', tidak generate langsung
-    if (module === 'img2prompt') {
-        resultDiv.innerHTML = '<p style="color:red;">Mode img2prompt aktif. Silakan pilih modul lain untuk generate gambar/video.</p>';
-        document.getElementById('loadingSpinner').style.display = 'none'; // sembunyikan spinner
-        return;
+    // Kalau module AI Change Clothes
+    if (module === 'ai-changeclothes') {
+        // Panggil API change clothes
+        // Pastikan URL gambar dan prompt sudah ada
+        const urlGambar = uploadedImageUrl;
+        const promptText = document.getElementById('promptInput').value.trim();
+
+        // Jika tidak ada gambar, minta upload
+        if (!urlGambar) {
+            alert('Silakan upload gambar terlebih dahulu.');
+            document.getElementById('loadingSpinner').style.display = 'none';
+            return;
+        }
+
+        // Panggil API change clothes
+        fetch(`https://api.ibeng.my.id/api/ai/changeclothes?url=${encodeURIComponent(urlGambar)}&prompt=${encodeURIComponent(promptText)}&apikey=${apiKey}`)
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(err => { throw new Error('Gagal dari API: ' + (err.message || res.status)); });
+            }
+            return res.json();
+        })
+        .then(data => {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            if (data.status === 'Success' && data.data) {
+                // Tampilkan gambar hasil
+                resultDiv.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = 'https://api.ibeng.my.id/api/ai/changeclothes?url=' + encodeURIComponent(uploadedImageUrl) + '&prompt=' + encodeURIComponent(promptText) + '&apikey=' + apiKey;
+                img.alt = 'Hasil Change Clothes';
+                resultDiv.appendChild(img);
+            } else {
+                resultDiv.innerHTML = '<p style="color:red;">Gagal mendapatkan hasil: ' + (data.message || 'Tidak diketahui') + '</p>';
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            resultDiv.innerHTML = '<p style="color:red;">' + err.message + '</p>';
+        })
+        .finally(() => {
+            document.getElementById('loadingSpinner').style.display = 'none';
+        });
+        return; // keluar dari fungsi
     }
 
+    // Kalau bukan change clothes, proses generate biasa
     const url = `https://api.ibeng.my.id/api/ai/${module}?query=${encodeURIComponent(finalPrompt)}&apikey=${apiKey}`;
-
     fetch(url)
         .then(res => {
             if (!res.ok) {
@@ -305,12 +333,9 @@ function callApiGenerate(finalPrompt) {
             return res.json();
         })
         .then(data => {
-            // Sembunyikan spinner setelah selesai
             document.getElementById('loadingSpinner').style.display = 'none';
-
             resultDiv.innerHTML = '';
 
-            // Tampilkan gambar upload jika ada
             if (uploadedImageUrl) {
                 const imgUpload = document.createElement('img');
                 imgUpload.src = uploadedImageUrl;
@@ -320,7 +345,6 @@ function callApiGenerate(finalPrompt) {
                 resultDiv.appendChild(imgUpload);
             }
 
-            // Tampilkan hasil dari API
             if (data && data.data && data.data.data) {
                 const mediaData = data.data.data;
                 if (mediaData.image_url) {
@@ -340,7 +364,6 @@ function callApiGenerate(finalPrompt) {
             }
         })
         .catch(err => {
-            // Sembunyikan spinner saat error
             document.getElementById('loadingSpinner').style.display = 'none';
             console.error(err);
             document.getElementById('result').innerHTML = '<p style="color:red;">' + err.message + '</p>';
