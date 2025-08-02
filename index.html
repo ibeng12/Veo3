@@ -76,18 +76,24 @@
 <body>
 <h1>Generate Gambar dan Video dengan VEO 3</h1>
 <div class="container">
+
     <!-- Pilihan modul -->
     <label for="modulSelect">Pilih Modul:</label>
     <select id="modulSelect">
         <option value="veo3">VEO 3</option>
         <option value="veo3-fast">VEO 3 Fast</option>
-        <!-- Tambahkan modul lain sesuai kebutuhan -->
-        <!-- <option value="modulLain">Modul Lain</option> -->
+        <!-- Bisa tambahkan pilihan lain sesuai kebutuhan -->
     </select>
 
     <!-- Input prompt -->
     <label for="promptInput">Masukkan Prompt:</label>
     <input type="text" id="promptInput" placeholder="Masukkan prompt" />
+
+    <!-- Upload gambar -->
+    <label for="imageUpload">Upload Gambar Baru:</label>
+    <input type="file" id="imageUpload" accept="image/*" />
+    <button onclick="uploadGambar()">Upload Gambar</button>
+    <div id="uploadStatus"></div>
 
     <!-- Tombol generate -->
     <button onclick="generateMedia()">Generate</button>
@@ -95,6 +101,56 @@
 </div>
 
 <script>
+/**
+ * Fungsi upload gambar ke API
+ */
+function uploadGambar() {
+    const fileInput = document.getElementById('imageUpload');
+    const uploadStatus = document.getElementById('uploadStatus');
+
+    const file = fileInput.files[0];
+    if (!file) {
+        alert('Silakan pilih file gambar terlebih dahulu.');
+        return;
+    }
+
+    uploadStatus.innerHTML = 'Mengunggah gambar...';
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    fetch('https://fgsi.koyeb.app/api/upload/uploadMtyun', {
+        method: 'POST',
+        headers: {
+            'key': 'fgsiapi-1afccfd1-6d' // Key API sesuai instruksi
+        },
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Gagal upload gambar: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data && data.data && data.data.image_url) {
+            const uploadedImageUrl = data.data.image_url;
+            // Masukkan URL ke input prompt
+            document.getElementById('promptInput').value = uploadedImageUrl;
+            uploadStatus.innerHTML = 'Gambar berhasil diupload dan URL dimasukkan ke prompt.';
+        } else {
+            throw new Error('Respon tidak valid dari API upload.');
+        }
+    })
+    .catch(error => {
+        uploadStatus.innerHTML = 'Error: ' + error.message;
+        console.error(error);
+    });
+}
+
+/**
+ * Fungsi generate gambar/video dari prompt
+ */
 function generateMedia() {
     const prompt = document.getElementById('promptInput').value.trim();
     const resultDiv = document.getElementById('result');
@@ -158,8 +214,9 @@ function generateMedia() {
         });
 }
 </script>
-    <footer style="text-align:center; margin-top:40px; font-size:14px; color:#555;">
-    &copy; 2025 Achmad Rizky. .
+
+<footer style="text-align:center; margin-top:40px; font-size:14px; color:#555;">
+    © 2025 Achmad Rizky.
 </footer>
 </body>
 </html>
