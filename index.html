@@ -150,7 +150,6 @@ function uploadGambar() {
         return response.json();
     })
     .then(data => {
-        // Sesuaikan penanganan response sesuai format yang diberikan
         if (data && data.status === true && data.data && data.data.url) {
             uploadedImageUrl = data.data.url;
             // tampilkan preview
@@ -161,8 +160,8 @@ function uploadGambar() {
             imgPreview.style.maxWidth = '100%';
             imgPreview.style.borderRadius = '8px';
             gambarPreviewDiv.appendChild(imgPreview);
-            uploadStatus.innerHTML = 'Gambar berhasil diupload. Jika mode otomatis aktif, prompt akan diambil dari gambar.';
-            // Jika mode otomatis aktif, otomatis panggil API img2prompt
+            uploadStatus.innerHTML = 'Gambar berhasil diupload.';
+            // Jika mode otomatis aktif dan modul img2prompt, otomatis panggil API prompt
             if (document.getElementById('autoPromptMode').checked && getSelectedModule() === 'img2prompt') {
                 fetchPromptFromImage();
             }
@@ -176,12 +175,12 @@ function uploadGambar() {
     });
 }
 
-// Fungsi untuk mendapatkan module yang dipilih
+// Mendapatkan modul yang dipilih
 function getSelectedModule() {
     return document.getElementById('modulSelect').value;
 }
 
-// Fungsi untuk panggil API img2prompt dan isi prompt
+// Fungsi mengambil prompt otomatis dari gambar
 function fetchPromptFromImage() {
     if (!uploadedImageUrl) {
         alert('Silakan upload gambar terlebih dahulu.');
@@ -213,36 +212,34 @@ function generateMedia() {
     const promptField = document.getElementById('promptInput');
     const prompt = promptField.value.trim();
     const resultDiv = document.getElementById('result');
-    const modul = getSelectedModule();
+    const module = getSelectedModule();
     const isAutoPrompt = document.getElementById('autoPromptMode').checked;
 
-    // Jika mode img2prompt dipilih
-    if (modul === 'img2prompt') {
+    // Jika modul adalah 'img2prompt', otomatis proses
+    if (module === 'img2prompt') {
         if (!uploadedImageUrl) {
             alert('Silakan upload gambar terlebih dahulu.');
             return;
         }
-        // otomatis ambil prompt dari gambar, lalu generate
+        // Ambil prompt otomatis dari gambar
         fetchPromptFromImage()
             .then(() => {
-                // Setelah prompt diisi otomatis, panggil API generate
+                // Setelah prompt terisi otomatis, panggil generate gambar/video
                 callApiGenerate(promptField.value);
             })
             .catch(() => {
                 // Error sudah ditangani di fetchPromptFromImage
             });
-        return; // keluar dari fungsi
+        return;
     }
 
-    // Jika mode otomatis aktif dan prompt kosong
-if (isAutoPrompt && uploadedImageUrl && !prompt) {
+    // Jika mode otomatis aktif dan prompt kosong, otomatis ambil prompt dari gambar
+    if (isAutoPrompt && uploadedImageUrl && !prompt) {
         fetchPromptFromImage()
             .then(() => {
                 callApiGenerate(document.getElementById('promptInput').value);
             })
-            .catch(() => {
-                // Error sudah ditangani
-            });
+            .catch(() => {});
         return;
     }
 
@@ -252,7 +249,7 @@ if (isAutoPrompt && uploadedImageUrl && !prompt) {
         return;
     }
 
-    // Panggil API generate biasa
+    // Generate gambar/video sesuai prompt dan modul
     callApiGenerate(prompt);
 }
 
@@ -264,9 +261,9 @@ function callApiGenerate(finalPrompt) {
     const module = getSelectedModule();
     const apiKey = 'MELvQtx7BG';
 
-    // Jika module adalah 'img2prompt', kita tidak panggil generate gambar/video
+    // Jika mode img2prompt, tidak generate gambar/video langsung
     if (module === 'img2prompt') {
-        resultDiv.innerHTML = '<p style="color:red;">Mode img2prompt tidak mendukung generate langsung. Silakan pilih modul lain.</p>';
+        resultDiv.innerHTML = '<p style="color:red;">Mode img2prompt aktif. Silakan pilih modul lain untuk generate gambar/video.</p>';
         return;
     }
 
