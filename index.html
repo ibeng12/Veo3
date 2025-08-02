@@ -28,7 +28,7 @@ label {
     margin-bottom: 5px;
     font-weight: bold;
 }
-select, input[type="text"], input[type="file"] {
+select, input[type="text"], input[type="file"], textarea {
     width: 100%;
     padding: 10px 15px;
     font-size: 16px;
@@ -84,7 +84,7 @@ button:hover {
 }
 /* Gambar upload kecil */
 #gambarPreview img {
-    max-width: 100px; /* kecilkan gambar */
+    max-width: 100px; /* kecil */
     height: auto;
     border-radius: 4px;
     display: block;
@@ -250,7 +250,6 @@ function generateMedia() {
     console.log('Generate dipanggil');
     spinner.style.display = 'block'; // tampilkan spinner
 
-    // Jika modulnya changeclothes
     if (module === 'changeclothes') {
         if (!uploadedImageUrl) {
             alert('Silakan upload gambar terlebih dahulu.');
@@ -262,7 +261,6 @@ function generateMedia() {
         return;
     }
 
-    // Jika modulnya img2prompt
     if (module === 'img2prompt') {
         if (!uploadedImageUrl) {
             alert('Silakan upload gambar terlebih dahulu.');
@@ -277,7 +275,6 @@ function generateMedia() {
         return;
     }
 
-    // Jika mode otomatis aktif dan prompt kosong
     const isAutoPrompt = document.getElementById('autoPromptMode').checked;
     if (isAutoPrompt && uploadedImageUrl && !prompt) {
         fetchPromptFromImage()
@@ -288,18 +285,15 @@ function generateMedia() {
         return;
     }
 
-    // Jika prompt kosong di mode manual
     if (!prompt) {
         alert('Silakan masukkan prompt.');
         spinner.style.display = 'none';
         return;
     }
 
-    // Generate gambar/video
     callApiGenerate(prompt);
 }
 
-// Fungsi API generate
 function callApiGenerate(finalPrompt) {
     const resultDiv = document.getElementById('result');
     resultDiv.innerHTML = '<p class="loading">Memproses, harap tunggu...</p>';
@@ -308,7 +302,6 @@ function callApiGenerate(finalPrompt) {
     const apiKey = 'MELvQtx7BG';
 
     if (module === 'changeclothes') {
-        // sudah di handle di generateMedia
         return;
     }
 
@@ -325,23 +318,10 @@ function callApiGenerate(finalPrompt) {
             document.getElementById('loadingSpinner').style.display = 'none';
             resultDiv.innerHTML = '';
 
-            if (uploadedImageUrl) {
-                const imgUpload = document.createElement('img');
-                imgUpload.src = uploadedImageUrl;
-                imgUpload.alt = 'Gambar Upload';
-                imgUpload.style.maxWidth = '100px'; // kecil
-                imgUpload.style.borderRadius = '4px';
-                resultDiv.appendChild(imgUpload);
-            }
-
+            // Hapus gambar upload dari hasil, biarkan hanya video
+            // jika ada video, tampilkan
             if (data && data.data && data.data.data) {
                 const mediaData = data.data.data;
-                if (mediaData.image_url) {
-                    const img = document.createElement('img');
-                    img.src = mediaData.image_url;
-                    img.alt = finalPrompt;
-                    resultDiv.appendChild(img);
-                }
                 if (mediaData.video_url) {
                     const video = document.createElement('video');
                     video.src = mediaData.video_url;
@@ -359,7 +339,7 @@ function callApiGenerate(finalPrompt) {
         });
 }
 
-// Fungsi API Change Clothes
+// API Change Clothes
 function fetchChangeClothes(imageUrl, prompt) {
     const resultDiv = document.getElementById('result');
     resultDiv.innerHTML = '<p class="loading">Sedang mengubah pakaian...</p>';
