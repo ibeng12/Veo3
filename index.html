@@ -82,6 +82,7 @@ button:hover {
     <select id="modulSelect">
         <option value="veo3">VEO 3</option>
         <option value="veo3-fast">VEO 3 Fast</option>
+        <option value="img2prompt">img2prompt (dari gambar)</option>
     </select>
 
     <!-- Upload gambar -->
@@ -112,7 +113,7 @@ button:hover {
 </div>
 
 <script>
-let uploadedImageUrl = ''; // menyimpan URL gambar upload
+let uploadedImageUrl = ''; // Menyimpan URL gambar upload
 
 // Fungsi upload gambar
 function uploadGambar() {
@@ -162,7 +163,7 @@ function uploadGambar() {
             gambarPreviewDiv.appendChild(imgPreview);
             uploadStatus.innerHTML = 'Gambar berhasil diupload. Jika mode otomatis aktif, prompt akan diambil dari gambar.';
             // Jika mode otomatis aktif, otomatis panggil API img2prompt
-            if (document.getElementById('autoPromptMode').checked) {
+            if (document.getElementById('autoPromptMode').checked && getSelectedModule() === 'img2prompt') {
                 fetchPromptFromImage();
             }
         } else {
@@ -175,11 +176,16 @@ function uploadGambar() {
     });
 }
 
+// Fungsi untuk mendapatkan module yang dipilih
+function getSelectedModule() {
+    return document.getElementById('modulSelect').value;
+}
+
 // Fungsi untuk panggil API img2prompt dan isi prompt
 function fetchPromptFromImage() {
     if (!uploadedImageUrl) {
         alert('Silakan upload gambar terlebih dahulu.');
-        return;
+        return Promise.reject(new Error('Gambar belum diupload.'));
     }
     const apiUrl = `https://api.ibeng.my.id/api/ai/img2prompt?url=${encodeURIComponent(uploadedImageUrl)}&apikey=MELvQtx7BG`;
     return fetch(apiUrl)
@@ -198,6 +204,7 @@ function fetchPromptFromImage() {
         })
         .catch(err => {
             alert('Error saat mengambil prompt: ' + err.message);
+            return Promise.reject(err);
         });
 }
 
@@ -206,77 +213,108 @@ function generateMedia() {
     const promptField = document.getElementById('promptInput');
     const prompt = promptField.value.trim();
     const resultDiv = document.getElementById('result');
-    const modul = document.getElementById('modulSelect').value;
+    const modul = getSelectedModule();
     const isAutoPrompt = document.getElementById('autoPromptMode').checked;
 
-    if (isAutoPrompt && uploadedImageUrl && !prompt) {
-        // Jika mode otomatis aktif dan prompt kosong, panggil API terlebih dahulu
-        fetchPromptFromImage()
-            .then(() => {
-                // Setelah prompt terisi otomatis, panggil API generate
-                callApiGenerate(promptField.value);
-            })
-            .catch(err => {
-                resultDiv.innerHTML = '<p style="color:red;">' + err.message + '</p>';
-            });
-    } else {
-        // Mode manual
-        if (!prompt) {
-            alert('Silakan masukkan prompt.');
+    // Jika mode img2prompt dipilih
+    if (modul === 'img2prompt') {
+        if (!uploadedImageUrl) {
+            alert('Silakan upload gambar terlebih dahulu.');
             return;
         }
-        callApiGenerate(prompt);
-    }
-
-    function callApiGenerate(finalPrompt) {
-        resultDiv.innerHTML = '<p class="loading">Memproses, harap tunggu...</p>';
-        const apiKey = 'MELvQtx7BG';
-        const url = `https://api.ibeng.my.id/api/ai/${modul}?query=${encodeURIComponent(finalPrompt)}&apikey=${apiKey}`;
-
-        fetch(url)
-            .then(res => {
-                if (!res.ok) {
-                    return res.json().then(err => { throw new Error('Gagal dari API: ' + (err.message || res.status)); });
-                }
-                return res.json();
+        // otomatis ambil prompt dari gambar, lalu generate
+        fetchPromptFromImage()
+            .then(() => {
+                // Setelah prompt diisi otomatis, panggil API generate
+                callApiGenerate(promptField.value);
             })
-            .then(data => {
-                resultDiv.innerHTML = '';
-
-                // Tampilkan gambar upload jika ada
-                if (uploadedImageUrl) {
-                    const imgUpload = document.createElement('img');
-                    imgUpload.src = uploadedImageUrl;
-                    imgUpload.alt = 'Gambar Upload';
-                    imgUpload.style.maxWidth = '100%';
-                    imgUpload.style.borderRadius = '8px';
-                    resultDiv.appendChild(imgUpload);
-                }
-
-                // Tampilkan hasil dari API
-                if (data && data.data && data.data.data) {
-                    const mediaData = data.data.data;
-                    if (mediaData.image_url) {
-                        const img = document.createElement('img');
-                        img.src = mediaData.image_url;
-                        img.alt = finalPrompt;
-                        resultDiv.appendChild(img);
-                    }
-                    if (mediaData.video_url) {
-                        const video = document.createElement('video');
-                        video.src = mediaData.video_url;
-                        video.controls = true;
-                        resultDiv.appendChild(video);
-                    }
-                } else {
-                    resultDiv.innerHTML += '<p style="color:red;">Data dari API tidak lengkap.</p>';
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                document.getElementById('result').innerHTML = '<p style="color:red;">' + err.message + '</p>';
+            .catch(() => {
+                // Error sudah ditangani di fetchPromptFromImage
             });
+        return; // keluar dari fungsi
     }
+
+    // Jika mode otomatis aktif dan prompt kosong
+if (isAutoPrompt && uploadedImageUrl && !prompt) {
+        fetchPromptFromImage()
+            .then(() => {
+                callApiGenerate(document.getElementById('promptInput').value);
+            })
+            .catch(() => {
+                // Error sudah ditangani
+            });
+        return;
+    }
+
+    // Jika prompt kosong di mode manual
+    if (!prompt) {
+        alert('Silakan masukkan prompt.');
+        return;
+    }
+
+    // Panggil API generate biasa
+    callApiGenerate(prompt);
+}
+
+// Fungsi panggil API generate gambar/video
+function callApiGenerate(finalPrompt) {
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = '<p class="loading">Memproses, harap tunggu...</p>';
+
+    const module = getSelectedModule();
+    const apiKey = 'MELvQtx7BG';
+
+    // Jika module adalah 'img2prompt', kita tidak panggil generate gambar/video
+    if (module === 'img2prompt') {
+        resultDiv.innerHTML = '<p style="color:red;">Mode img2prompt tidak mendukung generate langsung. Silakan pilih modul lain.</p>';
+        return;
+    }
+
+    const url = `https://api.ibeng.my.id/api/ai/${module}?query=${encodeURIComponent(finalPrompt)}&apikey=${apiKey}`;
+
+    fetch(url)
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(err => { throw new Error('Gagal dari API: ' + (err.message || res.status)); });
+            }
+            return res.json();
+        })
+        .then(data => {
+            resultDiv.innerHTML = '';
+
+            // Tampilkan gambar upload jika ada
+            if (uploadedImageUrl) {
+                const imgUpload = document.createElement('img');
+                imgUpload.src = uploadedImageUrl;
+                imgUpload.alt = 'Gambar Upload';
+                imgUpload.style.maxWidth = '100%';
+                imgUpload.style.borderRadius = '8px';
+                resultDiv.appendChild(imgUpload);
+            }
+
+            // Tampilkan hasil dari API
+            if (data && data.data && data.data.data) {
+                const mediaData = data.data.data;
+                if (mediaData.image_url) {
+                    const img = document.createElement('img');
+                    img.src = mediaData.image_url;
+                    img.alt = finalPrompt;
+                    resultDiv.appendChild(img);
+                }
+                if (mediaData.video_url) {
+                    const video = document.createElement('video');
+                    video.src = mediaData.video_url;
+                    video.controls = true;
+                    resultDiv.appendChild(video);
+                }
+            } else {
+                resultDiv.innerHTML += '<p style="color:red;">Data dari API tidak lengkap.</p>';
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('result').innerHTML = '<p style="color:red;">' + err.message + '</p>';
+        });
 }
 </script>
 
