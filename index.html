@@ -59,6 +59,7 @@
         max-width: 100%;
         height: auto;
         border-radius: 8px;
+        margin-bottom: 10px;
     }
     #result video {
         max-width: 100%;
@@ -82,7 +83,6 @@
     <select id="modulSelect">
         <option value="veo3">VEO 3</option>
         <option value="veo3-fast">VEO 3 Fast</option>
-        <!-- Bisa tambahkan pilihan lain sesuai kebutuhan -->
     </select>
 
     <!-- Input prompt -->
@@ -101,9 +101,8 @@
 </div>
 
 <script>
-/**
- * Fungsi upload gambar ke API
- */
+let uploadedImageUrl = ''; // Variabel global untuk menyimpan URL gambar upload
+
 function uploadGambar() {
     const fileInput = document.getElementById('imageUpload');
     const uploadStatus = document.getElementById('uploadStatus');
@@ -122,8 +121,7 @@ function uploadGambar() {
     fetch('https://fgsi.koyeb.app/api/upload/uploadMtyun', {
         method: 'POST',
         headers: {
-            'apikey': 'fgsiapi-1afccfd1-6d' // Pastikan ini sesuai API
-            // Jangan tambahkan Content-Type, biarkan browser otomatis yang atur
+            'key': 'fgsiapi-1afccfd1-6d'
         },
         body: formData
     })
@@ -138,17 +136,9 @@ function uploadGambar() {
         return response.json();
     })
     .then(data => {
-        // Response dari API upload:
-        // {
-        //   developer: 'Fgsi RestAPIs',
-        //   status: true,
-        //   data: { url: 'https://...' },
-        //   message: null
-        // }
         if (data && data.status && data.data && data.data.url) {
-            const uploadedImageUrl = data.data.url;
-            // Masukkan URL ke input prompt
-            document.getElementById('promptInput').value = uploadedImageUrl;
+            uploadedImageUrl = data.data.url;
+            document.getElementById('promptInput').value = uploadedImageUrl; // otomatis isi prompt
             uploadStatus.innerHTML = 'Gambar berhasil diupload dan URL dimasukkan ke prompt.';
         } else {
             throw new Error('Respon tidak valid dari API upload.');
@@ -160,14 +150,10 @@ function uploadGambar() {
     });
 }
 
-/**
- * Fungsi generate gambar/video dari prompt
- */
 function generateMedia() {
     const prompt = document.getElementById('promptInput').value.trim();
     const resultDiv = document.getElementById('result');
 
-    // Pilih modul dari dropdown
     const modul = document.getElementById('modulSelect').value;
 
     if (!prompt) {
@@ -175,12 +161,9 @@ function generateMedia() {
         return;
     }
 
-    // Tampilkan indikator loading
     resultDiv.innerHTML = '<p class="loading">Memproses, harap tunggu...</p>';
 
     const apiKey = 'MELvQtx7BG';
-
-    // Sesuaikan URL API berdasarkan modul yang dipilih
     const url = `https://api.ibeng.my.id/api/ai/${modul}?query=${encodeURIComponent(prompt)}&apikey=${apiKey}`;
 
     fetch(url)
@@ -195,13 +178,21 @@ function generateMedia() {
             return response.json();
         })
         .then(data => {
-            console.log('Response API:', data); // Debug
+            console.log('Response API:', data);
             resultDiv.innerHTML = '';
+
+            // Jika gambar upload sebelumnya ada, tampilkan dulu
+            if (uploadedImageUrl) {
+                const imgUploaded = document.createElement('img');
+                imgUploaded.src = uploadedImageUrl;
+                imgUploaded.alt = 'Gambar Upload';
+                imgUploaded.style.marginBottom = '10px';
+                resultDiv.appendChild(imgUploaded);
+            }
 
             if (data && data.data && data.data.data) {
                 const mediaData = data.data.data;
 
-                // Tampilkan gambar jika ada
                 if (mediaData.image_url) {
                     const img = document.createElement('img');
                     img.src = mediaData.image_url;
@@ -211,7 +202,6 @@ function generateMedia() {
                     resultDiv.innerHTML += '<p style="color:red;">Gambar tidak ditemukan.</p>';
                 }
 
-                // Tampilkan video jika ada
                 if (mediaData.video_url) {
                     const video = document.createElement('video');
                     video.src = mediaData.video_url;
@@ -221,7 +211,7 @@ function generateMedia() {
                     resultDiv.innerHTML += '<p style="color:red;">Video tidak ditemukan.</p>';
                 }
             } else {
-                resultDiv.innerHTML = '<p style="color:red;">Gagal mendapatkan data dari API.</p>';
+                resultDiv.innerHTML += '<p style="color:red;">Gagal mendapatkan data dari API.</p>';
             }
         })
         .catch(error => {
