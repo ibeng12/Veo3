@@ -122,7 +122,7 @@ function uploadGambar() {
     fetch('https://fgsi.koyeb.app/api/upload/uploadMtyun', {
         method: 'POST',
         headers: {
-            'apikey': 'fgsiapi-1afccfd1-6d' // Pastikan ini sesuai API
+            'key': 'fgsiapi-1afccfd1-6d' // Pastikan ini sesuai API
             // Jangan tambahkan Content-Type, biarkan browser otomatis yang atur
         },
         body: formData
@@ -132,15 +132,21 @@ function uploadGambar() {
             return response.json().then(errData => {
                 throw new Error('Gagal upload gambar: ' + (errData.message || response.status));
             }).catch(() => {
-                // Jika response bukan JSON
                 throw new Error('Gagal upload gambar: ' + response.status);
             });
         }
         return response.json();
     })
     .then(data => {
-        if (data && data.data && data.data.image_url) {
-            const uploadedImageUrl = data.data.image_url;
+        // Response dari API upload:
+        // {
+        //   developer: 'Fgsi RestAPIs',
+        //   status: true,
+        //   data: { url: 'https://...' },
+        //   message: null
+        // }
+        if (data && data.status && data.data && data.data.url) {
+            const uploadedImageUrl = data.data.url;
             // Masukkan URL ke input prompt
             document.getElementById('promptInput').value = uploadedImageUrl;
             uploadStatus.innerHTML = 'Gambar berhasil diupload dan URL dimasukkan ke prompt.';
