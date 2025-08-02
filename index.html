@@ -28,7 +28,7 @@
         margin-bottom: 5px;
         font-weight: bold;
     }
-    select, input[type="text"] {
+    select, input[type="text"], input[type="file"] {
         width: 100%;
         padding: 10px 15px;
         font-size: 16px;
@@ -122,13 +122,19 @@ function uploadGambar() {
     fetch('https://fgsi.koyeb.app/api/upload/uploadMtyun', {
         method: 'POST',
         headers: {
-            'key': 'fgsiapi-1afccfd1-6d' // Key API sesuai instruksi
+            'key': 'fgsiapi-1afccfd1-6d' // Pastikan ini sesuai API
+            // Jangan tambahkan Content-Type, biarkan browser otomatis yang atur
         },
         body: formData
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Gagal upload gambar: ' + response.status);
+            return response.json().then(errData => {
+                throw new Error('Gagal upload gambar: ' + (errData.message || response.status));
+            }).catch(() => {
+                // Jika response bukan JSON
+                throw new Error('Gagal upload gambar: ' + response.status);
+            });
         }
         return response.json();
     })
@@ -174,7 +180,11 @@ function generateMedia() {
     fetch(url)
         .then(response => {
             if (!response.ok) {
-                throw new Error('Gagal mendapatkan response dari server: ' + response.status);
+                return response.json().then(errData => {
+                    throw new Error('Gagal mendapatkan response dari server: ' + (errData.message || response.status));
+                }).catch(() => {
+                    throw new Error('Gagal mendapatkan response dari server: ' + response.status);
+                });
             }
             return response.json();
         })
