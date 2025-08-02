@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8" />
-<title>Gabungan Gambar dan Prompt</title>
+<title>Gabungan Gambar dan Prompt dengan Loading</title>
 <style>
 body {
     font-family: Arial, sans-serif;
@@ -233,6 +233,7 @@ function generateMedia() {
     const module = getSelectedModule();
     const spinner = document.getElementById('loadingSpinner');
 
+    console.log('Generate dipanggil');
     // Tampilkan spinner saat proses
     spinner.style.display = 'block';
 
@@ -240,7 +241,7 @@ function generateMedia() {
     if (module === 'img2prompt') {
         if (!uploadedImageUrl) {
             alert('Silakan upload gambar terlebih dahulu.');
-            spinner.style.display = 'none';
+            spinner.style.display = 'none'; // sembunyikan spinner
             return;
         }
         // Ambil prompt otomatis dari gambar dan langsung generate
@@ -250,7 +251,7 @@ function generateMedia() {
                 callApiGenerate(promptField.value);
             })
             .catch(() => {
-                spinner.style.display = 'none';
+                spinner.style.display = 'none'; // sembunyikan spinner saat error
             });
         return;
     }
@@ -263,7 +264,7 @@ function generateMedia() {
                 callApiGenerate(document.getElementById('promptInput').value);
             })
             .catch(() => {
-                spinner.style.display = 'none';
+                spinner.style.display = 'none'; // sembunyikan spinner saat error
             });
         return;
     }
@@ -271,7 +272,7 @@ function generateMedia() {
     // Jika prompt kosong di mode manual
     if (!prompt) {
         alert('Silakan masukkan prompt.');
-        spinner.style.display = 'none';
+        spinner.style.display = 'none'; // sembunyikan spinner
         return;
     }
 
@@ -345,9 +346,6 @@ function callApiGenerate(finalPrompt) {
             document.getElementById('result').innerHTML = '<p style="color:red;">' + err.message + '</p>';
         });
 }
-
-// Tambahkan spinner ke halaman
-const spinnerDiv = document.getElementById('loadingSpinner');
 </script>
 
 <!-- Spinner kecil ala Apple -->
