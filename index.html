@@ -131,7 +131,7 @@ function uploadGambar() {
     const formData = new FormData();
     formData.append('file', file);
 
-    fetch('https://fgsi.koyeb.app/api/upload/uploadMtyun', {
+    fetch('https://fgsi.koyeb.app/api/upload/uploadS3Aws', {
         method: 'POST',
         headers: {
             'apikey': 'fgsiapi-1afccfd1-6d'
@@ -149,7 +149,8 @@ function uploadGambar() {
         return response.json();
     })
     .then(data => {
-        if (data && data.status && data.data && data.data.url) {
+        // Sesuaikan penanganan response sesuai format yang diberikan
+        if (data && data.status === true && data.data && data.data.url) {
             uploadedImageUrl = data.data.url;
             // tampilkan preview
             gambarPreviewDiv.innerHTML = '';
@@ -181,7 +182,7 @@ function fetchPromptFromImage() {
         return;
     }
     const apiUrl = `https://api.ibeng.my.id/api/ai/img2prompt?url=${encodeURIComponent(uploadedImageUrl)}&apikey=MELvQtx7BG`;
-    fetch(apiUrl)
+    return fetch(apiUrl)
         .then(res => {
             if (!res.ok) {
                 return res.json().then(err => { throw new Error('Gagal mendapatkan prompt: ' + (err.message || res.status)); });
