@@ -5,60 +5,71 @@
 <title>Gabungan Gambar dan Prompt dengan Loading</title>
 <style>
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: #f0f2f5;
     margin: 0;
     padding: 20px;
 }
 h1 {
     text-align: center;
     color: #333;
+    margin-bottom: 20px;
 }
 .container {
-    max-width: 600px;
+    max-width: 640px;
     margin: 0 auto;
     padding: 20px;
     background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
 }
 label {
     display: block;
-    margin-top: 10px;
+    margin-top: 15px;
     margin-bottom: 5px;
-    font-weight: bold;
+    font-weight: 600;
+    font-size: 14px;
+    color: #555;
 }
-select, input[type="text"], input[type="file"], textarea {
+select, input[type="file"], textarea {
     width: 100%;
-    padding: 10px 15px;
-    font-size: 16px;
+    padding: 12px 15px;
+    font-size: 15px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 8px;
     box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+select:focus, input[type="file"]:focus, textarea:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.2);
 }
 button {
-    margin-top: 10px;
+    margin-top: 20px;
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     font-size: 16px;
+    font-weight: 600;
     background-color: #4CAF50;
-    color: white;
+    color: #fff;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.2s;
 }
 button:hover {
     background-color: #45a049;
+    transform: scale(1.02);
 }
-/* Spinner style */
 #loadingSpinner {
-    display: none; /* sembunyikan awalnya */
-    margin: 20px auto;
-    width: 40px;
-    height: 40px;
-    border: 4px solid #ccc;
-    border-top: 4px solid #000;
+    display: none;
+    margin: 30px auto;
+    width: 50px;
+    height: 50px;
+    border: 6px solid #ccc;
+    border-top: 6px solid #4CAF50;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -67,43 +78,50 @@ button:hover {
     100% { transform: rotate(360deg); }
 }
 #result {
-    margin-top: 20px;
-    text-align: center;
+    margin-top: 25px;
+    padding: 15px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #e0f7fa, #ffffff);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
-#result img {
+#result img, #result video {
     max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin-bottom: 10px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-top: 15px;
+    transition: all 0.3s ease;
 }
-#result video {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin-top: 20px;
+#result p {
+    font-size: 14px;
+    color: #999;
+    margin-top: 15px;
 }
-/* Gambar upload kecil */
 #gambarPreview img {
-    max-width: 100px; /* kecil */
+    max-width: 100px;
     height: auto;
-    border-radius: 4px;
-    display: block;
-    margin: 10px auto;
+    border-radius: 8px;
+    margin-top: 10px;
+    transition: all 0.2s ease;
 }
-/* Kotak prompt lebih besar */
 #promptInput {
     width: 100%;
     height: 80px;
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 4px;
+    padding: 12px;
+    font-size: 15px;
+    border-radius: 8px;
     border: 1px solid #ccc;
     resize: vertical;
+    transition: all 0.2s ease;
 }
 </style>
 </head>
 <body>
-<h1>Gabungan Gambar dan Prompt</h1>
+<h1 style="text-align:center; margin-bottom:20px;">Gabungan Gambar dan Prompt</h1>
 <div class="container">
 
     <!-- Pilihan modul -->
@@ -125,13 +143,13 @@ button:hover {
     <div id="gambarPreview"></div>
 
     <!-- Toggle mode otomatis img2prompt -->
-    <label style="margin-top:10px;">
+    <label style="margin-top:10px; display:flex; align-items:center; gap:10px;">
         <input type="checkbox" id="autoPromptMode" />
         Otomatis Ambil Prompt dari Gambar (img2prompt)
     </label>
 
     <!-- Input prompt manual, kotak besar -->
-    <label for="promptInput" style="margin-top:10px;">Masukkan Prompt:</label>
+    <label for="promptInput" style="margin-top:15px;">Masukkan Prompt:</label>
     <textarea id="promptInput" placeholder="Masukkan prompt" rows="4"></textarea>
 
     <!-- Tombol Generate -->
@@ -148,7 +166,6 @@ button:hover {
 <script>
 let uploadedImageUrl = ''; // Menyimpan URL gambar upload
 
-// Fungsi upload gambar
 function uploadGambar() {
     const fileInput = document.getElementById('imageUpload');
     const uploadStatus = document.getElementById('uploadStatus');
@@ -190,7 +207,6 @@ function uploadGambar() {
             const imgPreview = document.createElement('img');
             imgPreview.src = uploadedImageUrl;
             imgPreview.alt = 'Gambar Upload';
-            // styling kecil otomatis dari CSS
             gambarPreviewDiv.appendChild(imgPreview);
             uploadStatus.innerHTML = 'Gambar berhasil diupload.';
             // Jika mode otomatis aktif dan modul img2prompt, otomatis panggil API prompt
@@ -207,12 +223,10 @@ function uploadGambar() {
     });
 }
 
-// Mendapatkan modul yang dipilih
 function getSelectedModule() {
     return document.getElementById('modulSelect').value;
 }
 
-// Fungsi mengambil prompt otomatis dari gambar
 function fetchPromptFromImage() {
     if (!uploadedImageUrl) {
         alert('Silakan upload gambar terlebih dahulu.');
@@ -229,17 +243,10 @@ function fetchPromptFromImage() {
         .then(data => {
             if (data && data.status === 'Success' && data.data && data.data.prompt) {
                 document.getElementById('promptInput').value = data.data.prompt;
-            } else {
-                alert('Gagal mendapatkan prompt dari gambar.');
             }
-        })
-        .catch(err => {
-            alert('Error saat mengambil prompt: ' + err.message);
-            return Promise.reject(err);
         });
 }
 
-// Fungsi utama generate
 function generateMedia() {
     const promptField = document.getElementById('promptInput');
     const prompt = promptField.value.trim();
@@ -247,8 +254,7 @@ function generateMedia() {
     const module = getSelectedModule();
     const spinner = document.getElementById('loadingSpinner');
 
-    console.log('Generate dipanggil');
-    spinner.style.display = 'block'; // tampilkan spinner
+    spinner.style.display = 'block';
 
     if (module === 'changeclothes') {
         if (!uploadedImageUrl) {
@@ -256,8 +262,7 @@ function generateMedia() {
             spinner.style.display = 'none';
             return;
         }
-        const promptChangeClothes = prompt || 'Change clothes'; 
-        fetchChangeClothes(uploadedImageUrl, promptChangeClothes);
+        fetchChangeClothes(uploadedImageUrl, prompt || 'Change clothes');
         return;
     }
 
@@ -269,7 +274,7 @@ function generateMedia() {
         }
         fetchPromptFromImage()
             .then(() => {
-                callApiGenerate(promptField.value);
+                callApiGenerate(prompt);
             })
             .catch(() => { spinner.style.display = 'none'; });
         return;
@@ -296,7 +301,7 @@ function generateMedia() {
 
 function callApiGenerate(finalPrompt) {
     const resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = '<p class="loading">Memproses, harap tunggu...</p>';
+    resultDiv.innerHTML = '<p style="color:#555;">Memproses, harap tunggu...</p>';
 
     const module = getSelectedModule();
     const apiKey = 'MELvQtx7BG';
@@ -318,31 +323,25 @@ function callApiGenerate(finalPrompt) {
             document.getElementById('loadingSpinner').style.display = 'none';
             resultDiv.innerHTML = '';
 
-            // Hapus gambar upload dari hasil, biarkan hanya video
-            // jika ada video, tampilkan
-            if (data && data.data && data.data.data) {
-                const mediaData = data.data.data;
-                if (mediaData.video_url) {
-                    const video = document.createElement('video');
-                    video.src = mediaData.video_url;
-                    video.controls = true;
-                    resultDiv.appendChild(video);
-                }
-            } else {
-                resultDiv.innerHTML += '<p style="color:red;">Data dari API tidak lengkap.</p>';
+            // Hapus gambar upload dari hasil
+            // Jika ada video, tampilkan
+            if (data && data.data && data.data.data && data.data.data.video_url) {
+                const video = document.createElement('video');
+                video.src = data.data.data.video_url;
+                video.controls = true;
+                resultDiv.appendChild(video);
             }
         })
         .catch(err => {
             document.getElementById('loadingSpinner').style.display = 'none';
-            console.error(err);
-            document.getElementById('result').innerHTML = '<p style="color:red;">' + err.message + '</p>';
+            resultDiv.innerHTML = '<p style="color:#999;">' + err.message + '</p>';
         });
 }
 
 // API Change Clothes
 function fetchChangeClothes(imageUrl, prompt) {
     const resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = '<p class="loading">Sedang mengubah pakaian...</p>';
+    resultDiv.innerHTML = '<p style="color:#555;">Sedang mengubah pakaian...</p>';
 
     const apiUrl = `https://api.ibeng.my.id/api/ai/changeclothes?url=${encodeURIComponent(imageUrl)}&prompt=${encodeURIComponent(prompt)}&apikey=MELvQtx7BG`;
 
@@ -356,20 +355,17 @@ function fetchChangeClothes(imageUrl, prompt) {
         .then(data => {
             document.getElementById('loadingSpinner').style.display = 'none';
             if (data && data.status === 'Success' && data.data) {
-                // tampilkan gambar hasil
                 resultDiv.innerHTML = '';
                 const img = document.createElement('img');
                 img.src = data.data;
                 img.alt = 'Change Clothes Result';
                 img.style.maxWidth = '100%';
                 resultDiv.appendChild(img);
-            } else {
-                resultDiv.innerHTML = '<p style="color:red;">Gagal mendapatkan hasil dari API.</p>';
             }
         })
         .catch(err => {
             document.getElementById('loadingSpinner').style.display = 'none';
-            resultDiv.innerHTML = '<p style="color:red;">' + err.message + '</p>';
+            resultDiv.innerHTML = '<p style="color:#999;">' + err.message + '</p>';
         });
 }
 </script>
