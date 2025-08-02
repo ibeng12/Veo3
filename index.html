@@ -51,6 +51,21 @@ button {
 button:hover {
     background-color: #45a049;
 }
+/* Spinner style */
+#loadingSpinner {
+    display: none; /* sembunyikan awalnya */
+    margin: 20px auto;
+    width: 40px;
+    height: 40px;
+    border: 4px solid #ccc;
+    border-top: 4px solid #000;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 #result {
     margin-top: 20px;
     text-align: center;
@@ -106,6 +121,9 @@ button:hover {
 
     <!-- Tombol Generate -->
     <button id="generateBtn" onclick="generateMedia()">Generate</button>
+
+    <!-- Loading spinner -->
+    <div id="loadingSpinner"></div>
 
     <!-- Tempat hasil -->
     <div id="result"></div>
@@ -213,11 +231,16 @@ function generateMedia() {
     const prompt = promptField.value.trim();
     const resultDiv = document.getElementById('result');
     const module = getSelectedModule();
+    const spinner = document.getElementById('loadingSpinner');
+
+    // Tampilkan spinner saat proses
+    spinner.style.display = 'block';
 
     // Jika module adalah 'img2prompt'
     if (module === 'img2prompt') {
         if (!uploadedImageUrl) {
             alert('Silakan upload gambar terlebih dahulu.');
+            spinner.style.display = 'none';
             return;
         }
         // Ambil prompt otomatis dari gambar dan langsung generate
@@ -227,7 +250,7 @@ function generateMedia() {
                 callApiGenerate(promptField.value);
             })
             .catch(() => {
-                // Error sudah ditangani di fetchPromptFromImage
+                spinner.style.display = 'none';
             });
         return;
     }
@@ -239,13 +262,16 @@ function generateMedia() {
             .then(() => {
                 callApiGenerate(document.getElementById('promptInput').value);
             })
-            .catch(() => {});
+            .catch(() => {
+                spinner.style.display = 'none';
+            });
         return;
     }
 
     // Jika prompt kosong di mode manual
     if (!prompt) {
         alert('Silakan masukkan prompt.');
+        spinner.style.display = 'none';
         return;
     }
 
@@ -264,6 +290,7 @@ function callApiGenerate(finalPrompt) {
     // Jika mode 'img2prompt', tidak generate langsung
     if (module === 'img2prompt') {
         resultDiv.innerHTML = '<p style="color:red;">Mode img2prompt aktif. Silakan pilih modul lain untuk generate gambar/video.</p>';
+        document.getElementById('loadingSpinner').style.display = 'none'; // sembunyikan spinner
         return;
     }
 
@@ -277,6 +304,9 @@ function callApiGenerate(finalPrompt) {
             return res.json();
         })
         .then(data => {
+            // Sembunyikan spinner setelah selesai
+            document.getElementById('loadingSpinner').style.display = 'none';
+
             resultDiv.innerHTML = '';
 
             // Tampilkan gambar upload jika ada
@@ -309,11 +339,19 @@ function callApiGenerate(finalPrompt) {
             }
         })
         .catch(err => {
+            // Sembunyikan spinner saat error
+            document.getElementById('loadingSpinner').style.display = 'none';
             console.error(err);
             document.getElementById('result').innerHTML = '<p style="color:red;">' + err.message + '</p>';
         });
 }
+
+// Tambahkan spinner ke halaman
+const spinnerDiv = document.getElementById('loadingSpinner');
 </script>
+
+<!-- Spinner kecil ala Apple -->
+<div id="loadingSpinner"></div>
 
 <footer style="text-align:center; margin-top:40px; font-size:14px; color:#555;">
     © 2025 Achmad Rizky.
