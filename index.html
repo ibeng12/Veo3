@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8" />
-<title>Gambar + Prompt Jadi Satu</title>
+<title>Gabungan Gambar dan Prompt</title>
 <style>
 body {
     font-family: Arial, sans-serif;
@@ -74,7 +74,7 @@ button:hover {
 </style>
 </head>
 <body>
-<h1>Gambar + Prompt Jadi Satu</h1>
+<h1>Gabungan Gambar dan Prompt</h1>
 <div class="container">
 
     <!-- Pilihan modul -->
@@ -86,27 +86,33 @@ button:hover {
 
     <!-- Upload gambar -->
     <label for="imageUpload">Upload Gambar:</label>
-    <input type="file" id="imageUpload" accept="image/*" />
-    <button onclick="uploadGambar()">Upload Gambar</button>
+    <input type="file" id="imageUpload" accept="image/*" onchange="uploadGambar()" />
+
     <div id="uploadStatus"></div>
 
-    <!-- Input prompt -->
-    <label for="promptInput">Atau Masukkan Prompt (otomatis diisi gambar):</label>
+    <!-- Preview gambar upload -->
+    <div id="gambarPreview" style="margin-top:10px;"></div>
+
+    <!-- Input prompt manual -->
+    <label for="promptInput">Masukkan Prompt:</label>
     <input type="text" id="promptInput" placeholder="Masukkan prompt" />
 
-    <!-- Generate -->
-    <button onclick="generateMedia()">Generate</button>
+    <!-- Tombol Generate -->
+    <button id="generateBtn" onclick="generateMedia()">Generate</button>
+
+    <!-- Tempat hasil -->
     <div id="result"></div>
 
 </div>
 
 <script>
-let uploadedImageUrl = ''; // Variabel global untuk simpan URL gambar upload
+let uploadedImageUrl = ''; // Simpan URL gambar upload
 
-// Fungsi upload gambar dan otomatis masuk ke prompt
+// Fungsi upload gambar
 function uploadGambar() {
     const fileInput = document.getElementById('imageUpload');
     const uploadStatus = document.getElementById('uploadStatus');
+    const gambarPreviewDiv = document.getElementById('gambarPreview');
 
     const file = fileInput.files[0];
     if (!file) {
@@ -138,9 +144,16 @@ function uploadGambar() {
     })
     .then(data => {
         if (data && data.status && data.data && data.data.url) {
-            uploadedImageUrl = data.data.url; // Simpan URL gambar
-            document.getElementById('promptInput').value = uploadedImageUrl; // otomatis isi prompt
-            uploadStatus.innerHTML = 'Gambar berhasil diupload dan URL dimasukkan ke prompt.';
+            uploadedImageUrl = data.data.url; // simpan URL
+            // Tampilkan gambar preview
+            gambarPreviewDiv.innerHTML = '';
+            const imgPreview = document.createElement('img');
+            imgPreview.src = uploadedImageUrl;
+            imgPreview.alt = 'Gambar Upload';
+            imgPreview.style.maxWidth = '100%';
+            imgPreview.style.borderRadius = '8px';
+            gambarPreviewDiv.appendChild(imgPreview);
+            uploadStatus.innerHTML = 'Gambar berhasil diupload. Sekarang isi prompt dan klik Generate.';
         } else {
             throw new Error('Respon tidak valid dari API upload.');
         }
@@ -151,16 +164,16 @@ function uploadGambar() {
     });
 }
 
-// Fungsi generate dari API
+// Fungsi generate
 function generateMedia() {
     const promptField = document.getElementById('promptInput');
-    let prompt = promptField.value.trim();
+    const prompt = promptField.value.trim();
 
     const resultDiv = document.getElementById('result');
     const modul = document.getElementById('modulSelect').value;
 
     if (!prompt) {
-        alert('Silakan masukkan prompt atau upload gambar terlebih dahulu.');
+        alert('Silakan masukkan prompt.');
         return;
     }
 
@@ -179,16 +192,17 @@ function generateMedia() {
         .then(data => {
             resultDiv.innerHTML = '';
 
-            // Jika ada gambar upload sebelumnya, tampilkan dulu
+            // Tampilkan gambar upload jika ada
             if (uploadedImageUrl) {
                 const imgUpload = document.createElement('img');
                 imgUpload.src = uploadedImageUrl;
                 imgUpload.alt = 'Gambar Upload';
-                imgUpload.style.marginBottom = '10px';
+                imgUpload.style.maxWidth = '100%';
+                imgUpload.style.borderRadius = '8px';
                 resultDiv.appendChild(imgUpload);
             }
 
-            // Tampilkan hasil generate dari API
+            // Tampilkan hasil dari API
             if (data && data.data && data.data.data) {
                 const mediaData = data.data.data;
 
