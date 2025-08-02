@@ -207,21 +207,20 @@ function fetchPromptFromImage() {
         });
 }
 
-// Fungsi generate
+// Fungsi utama generate
 function generateMedia() {
     const promptField = document.getElementById('promptInput');
     const prompt = promptField.value.trim();
     const resultDiv = document.getElementById('result');
     const module = getSelectedModule();
-    const isAutoPrompt = document.getElementById('autoPromptMode').checked;
 
-    // Jika modul adalah 'img2prompt', otomatis proses
+    // Jika module adalah 'img2prompt'
     if (module === 'img2prompt') {
         if (!uploadedImageUrl) {
             alert('Silakan upload gambar terlebih dahulu.');
             return;
         }
-        // Ambil prompt otomatis dari gambar
+        // Ambil prompt otomatis dari gambar dan langsung generate
         fetchPromptFromImage()
             .then(() => {
                 // Setelah prompt terisi otomatis, panggil generate gambar/video
@@ -234,6 +233,7 @@ function generateMedia() {
     }
 
     // Jika mode otomatis aktif dan prompt kosong, otomatis ambil prompt dari gambar
+    const isAutoPrompt = document.getElementById('autoPromptMode').checked;
     if (isAutoPrompt && uploadedImageUrl && !prompt) {
         fetchPromptFromImage()
             .then(() => {
@@ -249,7 +249,7 @@ function generateMedia() {
         return;
     }
 
-    // Generate gambar/video sesuai prompt dan modul
+    // Generate gambar/video
     callApiGenerate(prompt);
 }
 
@@ -261,7 +261,7 @@ function callApiGenerate(finalPrompt) {
     const module = getSelectedModule();
     const apiKey = 'MELvQtx7BG';
 
-    // Jika mode img2prompt, tidak generate gambar/video langsung
+    // Jika mode 'img2prompt', tidak generate langsung
     if (module === 'img2prompt') {
         resultDiv.innerHTML = '<p style="color:red;">Mode img2prompt aktif. Silakan pilih modul lain untuk generate gambar/video.</p>';
         return;
