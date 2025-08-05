@@ -89,23 +89,11 @@ button:hover {
     flex-direction: column;
     align-items: center;
 }
-#result img, #result video {
+#result img {
     max-width: 100%;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     margin-top: 15px;
-}
-#result p {
-    font-size: 14px;
-    color: #999;
-    margin-top: 15px;
-}
-#gambarPreview img {
-    max-width: 100px;
-    height: auto;
-    border-radius: 8px;
-    margin-top: 10px;
-    transition: all 0.2s ease;
 }
 </style>
 </head>
@@ -396,7 +384,7 @@ function fetchCaiResponse() {
         });
 }
 
-// txt2img API
+// txt2img API langsung tampil gambar
 function fetchTxt2Img(prompt) {
     const resultDiv = document.getElementById('result');
     resultDiv.innerHTML = '<p style="color:#555;">Memproses txt2img, harap tunggu...</p>';
