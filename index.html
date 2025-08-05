@@ -22,7 +22,6 @@ h1 {
     background-color: #fff;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
 }
 label {
     display: block;
@@ -39,12 +38,6 @@ select, input[type="file"], textarea {
     border: 1px solid #ccc;
     border-radius: 8px;
     box-sizing: border-box;
-    transition: all 0.2s ease;
-}
-select:focus, input[type="file"]:focus, textarea:focus {
-    outline: none;
-    border-color: #4CAF50;
-    box-shadow: 0 0 8px rgba(76, 175, 80, 0.2);
 }
 button {
     margin-top: 20px;
@@ -57,11 +50,9 @@ button {
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
 }
 button:hover {
     background-color: #45a049;
-    transform: scale(1.02);
 }
 #loadingSpinner {
     display: none;
@@ -101,7 +92,6 @@ button:hover {
 <h1 style="text-align:center; margin-bottom:20px;">Veo3 & Veo3-Fast</h1>
 <div class="container">
 
-    <!-- Pilihan modul -->
     <label for="modulSelect">Pilih Modul:</label>
     <select id="modulSelect">
         <option value="veo3">VEO 3</option>
@@ -112,32 +102,25 @@ button:hover {
         <option value="txt2img">txt2img (dari teks)</option>
     </select>
 
-    <!-- Upload gambar -->
     <label for="imageUpload">Upload Gambar:</label>
     <input type="file" id="imageUpload" accept="image/*" onchange="uploadGambar()" />
 
     <div id="uploadStatus"></div>
 
-    <!-- Preview gambar upload kecil -->
     <div id="gambarPreview"></div>
 
-    <!-- Toggle mode otomatis img2prompt -->
     <label style="margin-top:10px; display:flex; align-items:center; gap:10px;">
         <input type="checkbox" id="autoPromptMode" />
         Otomatis Ambil Prompt dari Gambar (img2prompt)
     </label>
 
-    <!-- Input prompt umum -->
     <label for="promptInput" style="margin-top:15px;">Masukkan Prompt:</label>
     <textarea id="promptInput" placeholder="Masukkan prompt" rows="4"></textarea>
 
-    <!-- Tombol Generate -->
     <button id="generateBtn" onclick="generateMedia()">START</button>
 
-    <!-- Spinner -->
     <div id="loadingSpinner"></div>
 
-    <!-- Hasil -->
     <div id="result"></div>
 
 </div>
@@ -186,6 +169,7 @@ function uploadGambar() {
             const imgPreview = document.createElement('img');
             imgPreview.src = uploadedImageUrl;
             imgPreview.alt = 'Gambar Upload';
+            imgPreview.style.maxWidth = '100px';
             gambarPreviewDiv.appendChild(imgPreview);
             uploadStatus.innerHTML = 'Gambar berhasil diupload.';
             // Jika mode otomatis aktif dan modul img2prompt, otomatis panggil API prompt
@@ -206,7 +190,6 @@ function getSelectedModule() {
     return document.getElementById('modulSelect').value;
 }
 
-// Fungsi untuk mendapatkan prompt dari gambar
 function fetchPromptFromImage() {
     if (!uploadedImageUrl) {
         alert('Silakan upload gambar terlebih dahulu.');
@@ -227,7 +210,6 @@ function fetchPromptFromImage() {
         });
 }
 
-// Fungsi utama generate
 function generateMedia() {
     const prompt = document.getElementById('promptInput').value.trim();
     const resultDiv = document.getElementById('result');
@@ -273,7 +255,7 @@ function generateMedia() {
         fetchTxt2Img(txtPrompt);
         return;
     }
-    // Jika otomatis dari gambar
+
     const isAutoPrompt = document.getElementById('autoPromptMode').checked;
     if (isAutoPrompt && uploadedImageUrl && !prompt) {
         fetchPromptFromImage()
@@ -291,7 +273,6 @@ function generateMedia() {
     callApiGenerate(prompt);
 }
 
-// API call utama
 function callApiGenerate(finalPrompt) {
     const resultDiv = document.getElementById('result');
     resultDiv.innerHTML = '<p style="color:#555;">Memproses, harap tunggu...</p>';
@@ -325,7 +306,6 @@ function callApiGenerate(finalPrompt) {
     }
 }
 
-// API Change Clothes
 function fetchChangeClothes(imageUrl, prompt) {
     const resultDiv = document.getElementById('result');
     resultDiv.innerHTML = '<p style="color:#555;">Sedang mengubah pakaian...</p>';
@@ -355,7 +335,6 @@ function fetchChangeClothes(imageUrl, prompt) {
         });
 }
 
-// CAI Response
 function fetchCaiResponse() {
     const message = document.getElementById('promptInput').value.trim();
     if (!message) {
@@ -384,30 +363,31 @@ function fetchCaiResponse() {
         });
 }
 
-// txt2img API langsung tampil gambar
+// Versi baru untuk txt2img yang langsung menampilkan gambar
 function fetchTxt2Img(prompt) {
     const resultDiv = document.getElementById('result');
     resultDiv.innerHTML = '<p style="color:#555;">Memproses txt2img, harap tunggu...</p>';
 
     const apiUrl = `https://api.ibeng.my.id/api/ai/txt2img?prompt=${encodeURIComponent(prompt)}&resolusi=tall&apikey=MELvQtx7BG`;
+
     fetch(apiUrl)
         .then(res => {
-            if (!res.ok) {
+            const contentType = res.headers.get('Content-Type');
+            if (contentType && contentType.startsWith('image/')) {
+                return res.blob(); // Respons gambar mentah
+            } else {
+                // Jika bukan gambar, coba parse JSON error
                 return res.json().then(err => { throw new Error('Gagal txt2img: ' + (err.message || res.status)); });
             }
-            return res.json();
         })
-        .then(data => {
-            document.getElementById('loadingSpinner').style.display = 'none';
+        .then(blob => {
+            // Tampilkan gambar dari Blob
+            const imgUrl = URL.createObjectURL(blob);
             resultDiv.innerHTML = '';
-            if (data && data.data && data.data.image_url) {
-                const img = document.createElement('img');
-                img.src = data.data.image_url;
-                img.alt = 'Hasil txt2img';
-                resultDiv.appendChild(img);
-            } else {
-                resultDiv.innerHTML = '<p style="color:#999;">Gambar tidak tersedia.</p>';
-            }
+            const img = document.createElement('img');
+            img.src = imgUrl;
+            img.alt = 'Hasil txt2img';
+            resultDiv.appendChild(img);
         })
         .catch(err => {
             document.getElementById('loadingSpinner').style.display = 'none';
