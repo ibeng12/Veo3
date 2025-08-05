@@ -88,7 +88,7 @@ button:hover {
 }
 /* Area chat untuk modul CAI */
 #chatContainer {
-    display: none;
+    display: none; /* akan diubah saat modul 'cai' dipilih */
     margin-top: 15px;
     border: 1px solid #ccc;
     padding: 10px;
@@ -100,7 +100,7 @@ button:hover {
     margin-bottom: 10px;
 }
 #namaChatContainer {
-    display: none;
+    display: none; /* akan diubah saat modul 'cai' dipilih */
     margin-top: 10px;
 }
 </style>
@@ -203,7 +203,7 @@ function uploadGambar() {
             imgPreview.style.maxWidth = '100px';
             gambarPreviewDiv.appendChild(imgPreview);
             uploadStatus.innerHTML = 'Gambar berhasil diupload.';
-            // Kalau mode otomatis dan modul img2prompt, otomatis panggil API prompt
+            // Jika mode otomatis dan modul img2prompt, otomatis panggil API prompt
             if (document.getElementById('autoPromptMode').checked && getSelectedModule() === 'img2prompt') {
                 fetchPromptFromImage();
             }
@@ -242,7 +242,7 @@ document.getElementById('modulSelect').addEventListener('change', function() {
         // Bersihkan riwayat chat
         document.getElementById('chatHistory').innerHTML = '';
     } else {
-        // Sembunyikan input nama dan area chat
+        // Sembunyikan input nama dan chat
         namaContainer.style.display = 'none';
         chatContainer.style.display = 'none';
 
@@ -320,12 +320,12 @@ function fetchCaiResponse(msg) {
     });
 }
 
-// Fungsi generate utama
+// Fungsi utama generate media
 function generateMedia() {
     const prompt = document.getElementById('promptInput').value.trim();
     const resultDiv = document.getElementById('result');
-    const module = getSelectedModule();
     const spinner = document.getElementById('loadingSpinner');
+    const module = getSelectedModule();
 
     spinner.style.display = 'block';
 
@@ -335,24 +335,226 @@ function generateMedia() {
         document.querySelector('label[for="promptInput"]').style.display = 'none';
         document.getElementById('promptInput').style.display = 'none';
 
-        // Jangan panggil API generate media
+        // Sembunyikan spinner
         spinner.style.display = 'none';
         return;
     } else {
+        // Sembunyikan area chat
         document.getElementById('chatContainer').style.display = 'none';
+
         // Tampilkan prompt
         document.querySelector('label[for="promptInput"]').style.display = 'block';
         document.getElementById('promptInput').style.display = 'block';
     }
 
-    // ... kode lain untuk modul lain tetap sama
-    // (kode fungsi fetchChangeClothes, fetchPromptFromImage, fetchTxt2Img, callApiGenerate, dll)
+    // Panggil API sesuai modul
+    if (module === 'veo3') {
+        fetchVeo3(prompt);
+    } else if (module === 'veo3-fast') {
+        fetchVeo3Fast(prompt);
+    } else if (module === 'img2prompt') {
+        fetchPromptFromImage();
+    } else if (module === 'changeclothes') {
+        fetchChangeClothes(prompt);
+    } else if (module === 'txt2img') {
+        fetchTxt2Img(prompt);
+    } else {
+        alert('Modul belum tersedia.');
+    }
+
+    spinner.style.display = 'none';
 }
 
-// Jangan lupa panggil fungsi untuk mengatur tampilan awal
-// Saat halaman dimuat, set tampilan sesuai default
+// Contoh fungsi fetch API untuk masing-masing fitur
+function fetchVeo3(prompt) {
+    // Gunakan API asli dari yang Anda miliki
+    fetch('https://api.yourdomain.com/veo3', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: prompt })
+    })
+    .then(res => res.json())
+    .then(data => {
+        displayResult(data.url); // sesuaikan response
+    })
+    .catch(() => {
+        displayResult(null, 'Gagal fetch Veo3');
+    });
+}
+
+function fetchVeo3Fast(prompt) {
+    fetch('https://api.yourdomain.com/veo3-fast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: prompt })
+    })
+    .then(res => res.json())
+    .then(data => {
+        displayResult(data.url);
+    })
+    .catch(() => {
+        displayResult(null, 'Gagal fetch Veo3-fast');
+    });
+}
+
+function fetchPromptFromImage() {
+    if (!uploadedImageUrl) {
+        alert('Silakan upload gambar terlebih dahulu.');
+        return;
+    }
+    // API img2prompt
+    fetch('https://api.yourdomain.com/img2prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: uploadedImageUrl })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('promptInput').value = data.prompt;
+        alert('Prompt berhasil diambil dari gambar.');
+    })
+    .catch(() => {
+        alert('Gagal mendapatkan prompt dari gambar.');
+    });
+}
+
+function fetchChangeClothes(prompt) {
+    fetch('https://api.yourdomain.com/changeclothes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: prompt, image: uploadedImageUrl })
+    })
+    .then(res => res.json())
+    .then(data => {
+        displayResult(data.url);
+    })
+    .catch(() => {
+        displayResult(null, 'Gagal fetch Change Clothes');
+    });
+}
+
+function fetchTxt2Img(prompt) {
+    fetch('https://api.yourdomain.com/txt2img', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: prompt })
+    })
+    .then(res => res.json())
+    .then(data => {
+        displayResult(data.url);
+    })
+    .catch(() => {
+        displayResult(null, 'Gagal fetch txt2img');
+    });
+}
+
+// Fungsi menampilkan hasil gambar
+function displayResult(imageUrl, message='') {
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = '';
+    if (imageUrl) {
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        resultDiv.appendChild(img);
+    } else {
+        resultDiv.innerHTML = '<p>' + message + '</p>';
+    }
+}
+
+// Event listener untuk perubahan modul
+document.getElementById('modulSelect').addEventListener('change', function() {
+    const selected = this.value;
+    const namaContainer = document.getElementById('namaChatContainer');
+    const promptLabel = document.querySelector('label[for="promptInput"]');
+    const promptTextarea = document.getElementById('promptInput');
+    const chatContainer = document.getElementById('chatContainer');
+
+    if (selected === 'cai') {
+        // Tampilkan input nama dan area chat
+        namaContainer.style.display = 'block';
+        chatContainer.style.display = 'block';
+
+        // Sembunyikan prompt
+        promptLabel.style.display = 'none';
+        promptTextarea.style.display = 'none';
+
+        // Bersihkan riwayat chat
+        document.getElementById('chatHistory').innerHTML = '';
+    } else {
+        // Sembunyikan input nama dan chat
+        namaContainer.style.display = 'none';
+        chatContainer.style.display = 'none';
+
+        // Tampilkan prompt
+        promptLabel.style.display = 'block';
+        promptTextarea.style.display = 'block';
+
+        // Reset prompt
+        document.getElementById('promptInput').value = '';
+    }
+});
+
+// Fungsi kirim pesan chat
+function sendChat() {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    if (!message) return;
+
+    const chatHistory = document.getElementById('chatHistory');
+
+    // Tampilkan pesan pengguna
+    const userMsgDiv = document.createElement('div');
+    userMsgDiv.style.padding = '5px 10px';
+    userMsgDiv.style.backgroundColor = '#e0f7fa';
+    userMsgDiv.style.marginBottom = '5px';
+    userMsgDiv.style.borderRadius = '8px';
+    userMsgDiv.innerText = 'Anda: ' + message;
+    chatHistory.appendChild(userMsgDiv);
+
+    input.value = '';
+
+    // Kirim ke API CAI
+    fetchCaiResponse(message);
+}
+
+function fetchCaiResponse(msg) {
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = '<p style="color:#555;">Sedang mengirim pesan...</p>';
+
+    const nama = document.getElementById('namaChat').value.trim();
+    if (!nama) {
+        alert('Silakan masukkan nama terlebih dahulu.');
+        return;
+    }
+    const chatId = encodeURIComponent(nama);
+    const apiUrl = `https://api.ibeng.my.id/api/ai/cai?message=${encodeURIComponent(msg)}&chat_id=${chatId}&custom=saya adalah chat gpt di kembangkan achmad rizky&apikey=MELvQtx7BG`;
+
+    fetch(apiUrl)
+    .then(res => res.json())
+    .then(data => {
+        const chatHistory = document.getElementById('chatHistory');
+        const replyDiv = document.createElement('div');
+        replyDiv.style.padding = '5px 10px';
+        replyDiv.style.backgroundColor = '#f0f0f0';
+        replyDiv.style.marginBottom = '5px';
+        replyDiv.style.borderRadius = '8px';
+        replyDiv.innerText = 'AI: ' + (data && data.result && data.result.text ? data.result.text : 'Tidak ada respons.');
+        chatHistory.appendChild(replyDiv);
+    })
+    .catch(err => {
+        const chatHistory = document.getElementById('chatHistory');
+        const errorDiv = document.createElement('div');
+        errorDiv.style.padding = '5px 10px';
+        errorDiv.style.backgroundColor = '#f8d7da';
+        errorDiv.style.marginBottom = '5px';
+        errorDiv.style.borderRadius = '8px';
+        errorDiv.innerText = 'Error: ' + err.message;
+        chatHistory.appendChild(errorDiv);
+    });
+}
+
+// Inisialisasi tampilan saat halaman dimuat
 window.onload = () => {
-    // Set tampilan awal sesuai pilihan default
     document.getElementById('modulSelect').dispatchEvent(new Event('change'));
 };
 </script>
