@@ -132,6 +132,7 @@ button:hover {
         <option value="img2prompt">img2prompt (dari gambar)</option>
         <option value="changeclothes">AI Change Clothes</option>
         <option value="cai">CAI (Chat AI)</option>
+        <option value="txt2img">txt2img (dari teks)</option> <!-- Penambahan -->
     </select>
 
     <!-- Upload gambar -->
@@ -152,6 +153,10 @@ button:hover {
     <!-- Input prompt manual, kotak besar -->
     <label for="promptInput" style="margin-top:15px;">Masukkan Prompt:</label>
     <textarea id="promptInput" placeholder="Masukkan prompt" rows="4"></textarea>
+
+    <!-- Input prompt untuk txt2img -->
+    <label for="txt2imgPrompt" style="margin-top:15px;">Prompt Gambar (txt2img):</label>
+    <textarea id="txt2imgPrompt" placeholder="Masukkan prompt untuk txt2img" rows="3"></textarea>
 
     <!-- Tombol Generate -->
     <button id="generateBtn" onclick="generateMedia()">START</button>
@@ -292,6 +297,18 @@ function generateMedia() {
         return;
     }
 
+    // Mode txt2img
+    if (module === 'txt2img') {
+        const txtPrompt = document.getElementById('txt2imgPrompt').value.trim();
+        if (!txtPrompt) {
+            alert('Silakan masukkan prompt untuk txt2img.');
+            spinner.style.display = 'none';
+            return;
+        }
+        fetchTxt2Img(txtPrompt);
+        return;
+    }
+
     // Mode otomatis dari gambar (autoPrompt)
     const isAutoPrompt = document.getElementById('autoPromptMode').checked;
     if (isAutoPrompt && uploadedImageUrl && !prompt) {
@@ -321,8 +338,8 @@ function callApiGenerate(finalPrompt) {
     const module = getSelectedModule();
     const apiKey = 'MELvQtx7BG';
 
-    // Jika bukan CAI, panggil API sesuai modul
-    if (module !== 'cai') {
+    // Jika bukan CAI dan txt2img, panggil API sesuai modul
+    if (module !== 'cai' && module !== 'txt2img') {
         const url = `https://api.ibeng.my.id/api/ai/${module}?query=${encodeURIComponent(finalPrompt)}&apikey=${apiKey}`;
 
         fetch(url)
@@ -410,6 +427,38 @@ function fetchCaiResponse() {
         })
         .catch(err => {
             document.getElementById('result').innerHTML = '<p style="color:#999;">' + err.message + '</p>';
+        });
+}
+
+// Fungsi untuk txt2img
+function fetchTxt2Img(prompt) {
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = '<p style="color:#555;">Memproses txt2img, harap tunggu...</p>';
+
+    const apiUrl = `https://api.ibeng.my.id/api/ai/txt2img?prompt=${encodeURIComponent(prompt)}&resolusi=tall&apikey=MELvQtx7BG`;
+
+    fetch(apiUrl)
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(err => { throw new Error('Gagal txt2img: ' + (err.message || res.status)); });
+            }
+            return res.json();
+        })
+        .then(data => {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            resultDiv.innerHTML = '';
+            if (data && data.data && data.data.image_url) {
+                const img = document.createElement('img');
+                img.src = data.data.image_url;
+                img.alt = 'Hasil txt2img';
+                resultDiv.appendChild(img);
+            } else {
+                resultDiv.innerHTML = '<p style="color:#999;">Gambar tidak tersedia.</p>';
+            }
+        })
+        .catch(err => {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            resultDiv.innerHTML = '<p style="color:#999;">' + err.message + '</p>';
         });
 }
 </script>
