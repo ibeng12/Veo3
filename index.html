@@ -31,7 +31,7 @@ label {
     font-size: 14px;
     color: #555;
 }
-select, input[type="file"], textarea, input[type="text"] {
+select, input[type="file"], textarea {
     width: 100%;
     padding: 12px 15px;
     font-size: 15px;
@@ -86,23 +86,6 @@ button:hover {
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     margin-top: 15px;
 }
-/* Area chat untuk modul CAI */
-#chatContainer {
-    display: none; /* akan diubah saat modul 'cai' dipilih */
-    margin-top: 15px;
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 8px;
-    max-height: 300px;
-    overflow-y: auto;
-}
-#chatHistory {
-    margin-bottom: 10px;
-}
-#namaChatContainer {
-    display: none; /* akan diubah saat modul 'cai' dipilih */
-    margin-top: 10px;
-}
 </style>
 </head>
 <body>
@@ -119,16 +102,11 @@ button:hover {
         <option value="txt2img">txt2img (dari teks)</option>
     </select>
 
-    <!-- Input nama untuk chat_id, muncul jika modul cai -->
-    <div id="namaChatContainer">
-        <label for="namaChat">Masukkan Nama (untuk sesi chat):</label>
-        <input type="text" id="namaChat" placeholder="Contoh: user123" />
-    </div>
-
     <label for="imageUpload">Upload Gambar:</label>
     <input type="file" id="imageUpload" accept="image/*" onchange="uploadGambar()" />
 
     <div id="uploadStatus"></div>
+
     <div id="gambarPreview"></div>
 
     <label style="margin-top:10px; display:flex; align-items:center; gap:10px;">
@@ -139,18 +117,10 @@ button:hover {
     <label for="promptInput" style="margin-top:15px;">Masukkan Prompt:</label>
     <textarea id="promptInput" placeholder="Masukkan prompt" rows="4"></textarea>
 
-    <!-- Area Chat untuk modul CAI -->
-    <div id="chatContainer">
-        <div id="chatHistory"></div>
-        <div style="display:flex; gap:5px;">
-            <input type="text" id="chatInput" placeholder="Ketik pesan..." style="flex:1; padding:8px; border-radius:4px; border:1px solid #ccc;" />
-            <button onclick="sendChat()" style="padding:8px 12px; border:none; background:#4CAF50; color:#fff; border-radius:4px;">Kirim</button>
-        </div>
-    </div>
-
     <button id="generateBtn" onclick="generateMedia()">START</button>
 
     <div id="loadingSpinner"></div>
+
     <div id="result"></div>
 
 </div>
@@ -158,7 +128,6 @@ button:hover {
 <script>
 let uploadedImageUrl = '';
 
-// Fungsi upload gambar
 function uploadGambar() {
     const fileInput = document.getElementById('imageUpload');
     const uploadStatus = document.getElementById('uploadStatus');
@@ -195,7 +164,7 @@ function uploadGambar() {
     .then(data => {
         if (data && data.status === true && data.data && data.data.url) {
             uploadedImageUrl = data.data.url;
-            // Tampilkan preview kecil
+            // tampilkan preview kecil
             gambarPreviewDiv.innerHTML = '';
             const imgPreview = document.createElement('img');
             imgPreview.src = uploadedImageUrl;
@@ -203,7 +172,7 @@ function uploadGambar() {
             imgPreview.style.maxWidth = '100px';
             gambarPreviewDiv.appendChild(imgPreview);
             uploadStatus.innerHTML = 'Gambar berhasil diupload.';
-            // Jika mode otomatis dan modul img2prompt, otomatis panggil API prompt
+            // Jika mode otomatis aktif dan modul img2prompt, otomatis panggil API prompt
             if (document.getElementById('autoPromptMode').checked && getSelectedModule() === 'img2prompt') {
                 fetchPromptFromImage();
             }
@@ -217,349 +186,224 @@ function uploadGambar() {
     });
 }
 
-// Dapatkan modul yang dipilih
 function getSelectedModule() {
     return document.getElementById('modulSelect').value;
-}
-
-// Saat modul berubah
-document.getElementById('modulSelect').addEventListener('change', function() {
-    const selected = this.value;
-    const namaContainer = document.getElementById('namaChatContainer');
-    const promptLabel = document.querySelector('label[for="promptInput"]');
-    const promptTextarea = document.getElementById('promptInput');
-    const chatContainer = document.getElementById('chatContainer');
-
-    if (selected === 'cai') {
-        // Tampilkan input nama dan area chat
-        namaContainer.style.display = 'block';
-        chatContainer.style.display = 'block';
-
-        // Sembunyikan prompt
-        promptLabel.style.display = 'none';
-        promptTextarea.style.display = 'none';
-
-        // Bersihkan riwayat chat
-        document.getElementById('chatHistory').innerHTML = '';
-    } else {
-        // Sembunyikan input nama dan chat
-        namaContainer.style.display = 'none';
-        chatContainer.style.display = 'none';
-
-        // Tampilkan prompt
-        promptLabel.style.display = 'block';
-        promptTextarea.style.display = 'block';
-
-        // Reset prompt
-        document.getElementById('promptInput').value = '';
-    }
-});
-
-// Fungsi kirim pesan chat
-function sendChat() {
-    const input = document.getElementById('chatInput');
-    const message = input.value.trim();
-    if (!message) return;
-
-    const chatHistory = document.getElementById('chatHistory');
-
-    // Tampilkan pesan pengguna
-    const userMsgDiv = document.createElement('div');
-    userMsgDiv.style.padding = '5px 10px';
-    userMsgDiv.style.backgroundColor = '#e0f7fa';
-    userMsgDiv.style.marginBottom = '5px';
-    userMsgDiv.style.borderRadius = '8px';
-    userMsgDiv.innerText = 'Anda: ' + message;
-    chatHistory.appendChild(userMsgDiv);
-
-    input.value = '';
-
-    // Kirim ke API CAI
-    fetchCaiResponse(message);
-}
-
-// Fungsi fetch API CAI
-function fetchCaiResponse(msg) {
-    const resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = '<p style="color:#555;">Sedang mengirim pesan...</p>';
-
-    const nama = document.getElementById('namaChat').value.trim();
-    if (!nama) {
-        alert('Silakan masukkan nama terlebih dahulu.');
-        return;
-    }
-    const chatId = encodeURIComponent(nama);
-    const apiUrl = `https://api.ibeng.my.id/api/ai/cai?message=${encodeURIComponent(msg)}&chat_id=${chatId}&custom=saya adalah chat gpt di kembangkan achmad rizky&apikey=MELvQtx7BG`;
-
-    fetch(apiUrl)
-    .then(res => {
-        if (!res.ok) {
-            return res.json().then(err => { throw new Error('Gagal dari API CAI: ' + (err.message || res.status)); });
-        }
-        return res.json();
-    })
-    .then(data => {
-        const chatHistory = document.getElementById('chatHistory');
-        const replyDiv = document.createElement('div');
-        replyDiv.style.padding = '5px 10px';
-        replyDiv.style.backgroundColor = '#f0f0f0';
-        replyDiv.style.marginBottom = '5px';
-        replyDiv.style.borderRadius = '8px';
-        replyDiv.innerText = 'AI: ' + (data && data.result && data.result.text ? data.result.text : 'Tidak ada respons.');
-        chatHistory.appendChild(replyDiv);
-    })
-    .catch(err => {
-        const chatHistory = document.getElementById('chatHistory');
-        const errorDiv = document.createElement('div');
-        errorDiv.style.padding = '5px 10px';
-        errorDiv.style.backgroundColor = '#f8d7da';
-        errorDiv.style.marginBottom = '5px';
-        errorDiv.style.borderRadius = '8px';
-        errorDiv.innerText = 'Error: ' + err.message;
-        chatHistory.appendChild(errorDiv);
-    });
-}
-
-// Fungsi utama generate media
-function generateMedia() {
-    const prompt = document.getElementById('promptInput').value.trim();
-    const resultDiv = document.getElementById('result');
-    const spinner = document.getElementById('loadingSpinner');
-    const module = getSelectedModule();
-
-    spinner.style.display = 'block';
-
-    if (module === 'cai') {
-        // Pastikan area chat dan input nama tampil
-        document.getElementById('chatContainer').style.display = 'block';
-        document.querySelector('label[for="promptInput"]').style.display = 'none';
-        document.getElementById('promptInput').style.display = 'none';
-
-        // Sembunyikan spinner
-        spinner.style.display = 'none';
-        return;
-    } else {
-        // Sembunyikan area chat
-        document.getElementById('chatContainer').style.display = 'none';
-
-        // Tampilkan prompt
-        document.querySelector('label[for="promptInput"]').style.display = 'block';
-        document.getElementById('promptInput').style.display = 'block';
-    }
-
-    // Panggil API sesuai modul
-    if (module === 'veo3') {
-        fetchVeo3(prompt);
-    } else if (module === 'veo3-fast') {
-        fetchVeo3Fast(prompt);
-    } else if (module === 'img2prompt') {
-        fetchPromptFromImage();
-    } else if (module === 'changeclothes') {
-        fetchChangeClothes(prompt);
-    } else if (module === 'txt2img') {
-        fetchTxt2Img(prompt);
-    } else {
-        alert('Modul belum tersedia.');
-    }
-
-    spinner.style.display = 'none';
-}
-
-// Contoh fungsi fetch API untuk masing-masing fitur
-function fetchVeo3(prompt) {
-    // Gunakan API asli dari yang Anda miliki
-    fetch('https://api.yourdomain.com/veo3', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: prompt })
-    })
-    .then(res => res.json())
-    .then(data => {
-        displayResult(data.url); // sesuaikan response
-    })
-    .catch(() => {
-        displayResult(null, 'Gagal fetch Veo3');
-    });
-}
-
-function fetchVeo3Fast(prompt) {
-    fetch('https://api.yourdomain.com/veo3-fast', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: prompt })
-    })
-    .then(res => res.json())
-    .then(data => {
-        displayResult(data.url);
-    })
-    .catch(() => {
-        displayResult(null, 'Gagal fetch Veo3-fast');
-    });
 }
 
 function fetchPromptFromImage() {
     if (!uploadedImageUrl) {
         alert('Silakan upload gambar terlebih dahulu.');
+        return Promise.reject(new Error('Gambar belum diupload.'));
+    }
+    const apiUrl = `https://api.ibeng.my.id/api/ai/img2prompt?url=${encodeURIComponent(uploadedImageUrl)}&apikey=MELvQtx7BG`;
+    return fetch(apiUrl)
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(err => { throw new Error('Gagal mendapatkan prompt: ' + (err.message || res.status)); });
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (data && data.status === 'Success' && data.data && data.data.prompt) {
+                document.getElementById('promptInput').value = data.data.prompt;
+            }
+        });
+}
+
+function generateMedia() {
+    const prompt = document.getElementById('promptInput').value.trim();
+    const resultDiv = document.getElementById('result');
+    const module = getSelectedModule();
+    const spinner = document.getElementById('loadingSpinner');
+
+    spinner.style.display = 'block';
+
+    // Penanganan khusus untuk module tertentu
+    if (module === 'cai') {
+        fetchCaiResponse();
+        spinner.style.display = 'none';
         return;
     }
-    // API img2prompt
-    fetch('https://api.yourdomain.com/img2prompt', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: uploadedImageUrl })
-    })
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById('promptInput').value = data.prompt;
-        alert('Prompt berhasil diambil dari gambar.');
-    })
-    .catch(() => {
-        alert('Gagal mendapatkan prompt dari gambar.');
-    });
-}
-
-function fetchChangeClothes(prompt) {
-    fetch('https://api.yourdomain.com/changeclothes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: prompt, image: uploadedImageUrl })
-    })
-    .then(res => res.json())
-    .then(data => {
-        displayResult(data.url);
-    })
-    .catch(() => {
-        displayResult(null, 'Gagal fetch Change Clothes');
-    });
-}
-
-function fetchTxt2Img(prompt) {
-    fetch('https://api.yourdomain.com/txt2img', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: prompt })
-    })
-    .then(res => res.json())
-    .then(data => {
-        displayResult(data.url);
-    })
-    .catch(() => {
-        displayResult(null, 'Gagal fetch txt2img');
-    });
-}
-
-// Fungsi menampilkan hasil gambar
-function displayResult(imageUrl, message='') {
-    const resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = '';
-    if (imageUrl) {
-        const img = document.createElement('img');
-        img.src = imageUrl;
-        resultDiv.appendChild(img);
-    } else {
-        resultDiv.innerHTML = '<p>' + message + '</p>';
-    }
-}
-
-// Event listener untuk perubahan modul
-document.getElementById('modulSelect').addEventListener('change', function() {
-    const selected = this.value;
-    const namaContainer = document.getElementById('namaChatContainer');
-    const promptLabel = document.querySelector('label[for="promptInput"]');
-    const promptTextarea = document.getElementById('promptInput');
-    const chatContainer = document.getElementById('chatContainer');
-
-    if (selected === 'cai') {
-        // Tampilkan input nama dan area chat
-        namaContainer.style.display = 'block';
-        chatContainer.style.display = 'block';
-
-        // Sembunyikan prompt
-        promptLabel.style.display = 'none';
-        promptTextarea.style.display = 'none';
-
-        // Bersihkan riwayat chat
-        document.getElementById('chatHistory').innerHTML = '';
-    } else {
-        // Sembunyikan input nama dan chat
-        namaContainer.style.display = 'none';
-        chatContainer.style.display = 'none';
-
-        // Tampilkan prompt
-        promptLabel.style.display = 'block';
-        promptTextarea.style.display = 'block';
-
-        // Reset prompt
-        document.getElementById('promptInput').value = '';
-    }
-});
-
-// Fungsi kirim pesan chat
-function sendChat() {
-    const input = document.getElementById('chatInput');
-    const message = input.value.trim();
-    if (!message) return;
-
-    const chatHistory = document.getElementById('chatHistory');
-
-    // Tampilkan pesan pengguna
-    const userMsgDiv = document.createElement('div');
-    userMsgDiv.style.padding = '5px 10px';
-    userMsgDiv.style.backgroundColor = '#e0f7fa';
-    userMsgDiv.style.marginBottom = '5px';
-    userMsgDiv.style.borderRadius = '8px';
-    userMsgDiv.innerText = 'Anda: ' + message;
-    chatHistory.appendChild(userMsgDiv);
-
-    input.value = '';
-
-    // Kirim ke API CAI
-    fetchCaiResponse(message);
-}
-
-function fetchCaiResponse(msg) {
-    const resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = '<p style="color:#555;">Sedang mengirim pesan...</p>';
-
-    const nama = document.getElementById('namaChat').value.trim();
-    if (!nama) {
-        alert('Silakan masukkan nama terlebih dahulu.');
+    if (module === 'changeclothes') {
+        if (!uploadedImageUrl) {
+            alert('Silakan upload gambar terlebih dahulu.');
+            spinner.style.display = 'none';
+            return;
+        }
+        fetchChangeClothes(uploadedImageUrl, prompt || 'Change clothes');
         return;
     }
-    const chatId = encodeURIComponent(nama);
-    const apiUrl = `https://api.ibeng.my.id/api/ai/cai?message=${encodeURIComponent(msg)}&chat_id=${chatId}&custom=saya adalah chat gpt di kembangkan achmad rizky&apikey=MELvQtx7BG`;
+    if (module === 'img2prompt') {
+        if (!uploadedImageUrl) {
+            alert('Silakan upload gambar terlebih dahulu.');
+            spinner.style.display = 'none';
+            return;
+        }
+        fetchPromptFromImage()
+            .then(() => {
+                callApiGenerate(document.getElementById('promptInput').value);
+            })
+            .catch(() => { spinner.style.display = 'none'; });
+        return;
+    }
+    if (module === 'txt2img') {
+        const txtPrompt = prompt;
+        if (!txtPrompt) {
+            alert('Silakan masukkan prompt untuk txt2img.');
+            spinner.style.display = 'none';
+            return;
+        }
+        fetchTxt2Img(txtPrompt);
+        return;
+    }
 
+    // Jika mode otomatis dan prompt kosong, ambil prompt dari gambar
+    const isAutoPrompt = document.getElementById('autoPromptMode').checked;
+    if (isAutoPrompt && uploadedImageUrl && !prompt) {
+        fetchPromptFromImage()
+            .then(() => {
+                callApiGenerate(document.getElementById('promptInput').value);
+            })
+            .catch(() => { spinner.style.display = 'none'; });
+        return;
+    }
+
+    if (!prompt) {
+        alert('Silakan masukkan prompt.');
+        spinner.style.display = 'none';
+        return;
+    }
+
+    callApiGenerate(prompt);
+}
+
+function callApiGenerate(finalPrompt) {
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = '<p style="color:#555;">Memproses, harap tunggu...</p>';
+
+    const module = getSelectedModule();
+    const apiKey = 'MELvQtx7BG';
+
+    // Untuk txt2img, API mengembalikan gambar langsung
+    if (module === 'txt2img') {
+        fetch(`https://api.ibeng.my.id/api/ai/txt2img?prompt=${encodeURIComponent(finalPrompt)}&resolusi=tall&apikey=${apiKey}`)
+            .then(res => {
+                const contentType = res.headers.get('Content-Type');
+                if (contentType && contentType.startsWith('image/')) {
+                    return res.blob(); // Respons gambar
+                } else {
+                    // Kalau error lain, coba parse JSON error
+                    return res.json().then(err => { throw new Error('Gagal txt2img: ' + (err.message || res.status)); });
+                }
+            })
+            .then(blob => {
+                // Tampilkan gambar dari Blob
+                const imgUrl = URL.createObjectURL(blob);
+                resultDiv.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = imgUrl;
+                img.alt = 'Hasil txt2img';
+                resultDiv.appendChild(img);
+            })
+            .catch(err => {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                resultDiv.innerHTML = '<p style="color:#999;">' + err.message + '</p>';
+            });
+        return; // selesai
+    }
+
+    // Untuk modul lain
+    const url = `https://api.ibeng.my.id/api/ai/${module}?query=${encodeURIComponent(finalPrompt)}&apikey=${apiKey}`;
+    fetch(url)
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(err => { throw new Error('Gagal dari API: ' + (err.message || res.status)); });
+            }
+            return res.json();
+        })
+        .then(data => {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            resultDiv.innerHTML = '';
+            if (data && data.data && data.data.data && data.data.data.video_url) {
+                const video = document.createElement('video');
+                video.src = data.data.data.video_url;
+                video.controls = true;
+                resultDiv.appendChild(video);
+            } else {
+                resultDiv.innerHTML = '<p style="color:#999;">Tidak ada video yang tersedia.</p>';
+            }
+        })
+        .catch(err => {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            resultDiv.innerHTML = '<p style="color:#999;">' + err.message + '</p>';
+        });
+}
+
+function fetchChangeClothes(imageUrl, prompt) {
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = '<p style="color:#555;">Sedang mengubah pakaian...</p>';
+
+    const apiUrl = `https://api.ibeng.my.id/api/ai/changeclothes?url=${encodeURIComponent(imageUrl)}&prompt=${encodeURIComponent(prompt)}&apikey=MELvQtx7BG`;
     fetch(apiUrl)
-    .then(res => res.json())
-    .then(data => {
-        const chatHistory = document.getElementById('chatHistory');
-        const replyDiv = document.createElement('div');
-        replyDiv.style.padding = '5px 10px';
-        replyDiv.style.backgroundColor = '#f0f0f0';
-        replyDiv.style.marginBottom = '5px';
-        replyDiv.style.borderRadius = '8px';
-        replyDiv.innerText = 'AI: ' + (data && data.result && data.result.text ? data.result.text : 'Tidak ada respons.');
-        chatHistory.appendChild(replyDiv);
-    })
-    .catch(err => {
-        const chatHistory = document.getElementById('chatHistory');
-        const errorDiv = document.createElement('div');
-        errorDiv.style.padding = '5px 10px';
-        errorDiv.style.backgroundColor = '#f8d7da';
-        errorDiv.style.marginBottom = '5px';
-        errorDiv.style.borderRadius = '8px';
-        errorDiv.innerText = 'Error: ' + err.message;
-        chatHistory.appendChild(errorDiv);
-    });
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(err => { throw new Error('Gagal dari API: ' + (err.message || res.status)); });
+            }
+            return res.json();
+        })
+        .then(data => {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            if (data && data.status === 'Success' && data.data) {
+                resultDiv.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = data.data;
+                img.alt = 'Change Clothes Result';
+                img.style.maxWidth = '100%';
+                resultDiv.appendChild(img);
+            } else {
+                resultDiv.innerHTML = '<p style="color:#999;">Gagal mendapatkan hasil.</p>';
+            }
+        })
+        .catch(err => {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            resultDiv.innerHTML = '<p style="color:#999;">' + err.message + '</p>';
+        });
 }
 
-// Inisialisasi tampilan saat halaman dimuat
-window.onload = () => {
-    document.getElementById('modulSelect').dispatchEvent(new Event('change'));
-};
+function fetchCaiResponse() {
+    const message = document.getElementById('promptInput').value.trim();
+    if (!message) {
+        alert('Silakan masukkan pesan untuk CAI.');
+        return;
+    }
+    const apiUrl = `https://api.ibeng.my.id/api/ai/cai?message=${encodeURIComponent(message)}&chat_id=chatbot&custom=saya adalah chat gpt di kembangkan achmad rizky&apikey=MELvQtx7BG`;
+    fetch(apiUrl)
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(err => { throw new Error('Gagal dari API CAI: ' + (err.message || res.status)); });
+            }
+            return res.json();
+        })
+        .then(data => {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+            if (data && data.status === 'Success' && data.result && data.result.text) {
+                resultDiv.innerHTML = '<p>' + data.result.text + '</p>';
+            } else {
+                resultDiv.innerHTML = '<p style="color:#999;">Tidak ada respons dari CAI.</p>';
+            }
+        })
+        .catch(err => {
+            document.getElementById('result').innerHTML = '<p style="color:#999;">' + err.message + '</p>';
+        });
+}
+
+// Fungsi utama generateMedia sudah diperbaiki di atas
 </script>
 
+<!-- Spinner kecil -->
 <div id="loadingSpinner"></div>
+
 <footer style="text-align:center; margin-top:40px; font-size:14px; color:#555;">
     © 2025 Achmad Rizky.
 </footer>
