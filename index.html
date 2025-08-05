@@ -218,7 +218,6 @@ function generateMedia() {
 
     spinner.style.display = 'block';
 
-    // Penanganan khusus untuk module tertentu
     if (module === 'cai') {
         fetchCaiResponse();
         spinner.style.display = 'none';
@@ -257,7 +256,6 @@ function generateMedia() {
         return;
     }
 
-    // Jika mode otomatis dan prompt kosong, ambil prompt dari gambar
     const isAutoPrompt = document.getElementById('autoPromptMode').checked;
     if (isAutoPrompt && uploadedImageUrl && !prompt) {
         fetchPromptFromImage()
@@ -267,13 +265,11 @@ function generateMedia() {
             .catch(() => { spinner.style.display = 'none'; });
         return;
     }
-
     if (!prompt) {
         alert('Silakan masukkan prompt.');
         spinner.style.display = 'none';
         return;
     }
-
     callApiGenerate(prompt);
 }
 
@@ -284,59 +280,30 @@ function callApiGenerate(finalPrompt) {
     const module = getSelectedModule();
     const apiKey = 'MELvQtx7BG';
 
-    // Untuk txt2img, API mengembalikan gambar langsung
-    if (module === 'txt2img') {
-        fetch(`https://api.ibeng.my.id/api/ai/txt2img?prompt=${encodeURIComponent(finalPrompt)}&resolusi=tall&apikey=${apiKey}`)
+    if (module !== 'cai' && module !== 'txt2img') {
+        const url = `https://api.ibeng.my.id/api/ai/${module}?query=${encodeURIComponent(finalPrompt)}&apikey=${apiKey}`;
+        fetch(url)
             .then(res => {
-                const contentType = res.headers.get('Content-Type');
-                if (contentType && contentType.startsWith('image/')) {
-                    return res.blob(); // Respons gambar
-                } else {
-                    // Kalau error lain, coba parse JSON error
-                    return res.json().then(err => { throw new Error('Gagal txt2img: ' + (err.message || res.status)); });
+                if (!res.ok) {
+                    return res.json().then(err => { throw new Error('Gagal dari API: ' + (err.message || res.status)); });
                 }
+                return res.json();
             })
-            .then(blob => {
-                // Tampilkan gambar dari Blob
-                const imgUrl = URL.createObjectURL(blob);
+            .then(data => {
+                document.getElementById('loadingSpinner').style.display = 'none';
                 resultDiv.innerHTML = '';
-                const img = document.createElement('img');
-                img.src = imgUrl;
-                img.alt = 'Hasil txt2img';
-                resultDiv.appendChild(img);
+                if (data && data.data && data.data.data && data.data.data.video_url) {
+                    const video = document.createElement('video');
+                    video.src = data.data.data.video_url;
+                    video.controls = true;
+                    resultDiv.appendChild(video);
+                }
             })
             .catch(err => {
                 document.getElementById('loadingSpinner').style.display = 'none';
                 resultDiv.innerHTML = '<p style="color:#999;">' + err.message + '</p>';
             });
-        return; // selesai
     }
-
-    // Untuk modul lain
-    const url = `https://api.ibeng.my.id/api/ai/${module}?query=${encodeURIComponent(finalPrompt)}&apikey=${apiKey}`;
-    fetch(url)
-        .then(res => {
-            if (!res.ok) {
-                return res.json().then(err => { throw new Error('Gagal dari API: ' + (err.message || res.status)); });
-            }
-            return res.json();
-        })
-        .then(data => {
-            document.getElementById('loadingSpinner').style.display = 'none';
-            resultDiv.innerHTML = '';
-            if (data && data.data && data.data.data && data.data.data.video_url) {
-                const video = document.createElement('video');
-                video.src = data.data.data.video_url;
-                video.controls = true;
-                resultDiv.appendChild(video);
-            } else {
-                resultDiv.innerHTML = '<p style="color:#999;">Tidak ada video yang tersedia.</p>';
-            }
-        })
-        .catch(err => {
-            document.getElementById('loadingSpinner').style.display = 'none';
-            resultDiv.innerHTML = '<p style="color:#999;">' + err.message + '</p>';
-        });
 }
 
 function fetchChangeClothes(imageUrl, prompt) {
@@ -360,8 +327,6 @@ function fetchChangeClothes(imageUrl, prompt) {
                 img.alt = 'Change Clothes Result';
                 img.style.maxWidth = '100%';
                 resultDiv.appendChild(img);
-            } else {
-                resultDiv.innerHTML = '<p style="color:#999;">Gagal mendapatkan hasil.</p>';
             }
         })
         .catch(err => {
@@ -398,7 +363,37 @@ function fetchCaiResponse() {
         });
 }
 
-// Fungsi utama generateMedia sudah diperbaiki di atas
+// Versi baru untuk txt2img yang langsung menampilkan gambar
+function fetchTxt2Img(prompt) {
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = '<p style="color:#555;">Memproses txt2img, harap tunggu...</p>';
+
+    const apiUrl = `https://api.ibeng.my.id/api/ai/txt2img?prompt=${encodeURIComponent(prompt)}&resolusi=tall&apikey=MELvQtx7BG`;
+
+    fetch(apiUrl)
+        .then(res => {
+            const contentType = res.headers.get('Content-Type');
+            if (contentType && contentType.startsWith('image/')) {
+                return res.blob(); // Respons gambar mentah
+            } else {
+                // Jika bukan gambar, coba parse JSON error
+                return res.json().then(err => { throw new Error('Gagal txt2img: ' + (err.message || res.status)); });
+            }
+        })
+        .then(blob => {
+            // Tampilkan gambar dari Blob
+            const imgUrl = URL.createObjectURL(blob);
+            resultDiv.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = imgUrl;
+            img.alt = 'Hasil txt2img';
+            resultDiv.appendChild(img);
+        })
+        .catch(err => {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            resultDiv.innerHTML = '<p style="color:#999;">' + err.message + '</p>';
+        });
+}
 </script>
 
 <!-- Spinner kecil -->
