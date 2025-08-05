@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8" />
-<title>Veo3 & Veo3-fast </title>
+<title>Veo3 & Veo3-fast</title>
 <style>
 body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -94,7 +94,6 @@ button:hover {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     margin-top: 15px;
-    transition: all 0.3s ease;
 }
 #result p {
     font-size: 14px;
@@ -106,16 +105,6 @@ button:hover {
     height: auto;
     border-radius: 8px;
     margin-top: 10px;
-    transition: all 0.2s ease;
-}
-#promptInput {
-    width: 100%;
-    height: 80px;
-    padding: 12px;
-    font-size: 15px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    resize: vertical;
     transition: all 0.2s ease;
 }
 </style>
@@ -132,7 +121,7 @@ button:hover {
         <option value="img2prompt">img2prompt (dari gambar)</option>
         <option value="changeclothes">AI Change Clothes</option>
         <option value="cai">CAI (Chat AI)</option>
-        <option value="txt2img">txt2img (dari teks)</option> <!-- Penambahan -->
+        <option value="txt2img">txt2img (dari teks)</option>
     </select>
 
     <!-- Upload gambar -->
@@ -150,27 +139,23 @@ button:hover {
         Otomatis Ambil Prompt dari Gambar (img2prompt)
     </label>
 
-    <!-- Input prompt manual, kotak besar -->
+    <!-- Input prompt umum -->
     <label for="promptInput" style="margin-top:15px;">Masukkan Prompt:</label>
     <textarea id="promptInput" placeholder="Masukkan prompt" rows="4"></textarea>
-
-    <!-- Input prompt untuk txt2img -->
-    <label for="txt2imgPrompt" style="margin-top:15px;">Prompt Gambar (txt2img):</label>
-    <textarea id="txt2imgPrompt" placeholder="Masukkan prompt untuk txt2img" rows="3"></textarea>
 
     <!-- Tombol Generate -->
     <button id="generateBtn" onclick="generateMedia()">START</button>
 
-    <!-- Loading spinner -->
+    <!-- Spinner -->
     <div id="loadingSpinner"></div>
 
-    <!-- Tempat hasil -->
+    <!-- Hasil -->
     <div id="result"></div>
 
 </div>
 
 <script>
-let uploadedImageUrl = ''; // Menyimpan URL gambar upload
+let uploadedImageUrl = '';
 
 function uploadGambar() {
     const fileInput = document.getElementById('imageUpload');
@@ -233,7 +218,7 @@ function getSelectedModule() {
     return document.getElementById('modulSelect').value;
 }
 
-// Fungsi untuk mendapatkan prompt dari gambar (opsional, jika ingin otomatis)
+// Fungsi untuk mendapatkan prompt dari gambar
 function fetchPromptFromImage() {
     if (!uploadedImageUrl) {
         alert('Silakan upload gambar terlebih dahulu.');
@@ -256,22 +241,18 @@ function fetchPromptFromImage() {
 
 // Fungsi utama generate
 function generateMedia() {
-    const promptField = document.getElementById('promptInput');
-    const prompt = promptField.value.trim();
+    const prompt = document.getElementById('promptInput').value.trim();
     const resultDiv = document.getElementById('result');
     const module = getSelectedModule();
     const spinner = document.getElementById('loadingSpinner');
 
     spinner.style.display = 'block';
 
-    // Mode CAI (Chat AI)
     if (module === 'cai') {
         fetchCaiResponse();
         spinner.style.display = 'none';
         return;
     }
-
-    // Mode Change Clothes
     if (module === 'changeclothes') {
         if (!uploadedImageUrl) {
             alert('Silakan upload gambar terlebih dahulu.');
@@ -281,8 +262,6 @@ function generateMedia() {
         fetchChangeClothes(uploadedImageUrl, prompt || 'Change clothes');
         return;
     }
-
-    // Mode img2prompt dari gambar
     if (module === 'img2prompt') {
         if (!uploadedImageUrl) {
             alert('Silakan upload gambar terlebih dahulu.');
@@ -291,15 +270,13 @@ function generateMedia() {
         }
         fetchPromptFromImage()
             .then(() => {
-                callApiGenerate(prompt);
+                callApiGenerate(document.getElementById('promptInput').value);
             })
             .catch(() => { spinner.style.display = 'none'; });
         return;
     }
-
-    // Mode txt2img
     if (module === 'txt2img') {
-        const txtPrompt = document.getElementById('txt2imgPrompt').value.trim();
+        const txtPrompt = prompt;
         if (!txtPrompt) {
             alert('Silakan masukkan prompt untuk txt2img.');
             spinner.style.display = 'none';
@@ -308,8 +285,7 @@ function generateMedia() {
         fetchTxt2Img(txtPrompt);
         return;
     }
-
-    // Mode otomatis dari gambar (autoPrompt)
+    // Jika otomatis dari gambar
     const isAutoPrompt = document.getElementById('autoPromptMode').checked;
     if (isAutoPrompt && uploadedImageUrl && !prompt) {
         fetchPromptFromImage()
@@ -319,18 +295,15 @@ function generateMedia() {
             .catch(() => { spinner.style.display = 'none'; });
         return;
     }
-
     if (!prompt) {
         alert('Silakan masukkan prompt.');
         spinner.style.display = 'none';
         return;
     }
-
-    // Mode default (gambar, prompt dari input)
     callApiGenerate(prompt);
 }
 
-// Fungsi untuk memanggil API utama
+// API call utama
 function callApiGenerate(finalPrompt) {
     const resultDiv = document.getElementById('result');
     resultDiv.innerHTML = '<p style="color:#555;">Memproses, harap tunggu...</p>';
@@ -338,10 +311,8 @@ function callApiGenerate(finalPrompt) {
     const module = getSelectedModule();
     const apiKey = 'MELvQtx7BG';
 
-    // Jika bukan CAI dan txt2img, panggil API sesuai modul
     if (module !== 'cai' && module !== 'txt2img') {
         const url = `https://api.ibeng.my.id/api/ai/${module}?query=${encodeURIComponent(finalPrompt)}&apikey=${apiKey}`;
-
         fetch(url)
             .then(res => {
                 if (!res.ok) {
@@ -352,8 +323,6 @@ function callApiGenerate(finalPrompt) {
             .then(data => {
                 document.getElementById('loadingSpinner').style.display = 'none';
                 resultDiv.innerHTML = '';
-
-                // Tampilkan video jika ada
                 if (data && data.data && data.data.data && data.data.data.video_url) {
                     const video = document.createElement('video');
                     video.src = data.data.data.video_url;
@@ -374,7 +343,6 @@ function fetchChangeClothes(imageUrl, prompt) {
     resultDiv.innerHTML = '<p style="color:#555;">Sedang mengubah pakaian...</p>';
 
     const apiUrl = `https://api.ibeng.my.id/api/ai/changeclothes?url=${encodeURIComponent(imageUrl)}&prompt=${encodeURIComponent(prompt)}&apikey=MELvQtx7BG`;
-
     fetch(apiUrl)
         .then(res => {
             if (!res.ok) {
@@ -399,16 +367,14 @@ function fetchChangeClothes(imageUrl, prompt) {
         });
 }
 
-// Fungsi untuk API CAI (Chat AI)
+// CAI Response
 function fetchCaiResponse() {
     const message = document.getElementById('promptInput').value.trim();
     if (!message) {
         alert('Silakan masukkan pesan untuk CAI.');
         return;
     }
-
     const apiUrl = `https://api.ibeng.my.id/api/ai/cai?message=${encodeURIComponent(message)}&chat_id=chatbot&custom=saya adalah chat gpt di kembangkan achmad rizky&apikey=MELvQtx7BG`;
-
     fetch(apiUrl)
         .then(res => {
             if (!res.ok) {
@@ -430,13 +396,12 @@ function fetchCaiResponse() {
         });
 }
 
-// Fungsi untuk txt2img
+// txt2img API
 function fetchTxt2Img(prompt) {
     const resultDiv = document.getElementById('result');
     resultDiv.innerHTML = '<p style="color:#555;">Memproses txt2img, harap tunggu...</p>';
 
     const apiUrl = `https://api.ibeng.my.id/api/ai/txt2img?prompt=${encodeURIComponent(prompt)}&resolusi=tall&apikey=MELvQtx7BG`;
-
     fetch(apiUrl)
         .then(res => {
             if (!res.ok) {
