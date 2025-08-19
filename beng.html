@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Dashboard Keren & Modern</title>
+<title>Dashboard Estetik & Responsive</title>
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
 <style>
-  /* Reset */
+  /* Reset dan dasar */
   * {
     box-sizing: border-box;
     margin: 0;
@@ -17,34 +17,18 @@
   body {
     font-family: 'Poppins', sans-serif;
     min-height: 100vh;
-    background-color: #0f2027;
-    overflow: hidden;
+    background-color: #000; /* Background hitam */
     color: #fff;
+    position: relative;
+    overflow-x: hidden;
   }
 
-  /* Animasi garis bergerak membentuk motif segitiga */
-  body::before {
-    content: "";
+  /* Animasi garis bergerak membentuk pola segitiga dan motif lain */
+  .canvas-background {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-image: 
-      radial-gradient(circle, rgba(255,255,255,0.02) 1px, transparent 1px);
-    background-size: 50px 50px;
-    animation: moveBg 30s linear infinite;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     z-index: -1;
-  }
-
-  @keyframes moveBg {
-    from {background-position: 0 0;}
-    to {background-position: 100px 100px;}
-  }
-
-  /* Membuat garis-garis menyambung membentuk pola segitiga dengan SVG */
-  .bg-shapes {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    z-index: -1;
-    pointer-events: none;
   }
 
   /* Header */
@@ -53,7 +37,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.4);
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   }
 
@@ -62,12 +46,10 @@
     align-items: center;
   }
 
-  /* Logo Icon */
   .logo {
     width: 50px;
     height: 50px;
-    margin-right: 15px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #00f, #0ff);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -76,6 +58,7 @@
     color: #fff;
     font-weight: bold;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    margin-right: 15px;
   }
 
   header h1 {
@@ -84,45 +67,42 @@
     color: #fff;
   }
 
-  /* Main content */
+  /* Main */
   main {
-    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 30px;
+    min-height: calc(100vh - 80px);
   }
 
-  /* Kotak utama */
   .center-box {
     background: rgba(255,255,255,0.05);
     padding: 40px;
     border-radius: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     max-width: 800px;
     width: 100%;
     text-align: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
   }
 
-  /* Judul utama */
   .center-box h2 {
     font-size: 2em;
     margin-bottom: 20px;
   }
 
-  /* Tombol Coba Sekarang */
   .try-button {
     display: inline-block;
     padding: 16px 32px;
     font-size: 1.3em;
     color: #fff;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #00f, #0ff);
     border: none;
     border-radius: 30px;
     cursor: pointer;
     transition: all 0.3s ease;
-    text-decoration: none;
     margin-bottom: 30px;
+    text-decoration: none;
     box-shadow: 0 4px 20px rgba(0,0,0,0.2);
   }
 
@@ -131,7 +111,6 @@
     transform: scale(1.05);
   }
 
-  /* Info section */
   .info-section {
     display: flex;
     flex-direction: column;
@@ -155,10 +134,10 @@
     line-height: 1.5;
   }
 
-  /* Footer kontak */
+  /* Footer */
   footer {
     padding: 20px;
-    background: rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.4);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -176,7 +155,7 @@
     font-size: 1em;
   }
 
-  /* Responsive */
+  /* Responsiveness */
   @media(max-width: 768px) {
     .center-box {
       padding: 20px;
@@ -197,45 +176,31 @@
 </head>
 <body>
 
-<!-- SVG pola garis membentuk motif segitiga -->
-<div class="bg-shapes">
-  <svg width="100%" height="100%" preserveAspectRatio="none">
-    <defs>
-      <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.1" />
-        <stop offset="100%" stop-color="#ffffff" stop-opacity="0.1" />
-      </linearGradient>
-    </defs>
-    <!-- Membuat pola segitiga -->
-    <polygon points="0,0 50,100 100,0" fill="url(#grad)" opacity="0.2" />
-    <polygon points="50,0 100,100 150,0" fill="url(#grad)" opacity="0.2" />
-    <polygon points="100,0 150,100 200,0" fill="url(#grad)" opacity="0.2" />
-    <polygon points="0,50 50,150 100,50" fill="url(#grad)" opacity="0.2" />
-    <polygon points="50,50 100,150 150,50" fill="url(#grad)" opacity="0.2" />
-    <polygon points="100,50 150,150 200,50" fill="url(#grad)" opacity="0.2" />
-  </svg>
-</div>
+<!-- Canvas untuk garis dinamis -->
+<canvas class="canvas-background"></canvas>
 
+<!-- Header -->
 <header>
   <div class="logo-container">
     <div class="logo">R</div>
-    <h1>Dashboard Modern</h1>
+    <h1>Dashboard Estetik</h1>
   </div>
 </header>
 
+<!-- Main Content -->
 <main>
   <div class="center-box">
     <h2>
-      <a href="https://api.ibeng.my.id/login" target="_blank" class="try-button">Coba Sekarang & Rasakan Perbedaannya!</a>
+      <a href="https://api.ibeng.my.id/login" target="_blank" class="try-button">Coba Sekarang & Rasakan Keajaibannya!</a>
     </h2>
     <div class="info-section">
       <div class="info-box">
         <h3>API Login Super Cepat & Aman</h3>
-        <p>Gunakan API login kami yang dirancang untuk memberikan akses cepat dan aman ke platform Anda. Endpoint lengkap dan data yang terenskripsi memastikan pengalaman terbaik dan perlindungan maksimal.</p>
+        <p>Percepat dan amankan proses loginmu dengan API kami yang dirancang khusus untuk performa tinggi dan keamanan maksimal. Rasakan pengalaman login yang seamless dan terpercaya.</p>
       </div>
       <div class="info-box">
         <h3>Hubungi Kami</h3>
-        <p>Butuh bantuan atau info lebih lengkap? Kami siap membantu!</p>
+        <p>Butuh bantuan? Hubungi kami kapan saja!</p>
         <p><strong>Email:</strong> rizkyibeng211@gmail.com</p>
         <p><strong>Telepon:</strong> 081257172080</p>
       </div>
@@ -243,12 +208,106 @@
   </div>
 </main>
 
+<!-- Footer -->
 <footer>
   <div class="contact-info">
     <div class="contact-item"><strong>Email:</strong> rizkyibeng211@gmail.com</div>
     <div class="contact-item"><strong>Telepon:</strong> 081257172080</div>
   </div>
 </footer>
+
+<!-- Script JS untuk garis dinamis -->
+<script>
+  const canvas = document.querySelector('.canvas-background');
+  const ctx = canvas.getContext('2d');
+
+  let width = window.innerWidth;
+  let height = window.innerHeight;
+  canvas.width = width;
+  canvas.height = height;
+
+  window.addEventListener('resize', () => {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+  });
+
+  // Partikel dan garis
+  const particlesCount = 100;
+  const particles = [];
+
+  for(let i=0; i<particlesCount; i++) {
+    particles.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.8,
+      vy: (Math.random() - 0.5) * 0.8,
+    });
+  }
+
+  function animate() {
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.fillRect(0, 0, width, height);
+
+    // Update posisi
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+
+      if(p.x < 0 || p.x > width) p.vx *= -1;
+      if(p.y < 0 || p.y > height) p.vy *= -1;
+    });
+
+    // Gambar garis antar partikel
+    for(let i=0; i<particles.length; i++) {
+      for(let j=i+1; j<particles.length; j++) {
+        const p1 = particles[i];
+        const p2 = particles[j];
+
+        const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+        if(dist < 150) {
+          ctx.strokeStyle = `rgba(255,255,255,${1 - dist/150})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Gambar garis segitiga jika tiga titik dekat
+    for(let i=0; i<particles.length; i++) {
+      for(let j=i+1; j<particles.length; j++) {
+        for(let k=j+1; k<particles.length; k++) {
+          const p1 = particles[i];
+          const p2 = particles[j];
+          const p3 = particles[k];
+
+          const d1 = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+          const d2 = Math.hypot(p2.x - p3.x, p2.y - p3.y);
+          const d3 = Math.hypot(p3.x - p1.x, p3.y - p1.y);
+
+          if(d1 < 150 && d2 < 150 && d3 < 150) {
+            ctx.strokeStyle = `rgba(255,255,255,0.1)`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.lineTo(p3.x, p3.y);
+            ctx.closePath();
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+</script>
 
 </body>
 </html>
