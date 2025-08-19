@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Garis Segitiga Bergerak</title>
+<title>Efek Garis Minimalis</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #000; overflow: hidden; font-family: 'Poppins', sans-serif; }
 
-  /* Header dan konten tetap */
+  /* Konten utama tetap di atas */
   header {
     position: relative;
     padding: 20px;
@@ -56,13 +56,13 @@
     background: linear-gradient(135deg, #f7971e, #ffd200);
     transform: scale(1.05);
   }
-  /* Footer */
   footer {
     padding: 20px;
     background: rgba(0,0,0,0.3);
     display: flex; flex-direction: column; align-items: center; gap: 10px;
   }
-  /* Canvas overlay */
+
+  /* Canvas overlay untuk efek garis */
   canvas {
     position: fixed;
     top: 0; left: 0;
@@ -107,6 +107,7 @@
 // Setup canvas
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
+
 let width = window.innerWidth;
 let height = window.innerHeight;
 canvas.width = width;
@@ -119,23 +120,23 @@ window.addEventListener('resize', () => {
   canvas.height = height;
 });
 
-// Partikel kecil untuk pola segitiga bergerak
-const particlesCount = 180;
+// Buat partikel kecil yang bergerak
+const particlesCount = 100;
 const particles = [];
 
 for(let i=0; i<particlesCount; i++) {
   particles.push({
     x: Math.random() * width,
     y: Math.random() * height,
-    vx: (Math.random() - 0.5) * 0.8,
-    vy: (Math.random() - 0.5) * 0.8,
+    vx: (Math.random() - 0.5) * 0.6,
+    vy: (Math.random() - 0.5) * 0.6,
   });
 }
 
-// Animasi
+// Fungsi animasi
 function animate() {
-  ctx.fillStyle = 'rgba(0,0,0,0.2)';
-  ctx.fillRect(0,0,width,height);
+  ctx.fillStyle = 'rgba(0,0,0,0.1)';
+  ctx.fillRect(0, 0, width, height);
 
   // Update posisi partikel
   particles.forEach(p => {
@@ -145,14 +146,14 @@ function animate() {
     if(p.y < 0 || p.y > height) p.vy *= -1;
   });
 
-  // Gambar garis antar partikel
+  // Gambar garis antar partikel yang dekat
   for(let i=0; i<particles.length; i++) {
     for(let j=i+1; j<particles.length; j++) {
       const p1 = particles[i];
       const p2 = particles[j];
       const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
-      if(dist < 100) {
-        ctx.strokeStyle = `rgba(255,255,255,${1 - dist/100})`;
+      if(dist < 120) {
+        ctx.strokeStyle = `rgba(255,255,255,${0.2 - dist/600})`;
         ctx.lineWidth = 0.5;
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
@@ -162,33 +163,9 @@ function animate() {
     }
   }
 
-  // Membuat segitiga kecil dari tiga titik dekat
-  for(let i=0; i<particles.length; i++) {
-    for(let j=i+1; j<particles.length; j++) {
-      for(let k=j+1; k<particles.length; k++) {
-        const p1 = particles[i];
-        const p2 = particles[j];
-        const p3 = particles[k];
-
-        const d12 = Math.hypot(p1.x - p2.x, p1.y - p2.y);
-        const d23 = Math.hypot(p2.x - p3.x, p2.y - p3.y);
-        const d31 = Math.hypot(p3.x - p1.x, p3.y - p1.y);
-
-        if(d12 < 80 && d23 < 80 && d31 < 80) {
-          ctx.strokeStyle = `rgba(255,255,255,0.1)`;
-          ctx.lineWidth = 0.5;
-          ctx.beginPath();
-          ctx.moveTo(p1.x, p1.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.lineTo(p3.x, p3.y);
-          ctx.closePath();
-          ctx.stroke();
-        }
-      }
-    }
-  }
   requestAnimationFrame(animate);
 }
+
 animate();
 </script>
 
