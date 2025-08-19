@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Efek Garis Minimalis</title>
+<title>Dashboard Estetik</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #000; overflow: hidden; font-family: 'Poppins', sans-serif; }
@@ -43,6 +43,11 @@
     box-shadow: 0 8px 20px rgba(0,0,0,0.4);
     text-align: center;
   }
+  h2 {
+    font-size: 2em;
+    color: #fff;
+    margin-bottom: 20px;
+  }
   .cta {
     display: inline-block;
     padding: 16px 32px;
@@ -56,10 +61,26 @@
     background: linear-gradient(135deg, #f7971e, #ffd200);
     transform: scale(1.05);
   }
+  p {
+    color: #ddd;
+    font-size: 1.1em;
+    line-height: 1.5;
+  }
+  /* Tambahkan kata tentang kami */
+  .about {
+    margin-top: 30px;
+    color: #ccc;
+    font-size: 1em;
+    line-height: 1.5;
+  }
+  /* Footer */
   footer {
     padding: 20px;
     background: rgba(0,0,0,0.3);
     display: flex; flex-direction: column; align-items: center; gap: 10px;
+    font-size: 0.9em;
+    color: #aaa;
+    text-align: center;
   }
 
   /* Canvas overlay untuk efek garis */
@@ -96,6 +117,11 @@
       <h3>API Login Super Cepat & Aman</h3>
       <p>Percepat dan amankan proses loginmu dengan API kami yang dirancang khusus untuk performa tinggi dan keamanan maksimal. Rasakan pengalaman login yang seamless dan terpercaya.</p>
     </div>
+    <div class="about">
+      <h3>Tentang Kami</h3>
+      <p>Kami menyediakan layanan REST API yang handal dan aman untuk kebutuhan autentikasi dan integrasi sistem Anda. Komitmen kami adalah memberikan solusi teknologi terbaik dengan dukungan penuh dan layanan profesional.</p>
+      <p>Hubungi kami di: <br/>No HP: 081257172080<br/>Email: rizkyibeng211@gmail.com</p>
+    </div>
   </div>
 </main>
 
@@ -128,14 +154,14 @@ for(let i=0; i<particlesCount; i++) {
   particles.push({
     x: Math.random() * width,
     y: Math.random() * height,
-    vx: (Math.random() - 0.5) * 0.6,
-    vy: (Math.random() - 0.5) * 0.6,
+    vx: (Math.random() - 0.5) * 0.8,
+    vy: (Math.random() - 0.5) * 0.8,
   });
 }
 
 // Fungsi animasi
 function animate() {
-  ctx.fillStyle = 'rgba(0,0,0,0.1)';
+  ctx.fillStyle = 'rgba(0,0,0,0.15)';
   ctx.fillRect(0, 0, width, height);
 
   // Update posisi partikel
@@ -153,8 +179,8 @@ function animate() {
       const p2 = particles[j];
       const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
       if(dist < 120) {
-        ctx.strokeStyle = `rgba(255,255,255,${0.2 - dist/600})`;
-        ctx.lineWidth = 0.5;
+        ctx.strokeStyle = `rgba(255,255,255,${0.4 - dist/300})`;
+        ctx.lineWidth = 0.8;
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
         ctx.lineTo(p2.x, p2.y);
@@ -168,6 +194,5 @@ function animate() {
 
 animate();
 </script>
-
 </body>
 </html>
