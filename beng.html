@@ -8,10 +8,10 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #000; font-family: 'Poppins', sans-serif; overflow-x: hidden; }
 
-  /* Konten utama tetap di atas */
+  /* Header kecil dan logo kecil */
   header {
     position: relative;
-    padding: 20px;
+    padding: 10px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -19,69 +19,92 @@
     z-index: 10;
   }
   .logo {
-    width: 50px; height: 50px;
+    width: 30px; height: 30px;
     background: linear-gradient(135deg, #00f, #0ff);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    color: #fff; font-weight: bold; font-size: 24px;
+    color: #fff; font-weight: bold; font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+    box-shadow: 0 0 8px rgba(0,255,255,0.7);
+    animation: pulse 2s infinite;
   }
-  h1 { color: #fff; font-family: 'Poppins', sans-serif; font-size: 1.8em; }
+  h1 {
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.2em;
+    opacity: 0;
+    animation: fadeIn 2s forwards;
+  }
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 8px rgba(0,255,255,0.7); }
+    50% { box-shadow: 0 0 20px rgba(0,255,255,1); }
+  }
 
   main {
     display: flex; justify-content: center; align-items: center;
-    padding: 30px;
-    min-height: calc(100vh - 80px);
+    padding: 20px;
+    min-height: calc(100vh - 60px);
     position: relative;
     z-index: 5;
   }
   .content-box {
     background: rgba(255,255,255,0.05);
-    padding: 40px;
-    border-radius: 20px;
-    max-width: 800px;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 700px;
     width: 100%;
     box-shadow: 0 8px 20px rgba(0,0,0,0.4);
     text-align: center;
+    animation: bounceIn 1s ease forwards;
+  }
+  @keyframes bounceIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
   }
   h2 {
-    font-size: 2em;
+    font-size: 1.5em;
     color: #fff;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
   }
   .cta {
     display: inline-block;
-    padding: 16px 32px;
-    margin-top: 20px;
+    padding: 12px 24px;
+    margin-top: 15px;
     background: linear-gradient(135deg, #00f, #0ff);
-    color: #fff; font-size: 1.3em; border-radius: 30px;
+    color: #fff; font-size: 1.1em; border-radius: 25px;
     text-decoration: none;
     transition: all 0.3s ease;
-    box-shadow: 0 0 15px rgba(0,255,255,0.7);
+    box-shadow: 0 0 12px rgba(0,255,255,0.7);
   }
   .cta:hover {
     background: linear-gradient(135deg, #f7971e, #ffd200);
     transform: scale(1.05);
-    box-shadow: 0 0 25px rgba(255,215,0,1);
+    box-shadow: 0 0 20px rgba(255,215,0,1);
   }
   p {
     color: #ddd;
-    font-size: 1.1em;
-    line-height: 1.5;
+    font-size: 1em;
+    line-height: 1.4;
+    margin-top: 10px;
   }
   .about {
-    margin-top: 30px;
+    margin-top: 20px;
     color: #ccc;
-    font-size: 1em;
-    line-height: 1.5;
+    font-size: 0.95em;
+    line-height: 1.4;
   }
-  /* Footer */
+  /* Footer kecil */
   footer {
-    padding: 20px;
+    padding: 10px 20px;
     background: rgba(0,0,0,0.4);
-    display: flex; flex-direction: column; align-items: center; gap: 10px;
-    font-size: 0.9em;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    font-size: 0.8em;
     color: #aaa;
     text-align: center;
+    animation: fadeIn 2s forwards;
   }
 
   /* Canvas overlay untuk efek garis */
@@ -94,9 +117,9 @@
 
   /* Responsif */
   @media(max-width: 768px){
-    .content-box { padding: 20px; }
-    .cta { font-size: 1.2em; padding: 12px 24px; }
-    h1 { font-size: 1.5em; }
+    .content-box { padding: 15px; }
+    .cta { font-size: 1em; padding: 10px 20px; }
+    h1 { font-size: 1em; }
   }
 </style>
 </head>
@@ -148,7 +171,7 @@ window.addEventListener('resize', () => {
 });
 
 // Buat partikel kecil yang bergerak
-const particlesCount = 120;
+const particlesCount = 100;
 const particles = [];
 
 for(let i=0; i<particlesCount; i++) {
@@ -157,10 +180,11 @@ for(let i=0; i<particlesCount; i++) {
     y: Math.random() * height,
     vx: (Math.random() - 0.5) * 1,
     vy: (Math.random() - 0.5) * 1,
+    size: Math.random() * 2 + 1
   });
 }
 
-// Fungsi animasi
+// Animasi garis dan partikel
 function animate() {
   ctx.fillStyle = 'rgba(0,0,0,0.2)';
   ctx.fillRect(0, 0, width, height);
@@ -171,6 +195,16 @@ function animate() {
     p.y += p.vy;
     if(p.x < 0 || p.x > width) p.vx *= -1;
     if(p.y < 0 || p.y > height) p.vy *= -1;
+  });
+
+  // Gambar partikel
+  particles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+    ctx.fillStyle = 'white';
+    ctx.shadowColor = 'white';
+    ctx.shadowBlur = 4;
+    ctx.fill();
   });
 
   // Gambar garis antar partikel yang dekat
@@ -191,6 +225,16 @@ function animate() {
       }
     }
   }
+
+  // Animasi tambahan: garis zigzag
+  ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  for(let i=0; i<width; i+=50){
+    ctx.moveTo(i, Math.random()*height);
+    ctx.lineTo(i+25, Math.random()*height);
+  }
+  ctx.stroke();
 
   requestAnimationFrame(animate);
 }
