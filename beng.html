@@ -6,7 +6,7 @@
 <title>Dashboard Estetik</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #000; overflow: hidden; font-family: 'Poppins', sans-serif; }
+  body { background: #000; font-family: 'Poppins', sans-serif; overflow-x: hidden; }
 
   /* Konten utama tetap di atas */
   header {
@@ -15,7 +15,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0,0,0,0.4);
     z-index: 10;
   }
   .logo {
@@ -56,17 +56,18 @@
     color: #fff; font-size: 1.3em; border-radius: 30px;
     text-decoration: none;
     transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(0,255,255,0.7);
   }
   .cta:hover {
     background: linear-gradient(135deg, #f7971e, #ffd200);
     transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(255,215,0,1);
   }
   p {
     color: #ddd;
     font-size: 1.1em;
     line-height: 1.5;
   }
-  /* Tambahkan kata tentang kami */
   .about {
     margin-top: 30px;
     color: #ccc;
@@ -76,7 +77,7 @@
   /* Footer */
   footer {
     padding: 20px;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0,0,0,0.4);
     display: flex; flex-direction: column; align-items: center; gap: 10px;
     font-size: 0.9em;
     color: #aaa;
@@ -120,7 +121,7 @@
     <div class="about">
       <h3>Tentang Kami</h3>
       <p>Kami menyediakan layanan REST API yang handal dan aman untuk kebutuhan autentikasi dan integrasi sistem Anda. Komitmen kami adalah memberikan solusi teknologi terbaik dengan dukungan penuh dan layanan profesional.</p>
-      <p>Hubungi kami di: <br/>No HP: 081257172080<br/>Email: rizkyibeng211@gmail.com</p>
+      <p>Hubungi kami di:<br/>No HP: 081257172080<br/>Email: rizkyibeng211@gmail.com</p>
     </div>
   </div>
 </main>
@@ -147,21 +148,21 @@ window.addEventListener('resize', () => {
 });
 
 // Buat partikel kecil yang bergerak
-const particlesCount = 100;
+const particlesCount = 120;
 const particles = [];
 
 for(let i=0; i<particlesCount; i++) {
   particles.push({
     x: Math.random() * width,
     y: Math.random() * height,
-    vx: (Math.random() - 0.5) * 0.8,
-    vy: (Math.random() - 0.5) * 0.8,
+    vx: (Math.random() - 0.5) * 1,
+    vy: (Math.random() - 0.5) * 1,
   });
 }
 
 // Fungsi animasi
 function animate() {
-  ctx.fillStyle = 'rgba(0,0,0,0.15)';
+  ctx.fillStyle = 'rgba(0,0,0,0.2)';
   ctx.fillRect(0, 0, width, height);
 
   // Update posisi partikel
@@ -178,9 +179,11 @@ function animate() {
       const p1 = particles[i];
       const p2 = particles[j];
       const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
-      if(dist < 120) {
-        ctx.strokeStyle = `rgba(255,255,255,${0.4 - dist/300})`;
-        ctx.lineWidth = 0.8;
+      if(dist < 150) {
+        ctx.strokeStyle = `rgba(255,255,255,${0.6 - dist/250})`;
+        ctx.lineWidth = 1.2;
+        ctx.shadowColor = 'white';
+        ctx.shadowBlur = 4;
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
         ctx.lineTo(p2.x, p2.y);
