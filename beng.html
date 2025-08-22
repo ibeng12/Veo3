@@ -248,7 +248,7 @@
         <p class="hint">If your API returns a direct video URL, it will play here. If it returns a job id, the app will poll until ready.</p>
 
         <h3 style="margin-top:18px">Connection</h3>
-        <div id="conn" class="small muted">Base URL: <span id="connBase">—</span><br/>Auth: Bearer &lt;your-key&gt;</div>
+        <div id="conn" class="small muted">Base URL: <span id="connBase">—</span><br/>Auth: Bearer <your-key></div>
       </aside>
     </div>
   </main>
@@ -377,17 +377,17 @@
       genBtn.disabled = true;
 
       try {
-        // API Anda menggunakan GET dengan parameter query & apikey
         const url = `${conf.base.replace(/\/+$/,"")}/api/ai/veo3?query=${encodeURIComponent(payload.query)}&apikey=${encodeURIComponent(payload.apikey)}`;
         const res = await fetch(url, { method: "GET", signal: abortCtrl.signal });
         if (!res.ok) throw new Error("Request failed: " + res.status + " " + res.statusText);
         const data = await res.json();
         log("Response: " + JSON.stringify(data));
 
-        if (data.data && data.data.video_url) {
+        // Perbaikan di sini: sesuai struktur respons yang Anda berikan
+        if (data.data && data.data.data && data.data.data.video_url) {
           setProgress(1);
           log("Received direct video URL.");
-          setPreviewVideo(data.data.video_url);
+          setPreviewVideo(data.data.data.video_url);
         } else {
           throw new Error("Unexpected response. No video URL found.");
         }
