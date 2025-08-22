@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Veo 3 - AI Video Generation (Your API Key)</title>
+  <title>Veo 3 - AI Video Generation</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
     :root {
@@ -34,37 +34,11 @@
     .container { max-width: 1100px; margin: 0 auto; padding: 0 18px; }
     .row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 
-    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: .3px; }
-    .brand i { color: var(--accent); font-size: 22px; }
-    .brand span { font-size: 20px; }
-
-    .keybar {
-      display: flex; gap: 10px; flex-wrap: wrap;
-      background: rgba(255,255,255,.12);
-      padding: 10px; border-radius: 10px;
-    }
-    .keybar input, .keybar button {
-      border: none; border-radius: 8px; padding: 10px 12px; font-size: 14px;
-    }
-    .keybar input {
-      min-width: 220px; color: #1a1a2e;
-    }
-    .keybar .api, .keybar .baseurl {
-      background: #fff; outline: none;
-    }
-    .keybar button {
-      background: #fff; color: var(--primary); font-weight: 700; cursor: pointer;
-    }
-    .keybar button:hover { filter: brightness(.95); }
-    .tag {
-      padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.18);
-      font-size: 12px; display: inline-flex; align-items: center; gap: 6px;
-    }
-    .tag i { font-size: 12px; }
+    /* Menghapus bagian header API */
+    /* .header-section { display: none; } */
 
     .hero {
       padding: 26px 0 8px;
-      color: #fff;
     }
     .hero h1 { margin: 0 0 8px; font-size: 28px; font-weight: 800; }
     .hero p { margin: 0; opacity: .9; }
@@ -83,7 +57,7 @@
     .muted { color: var(--muted); font-size: 14px; }
 
     label { display:block; font-weight: 700; margin: 12px 0 6px; font-size: 14px; }
-    input[type="text"], input[type="number"], textarea, select {
+    textarea, input[type="number"] {
       width: 100%; padding: 12px 12px; border: 1px solid var(--border);
       border-radius: 10px; font-size: 14px; outline: none;
       transition: box-shadow .2s, border-color .2s;
@@ -141,19 +115,11 @@
 </head>
 <body>
   <header>
+    <!-- Bagian header API yang dihapus -->
     <div class="container">
-      <div class="row">
-        <div class="brand"><i class="fa-solid fa-clapperboard"></i><span>Veo 3 Generator</span></div>
-        <div class="keybar">
-          <input id="baseUrl" class="baseurl" type="text" placeholder="API Base URL (e.g. https://api.your-veo3.com)" />
-          <input id="apiKey" class="api" type="text" placeholder="Your API Key (Bearer)" />
-          <button id="saveKey"><i class="fa-solid fa-key"></i> Save</button>
-          <div id="keyStatus" class="tag"><i class="fa-regular fa-circle"></i> Not set</div>
-        </div>
-      </div>
       <div class="hero">
-        <h1>Create AI videos with your own API key</h1>
-        <p>Prompt-to-video and image-conditioned generation. Keys are stored locally in your browser (localStorage).</p>
+        <h1>Create AI videos with Veo3 Prompt</h1>
+        <p>Enter prompt to generate video via Veo3 API. Results will be shown below.</p>
       </div>
     </div>
   </header>
@@ -162,7 +128,7 @@
     <div class="container grid">
       <section class="card">
         <h2>Generation Settings</h2>
-        <p class="muted">Fill in your prompt and (optionally) upload a reference image. Adjust parameters as needed.</p>
+        <p class="muted">Enter your prompt and generate the video.</p>
 
         <label for="prompt">Prompt</label>
         <textarea id="prompt" placeholder="Describe your video..."></textarea>
@@ -205,34 +171,13 @@
           </div>
         </div>
 
-        <label>Reference Image (optional)</label>
-        <div id="drop" class="dropzone">
-          <div>
-            <i class="fa-regular fa-image"></i>
-            <div><strong>Click to upload</strong> or drag & drop</div>
-            <div class="hint">JPEG/PNG, max ~10MB (depends on your API)</div>
-          </div>
-          <input id="imageInput" type="file" accept="image/*" style="display:none"/>
-        </div>
-        <div id="imgPreviewWrap" style="display:none; margin-top:10px">
-          <img id="imgPreview" alt="preview"/>
-          <div class="actions">
-            <button class="btn secondary" id="clearImage"><i class="fa-solid fa-xmark"></i> Remove Image</button>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="btn" id="generate"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate</button>
-          <button class="btn secondary" id="cancel"><i class="fa-solid fa-stop"></i> Cancel</button>
+        <!-- Tombol untuk panggil API Veo3 -->
+        <div style="margin-top:20px;">
+          <button class="btn" id="veo3Btn"><i class="fa-solid fa-magic"></i> Get Veo3 Result</button>
         </div>
 
         <div class="progress" aria-hidden="true"><div id="bar" class="bar"></div></div>
         <div id="log" class="log" aria-live="polite"></div>
-
-        <!-- Tambahkan tombol baru untuk panggil API veo3 -->
-        <div style="margin-top:20px;">
-          <button class="btn" id="veo3Btn"><i class="fa-solid fa-magic"></i> Get Veo3 Result</button>
-        </div>
       </section>
 
       <aside class="card">
@@ -245,9 +190,6 @@
           <button id="copyLink" class="btn secondary" style="display:none"><i class="fa-regular fa-copy"></i> Copy Link</button>
         </div>
         <p class="hint">If your API returns a direct video URL, it will play here. If it returns a job id, the app will poll until ready.</p>
-
-        <h3 style="margin-top:18px">Connection</h3>
-        <div id="conn" class="small muted">Base URL: <span id="connBase">—</span><br/>Auth: Bearer &lt;your-key&gt;</div>
       </aside>
     </div>
   </main>
@@ -255,12 +197,11 @@
   <footer>
     <div class="container small">
       <div class="pill warn"><i class="fa-solid fa-triangle-exclamation"></i> Security note</div>
-      Store keys only on devices you trust. This is a pure front‑end demo. In production, proxy requests via your own backend to keep keys private and enable CORS.
+      Store keys only on devices you trust. This is a front-end demo. In production, proxy requests via your own backend.
     </div>
   </footer>
 
   <script>
-    // =================== Variabel utama tanpa LS_KEY dan LS_BASE ===================
     // =================== Fungsi call API Veo3 ===================
     async function callVeo3(query) {
       const apiUrl = "https://api.ibeng.my.id/api/ai/veo3?query=" + encodeURIComponent(query) + "&apikey=MrsNK32zbG";
@@ -272,10 +213,7 @@
         if (result.status === "Success" && result.data && result.data.data) {
           const imageUrl = result.data.data.image_url;
           const videoUrl = result.data.data.video_url;
-
-          // Tampilkan gambar
           setPreviewImage(imageUrl);
-          // Atau, jika ingin otomatis mainkan video:
           setPreviewVideo(videoUrl);
         } else {
           log("API response error: " + (result.message || "Unknown error"));
@@ -297,113 +235,37 @@
       downloadA.href = url;
       copyLink.style.display = "inline-flex";
       copyLink.onclick = async () => {
-        try {
-          await navigator.clipboard.writeText(url);
-          copyLink.innerHTML = '<i class="fa-regular fa-copy"></i> Copied';
-          setTimeout(() => { copyLink.innerHTML = '<i class="fa-regular fa-copy"></i> Copy Link'; }, 1200);
-        } catch {}
+        try { await navigator.clipboard.writeText(url); copyLink.innerHTML = '<i class="fa-regular fa-copy"></i> Copied'; setTimeout(()=>{copyLink.innerHTML='<i class="fa-regular fa-copy"></i> Copy Link';},1200);} catch {}
       };
     }
 
-    // =================== Panggil API veo3 saat tombol diklik ===================
+    // =================== Event untuk tombol Veo3 Result ===================
     document.getElementById("veo3Btn").addEventListener("click", () => {
       const promptText = document.getElementById("prompt").value.trim();
       if (promptText) {
         callVeo3(promptText);
       } else {
-        alert("Please enter a prompt to get Veo3 result");
+        alert("Please enter a prompt");
       }
     });
 
-    // ======= Sisa kode yang ada sebelumnya =======
-
-    // ======= Elements =======
-    const baseUrlEl = document.getElementById("baseUrl");
-    const apiKeyEl  = document.getElementById("apiKey");
-    const saveKeyBtn= document.getElementById("saveKey");
-    const keyStatus = document.getElementById("keyStatus");
-    const connBase  = document.getElementById("connBase");
-
-    const promptEl  = document.getElementById("prompt");
-    const aspectEl  = document.getElementById("aspect");
-    const durationEl= document.getElementById("duration");
-    const stepsEl   = document.getElementById("steps");
-    const cfgEl     = document.getElementById("cfg");
-    const seedEl    = document.getElementById("seed");
-    const fpsEl     = document.getElementById("fps");
-
-    const drop      = document.getElementById("drop");
-    const imgInput  = document.getElementById("imageInput");
-    const imgPrevW  = document.getElementById("imgPreviewWrap");
-    const imgPrev   = document.getElementById("imgPreview");
-    const clearImg  = document.getElementById("clearImage");
-
-    const genBtn    = document.getElementById("generate");
-    const cancelBtn = document.getElementById("cancel");
-    const logEl     = document.getElementById("log");
-    const barEl     = document.getElementById("bar");
-
-    const preview   = document.getElementById("preview");
+    // =================== Sisa kode untuk generate ===================
+    const promptEl = document.getElementById("prompt");
+    const aspectEl = document.getElementById("aspect");
+    const durationEl = document.getElementById("duration");
+    const stepsEl = document.getElementById("steps");
+    const cfgEl = document.getElementById("cfg");
+    const seedEl = document.getElementById("seed");
+    const fpsEl = document.getElementById("fps");
+    const logEl = document.getElementById("log");
+    const barEl = document.getElementById("bar");
+    const preview = document.getElementById("preview");
     const downloadA = document.getElementById("download");
-    const copyLink  = document.getElementById("copyLink");
+    const copyLink = document.getElementById("copyLink");
 
     let abortCtrl = null;
     let currentJob = null;
 
-    // ======= Load saved config =======
-    function loadSaved() {
-      const savedKey = localStorage.getItem("VEO3_API_KEY") || "";
-      const savedBase= localStorage.getItem("VEO3_BASE_URL") || "";
-      apiKeyEl.value = savedKey;
-      baseUrlEl.value= savedBase;
-      updateKeyStatus();
-      connBase.textContent = savedBase || "—";
-    }
-
-    function updateKeyStatus() {
-      const has = !!apiKeyEl.value.trim();
-      keyStatus.innerHTML = has
-        ? '<i class="fa-regular fa-circle-check"></i> Key set'
-        : '<i class="fa-regular fa-circle"></i> Not set';
-      keyStatus.className = "tag " + (has ? "ok" : "");
-    }
-
-    saveKeyBtn.addEventListener("click", () => {
-      localStorage.setItem("VEO3_API_KEY", apiKeyEl.value.trim());
-      localStorage.setItem("VEO3_BASE_URL", baseUrlEl.value.trim());
-      updateKeyStatus();
-      connBase.textContent = baseUrlEl.value.trim() || "—";
-      log("Saved API key and Base URL.");
-    });
-
-    // ======= Image handling =======
-    function setImage(file) {
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        imgPrev.src = reader.result;
-        imgPrevW.style.display = "block";
-      };
-      reader.readAsDataURL(file);
-    }
-    drop.addEventListener("click", () => imgInput.click());
-    drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.style.borderColor = "#4776e6"; });
-    drop.addEventListener("dragleave", () => { drop.style.borderColor = ""; });
-    drop.addEventListener("drop", (e) => {
-      e.preventDefault();
-      drop.style.borderColor = "";
-      const file = e.dataTransfer.files?.[0];
-      if (file) setImage(file);
-      imgInput.files = e.dataTransfer.files;
-    });
-    imgInput.addEventListener("change", (e) => setImage(e.target.files?.[0]));
-    clearImg.addEventListener("click", () => {
-      imgInput.value = "";
-      imgPrev.src = "";
-      imgPrevW.style.display = "none";
-    });
-
-    // ======= Helpers =======
     function log(msg) {
       const time = new Date().toLocaleTimeString();
       logEl.textContent += `[${time}] ${msg}\n`;
@@ -412,39 +274,20 @@
       const pct = Math.max(0, Math.min(100, Math.round(p * 100)));
       barEl.style.width = pct + "%";
     }
-    function setPreviewVideo(url) {
-      preview.innerHTML = `<video id="vid" controls playsinline></video>`;
-      const vid = document.getElementById("vid");
-      vid.src = url;
-      vid.load();
-      downloadA.style.display = "inline-flex";
-      downloadA.href = url;
-      copyLink.style.display = "inline-flex";
-      copyLink.onclick = async () => {
-        try { await navigator.clipboard.writeText(url); copyLink.innerHTML = '<i class="fa-regular fa-copy"></i> Copied'; setTimeout(()=>{copyLink.innerHTML='<i class="fa-regular fa-copy"></i> Copy Link';},1200);} catch {}
-      };
-    }
-
-    function setPreviewImage(url) {
-      preview.innerHTML = `<img src="${url}" alt="Generated Image"/>`;
-      downloadA.style.display = "none";
-      copyLink.style.display = "none";
-    }
 
     function requireConf() {
-      const base = baseUrlEl.value.trim();
-      const key  = apiKeyEl.value.trim();
-      if (!base) { alert("Please set API Base URL"); return null; }
-      if (!key ) { alert("Please set API Key"); return null; }
+      const base = ""; // kosong karena tidak pakai
+      const key  = ""; // kosong karena tidak pakai
+      if (!base || !key) { return null; }
       return { base, key };
     }
 
-    // ======= Generate flow =======
+    // Generate video
     async function startGeneration() {
-      const conf = requireConf(); if (!conf) return;
       const prompt = promptEl.value.trim();
       if (!prompt) { alert("Please enter a prompt"); return; }
 
+      const conf = { base: "", key: "" }; // tidak pakai auth
       const fd = new FormData();
       fd.append("prompt", prompt);
       fd.append("aspect", aspectEl.value);
@@ -453,67 +296,53 @@
       fd.append("cfg", String(cfgEl.value));
       if (seedEl.value.trim()) fd.append("seed", seedEl.value.trim());
       fd.append("fps", String(fpsEl.value));
-      if (imgInput.files && imgInput.files[0]) fd.append("image", imgInput.files[0]);
 
       abortCtrl = new AbortController();
       setProgress(0);
-      log("Submitting generation job...");
-      genBtn.disabled = true;
-
+      log("Submitting job...");
+      // Jika ingin pakai API auth, tambahkan headers dan conf
       try {
-        const res = await fetch(conf.base.replace(/\/+$/,"") + "/generate", {
+        const res = await fetch("https://api.ibeng.my.id/api/ai/veo3/generate", {
           method: "POST",
-          headers: { "Authorization": "Bearer " + conf.key },
+          // headers: { "Authorization": "Bearer ..." },
           body: fd,
           signal: abortCtrl.signal
         });
-        if (!res.ok) throw new Error("Request failed: " + res.status + " " + res.statusText);
+        if (!res.ok) throw new Error("Request failed");
         const data = await res.json();
         log("Response: " + JSON.stringify(data));
 
         if (data.video_url) {
           setProgress(1);
-          log("Received direct video URL.");
           setPreviewVideo(data.video_url);
         } else if (data.job_id) {
           currentJob = data.job_id;
-          log("Job accepted. ID: " + currentJob + " — polling status...");
-          await pollJob(conf, currentJob);
+          log("Job ID: " + currentJob);
+          await pollJob(currentJob);
         } else {
-          throw new Error("Unexpected response. Provide either video_url or job_id.");
+          throw new Error("Unexpected response");
         }
       } catch (err) {
-        if (err.name === "AbortError") {
-          log("Generation cancelled by user.");
-        } else {
-          console.error(err);
-          log("Error: " + err.message);
-          alert("Generation error: " + err.message);
-        }
-      } finally {
-        genBtn.disabled = false;
-        abortCtrl = null;
+        log("Error: " + err.message);
       }
     }
 
-    async function pollJob(conf, jobId) {
+    async function pollJob(jobId) {
       let done = false;
       let tries = 0;
       while (!done && tries < 600) {
         await new Promise(r => setTimeout(r, 1000));
         tries++;
         try {
-          const r = await fetch(conf.base.replace(/\/+$/,"") + "/jobs/" + encodeURIComponent(jobId), {
-            headers: { "Authorization": "Bearer " + conf.key }
-          });
-          if (!r.ok) throw new Error("Status HTTP " + r.status);
+          const r = await fetch(`https://api.ibeng.my.id/api/ai/veo3/jobs/${encodeURIComponent(jobId)}`);
+          if (!r.ok) throw new Error("Status " + r.status);
           const j = await r.json();
           if (typeof j.progress === "number") setProgress(j.progress);
-          if (j.status) log("Status: " + j.status + (j.progress!=null ? ` (${Math.round(j.progress*100)}%)`:""));
+          if (j.status) log("Status: " + j.status + (j.progress != null ? ` (${Math.round(j.progress * 100)}%)` : ""));
           if (j.status === "succeeded" && j.video_url) {
             setProgress(1);
             setPreviewVideo(j.video_url);
-            log("Job completed.");
+            log("Job succeeded");
             done = true;
             break;
           }
@@ -525,28 +354,12 @@
         }
         if (abortCtrl == null) { log("Polling stopped."); break; }
       }
-      if (!done && abortCtrl != null) log("Polling timeout or stopped.");
     }
 
-    // Event listeners
     document.getElementById("generate").addEventListener("click", startGeneration);
     document.getElementById("cancel").addEventListener("click", () => {
-      if (abortCtrl) { abortCtrl.abort(); abortCtrl = null; }
+      if (abortCtrl) abortCtrl.abort(), abortCtrl = null;
     });
-
-    // =================== Tambahkan ini untuk panggil API Veo3 ===================
-    document.getElementById("veo3Btn").addEventListener("click", () => {
-      const promptText = document.getElementById("prompt").value.trim();
-      if (promptText) {
-        callVeo3(promptText);
-      } else {
-        alert("Please enter a prompt to get Veo3 result");
-      }
-    });
-
-    // Load saved data
-    loadSaved();
-
   </script>
 </body>
 </html>
