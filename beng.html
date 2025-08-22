@@ -136,9 +136,30 @@
 
     footer { text-align:center; color: var(--muted); padding: 26px 0 40px; }
     .small { font-size: 12px; }
+
+    /* Loading overlay styles */
+    #loadingOverlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 9999;
+    }
+    #loadingOverlay.show { display: flex; }
+    .loader {
+      border: 8px solid #f3f3f3; /* Light grey */
+      border-top: 8px solid var(--primary); /* Blue */
+      border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
+  <!-- Loading overlay -->
+  <div id="loadingOverlay">
+    <div class="loader"></div>
+  </div>
+
   <header>
     <div class="container">
       <div class="row">
@@ -241,10 +262,6 @@
 
   <script>
     // ======= Config =======
-    // API endpoint: https://api.ibeng.my.id/api/ai/veo3?query=&apikey=YOUR_API_KEY
-    // Expect POST request to /api/ai/veo3 with JSON body, response contains image_url and video_url
-
-    // Variabel tanpa LS_KEY dan LS_BASE
     const baseUrlInput = document.getElementById("baseUrl");
     const apiKeyInput  = document.getElementById("apiKey");
     const saveKeyBtn= document.getElementById("saveKey");
@@ -263,17 +280,16 @@
     const cancelBtn = document.getElementById("cancel");
     const logEl     = document.getElementById("log");
     const barEl     = document.getElementById("bar");
+    const loadingOverlay = document.getElementById("loadingOverlay");
 
     const preview   = document.getElementById("preview");
     const downloadA = document.getElementById("download");
     const copyLink  = document.getElementById("copyLink");
 
     let abortCtrl = null;
-    let currentJob = null;
 
-    // Load saved API key dan URL dari localStorage
+    // Load saved API key dan URL
     function loadSaved() {
-      // Tidak menggunakan LS_KEY dan LS_BASE, jadi bisa diisi manual
       const savedKey = localStorage.getItem("VEO3_API_KEY") || "";
       const savedBase= localStorage.getItem("VEO3_BASE_URL") || "";
       apiKeyInput.value = savedKey;
@@ -298,7 +314,7 @@
       log("Saved API key and Base URL.");
     });
 
-    // ======= Helper functions =======
+    // Helper functions
     function log(msg) {
       const time = new Date().toLocaleTimeString();
       logEl.textContent += `[${time}] ${msg}\n`;
@@ -307,6 +323,13 @@
     function setProgress(p) {
       const pct = Math.max(0, Math.min(100, Math.round(p * 100)));
       barEl.style.width = pct + "%";
+    }
+    function showLoading(show) {
+      if (show) {
+        loadingOverlay.classList.add("show");
+      } else {
+        loadingOverlay.classList.remove("show");
+      }
     }
     function setPreviewVideo(url) {
       preview.innerHTML = `<video id="vid" controls playsinline></video>`;
@@ -329,13 +352,14 @@
       return { base, key };
     }
 
-    // ======= Generate process =======
     async function startGeneration() {
       const conf = requireConf(); if (!conf) return;
       const prompt = promptEl.value.trim();
       if (!prompt) { alert("Please enter a prompt"); return; }
 
-      // Membuat payload JSON sesuai API
+      // Tampilkan loading
+      showLoading(true);
+
       const payload = {
         query: prompt,
         apikey: conf.key,
@@ -353,9 +377,9 @@
       genBtn.disabled = true;
 
       try {
-        const res = await fetch(conf.base.replace(/\/+$/,"") + "/api/ai/veo3?query=" + encodeURIComponent(payload.query) + "&apikey=" + encodeURIComponent(payload.apikey), {
-          method: "GET", // API Anda menggunakan GET, sesuai data yang diberikan
-        });
+        // API Anda menggunakan GET dengan parameter query & apikey
+        const url = `${conf.base.replace(/\/+$/,"")}/api/ai/veo3?query=${encodeURIComponent(payload.query)}&apikey=${encodeURIComponent(payload.apikey)}`;
+        const res = await fetch(url, { method: "GET", signal: abortCtrl.signal });
         if (!res.ok) throw new Error("Request failed: " + res.status + " " + res.statusText);
         const data = await res.json();
         log("Response: " + JSON.stringify(data));
@@ -376,18 +400,19 @@
           alert("Generation error: " + err.message);
         }
       } finally {
+        showLoading(false);
         genBtn.disabled = false;
         abortCtrl = null;
       }
     }
 
-    // Event listener tombol generate
-    genBtn.addEventListener("click", startGeneration);
-    cancelBtn.addEventListener("click", () => {
+    // Event listener
+    document.getElementById("generate").addEventListener("click", startGeneration);
+    document.getElementById("cancel").addEventListener("click", () => {
       if (abortCtrl) { abortCtrl.abort(); abortCtrl = null; }
     });
 
-    // Load konfigurasi sebelumnya
+    // Load config
     loadSaved();
   </script>
 </body>
