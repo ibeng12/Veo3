@@ -1,231 +1,552 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>REST API | IBENG</title>
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
-<style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
-    color: #fff;
-    line-height: 1.6;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Veo 3 - AI Video Generation (Your API Key)</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #6e48aa;
+      --secondary: #9d50bb;
+      --accent: #4776e6;
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --text: #1f2230;
+      --muted: #60657a;
+      --success: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --border: #e4e7ee;
+    }
 
-  /* Header */
-  header {
-    padding: 30px 20px;
-    text-align: center;
-    background-color: rgba(0, 0, 0, 0.3);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  }
-  header h1 {
-    font-size: 2.8em;
-    margin-bottom: 10px;
-    letter-spacing: 2px;
-    font-weight: 600;
-  }
-  nav a {
-    color: #fff;
-    margin: 0 20px;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 1em;
-    transition: color 0.3s, transform 0.3s;
-  }
-  nav a:hover {
-    color: #ffd700;
-    transform: scale(1.1);
-  }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      line-height: 1.6;
+    }
 
-  /* Main content */
-.main {
-  padding: 50px 20px;
-  max-width: 800px;
-  margin: 0 auto;
-  text-align: center;
-}
-.main h2 {
-  font-size: 3em;
-  margin-bottom: 20px;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 1px;
-  animation: fadeInDown 1s ease-out;
-}
-.description {
-  font-size: 1.25em;
-  margin-bottom: 30px;
-  color: #f0f0f0;
-  animation: fadeIn 1.5s ease-in;
-}
-.btn {
-  background: linear-gradient(135deg, #00f, #0ff);
-  padding: 15px 40px;
-  border-radius: 50px;
-  font-size: 1.2em;
-  font-weight: 600;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 8px 15px rgba(0,0,0,0.2);
-  transition: all 0.3s ease;
-}
-.btn:hover {
-  background: linear-gradient(135deg, #f7971e, #ffd200);
-  transform: translateY(-3px);
-}
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff; padding: 28px 18px; box-shadow: 0 10px 30px rgba(0,0,0,.15);
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 18px; }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 
-/* About Section */
-.about {
-  margin-top: 50px;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 30px;
-  border-radius: 20px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-  max-width: 700px;
-  margin-left: auto;
-  margin-right: auto;
-}
-.about h3 {
-  font-size: 2em;
-  margin-bottom: 15px;
-  color: #ffd700;
-}
-.about p {
-  font-size: 1.1em;
-  color: #eee;
-  margin-bottom: 10px;
-  text-align: justify;
-}
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: .3px; }
+    .brand i { color: var(--accent); font-size: 22px; }
+    .brand span { font-size: 20px; }
 
-/* Contact & Location */
-.contact-section {
-  margin-top: 50px;
-  padding: 30px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-}
-.contact-item {
-  display: flex;
-  align-items: center;
-  background: rgba(255,255,255,0.1);
-  padding: 15px 20px;
-  border-radius: 15px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  transition: background 0.3s, transform 0.3s;
-}
-.contact-item:hover {
-  background: rgba(255,255,255,0.2);
-  transform: translateY(-3px);
-}
-.contact-item svg {
-  margin-right: 15px;
-  fill: #ffd700;
-}
-.contact-item span {
-  font-size: 1.1em;
-  color: #fff;
-}
+    .keybar {
+      display: flex; gap: 10px; flex-wrap: wrap;
+      background: rgba(255,255,255,.12);
+      padding: 10px; border-radius: 10px;
+    }
+    .keybar input, .keybar button {
+      border: none; border-radius: 8px; padding: 10px 12px; font-size: 14px;
+    }
+    .keybar input {
+      min-width: 220px; color: #1a1a2e;
+    }
+    .keybar .api, .keybar .baseurl {
+      background: #fff; outline: none;
+    }
+    .keybar button {
+      background: #fff; color: var(--primary); font-weight: 700; cursor: pointer;
+    }
+    .keybar button:hover { filter: brightness(.95); }
+    .tag {
+      padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.18);
+      font-size: 12px; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .tag i { font-size: 12px; }
 
-/* Footer */
-footer {
-  margin-top: 40px;
-  padding: 20px;
-  background-color: rgba(0,0,0,0.3);
-  text-align: center;
-  font-size: 0.95em;
-  color: #ccc;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
-}
+    .hero {
+      padding: 26px 0 8px;
+      color: #fff;
+    }
+    .hero h1 { margin: 0 0 8px; font-size: 28px; font-weight: 800; }
+    .hero p { margin: 0; opacity: .9; }
 
-/* Animations */
-@keyframes fadeInDown {
-  0% { opacity: 0; transform: translateY(-50px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+    main { padding: 26px 0 60px; }
+    .grid {
+      display: grid; grid-template-columns: 1.2fr .8fr; gap: 22px;
+    }
+    @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
 
-/* Responsive */
-@media(max-width: 768px){
-  header h1 { font-size: 2em; }
-  .main h2 { font-size: 2em; }
-  .btn { padding: 12px 30px; font-size: 1em; }
-}
-</style>
+    .card {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 14px; padding: 18px; box-shadow: 0 8px 20px rgba(31,34,48,.04);
+    }
+    .card h2 { margin: 0 0 14px; font-size: 18px; }
+    .muted { color: var(--muted); font-size: 14px; }
+
+    label { display:block; font-weight: 700; margin: 12px 0 6px; font-size: 14px; }
+    input[type="text"], input[type="number"], textarea, select {
+      width: 100%; padding: 12px 12px; border: 1px solid var(--border);
+      border-radius: 10px; font-size: 14px; outline: none;
+      transition: box-shadow .2s, border-color .2s;
+      background: #fff;
+    }
+    textarea { min-height: 120px; resize: vertical; }
+    input:focus, textarea:focus, select:focus { box-shadow: 0 0 0 4px rgba(71,118,230,.12); border-color: var(--accent); }
+
+    .row2 { display:flex; gap: 12px; }
+    .row2 > * { flex: 1; }
+
+    .dropzone {
+      border: 2px dashed var(--border); border-radius: 12px; padding: 18px;
+      display: grid; place-items: center; text-align: center; cursor: pointer; background: #fafbff;
+    }
+    .dropzone:hover { border-color: var(--accent); background: #f2f5ff; }
+
+    .btn {
+      display:inline-flex; align-items:center; gap:8px;
+      background: var(--accent); color:#fff; border:none; border-radius:10px;
+      padding: 12px 16px; font-weight: 800; cursor:pointer; letter-spacing:.3px;
+      box-shadow: 0 6px 18px rgba(71,118,230,.25);
+      transition: transform .08s ease, filter .2s;
+    }
+    .btn.secondary { background: #ffffff; color: var(--accent); border: 1px solid var(--border); box-shadow: none; }
+    .btn:active { transform: translateY(1px); }
+    .btn:hover { filter: brightness(.95); }
+
+    .actions { display:flex; flex-wrap: wrap; gap:10px; margin-top: 14px; }
+
+    .preview {
+      border-radius: 12px; overflow:hidden; background:#0b0b0f; min-height: 180px;
+      display:grid; place-items:center;
+    }
+    video, img { max-width: 100%; border-radius: 8px; }
+
+    .progress {
+      margin-top: 12px; height: 12px; width: 100%; background: #eef1f7; border-radius: 999px; overflow: hidden;
+    }
+    .bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--secondary)); transition: width .4s; }
+
+    .log { margin-top: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px; background: #0e1117; color: #d1d5db; border-radius: 10px; padding: 12px; max-height: 220px; overflow:auto; }
+
+    .pill {
+      display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700;
+    }
+    .ok { background: rgba(40,167,69,.12); color: var(--success); }
+    .bad { background: rgba(220,53,69,.12); color: var(--danger); }
+    .warn{ background: rgba(255,193,7,.14); color: #b08900; }
+    .hint{ font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+    footer { text-align:center; color: var(--muted); padding: 26px 0 40px; }
+    .small { font-size: 12px; }
+  </style>
 </head>
 <body>
+  <header>
+    <div class="container">
+      <div class="row">
+        <div class="brand"><i class="fa-solid fa-clapperboard"></i><span>Veo 3 Generator</span></div>
+        <div class="keybar">
+          <input id="baseUrl" class="baseurl" type="text" placeholder="API Base URL (e.g. https://api.your-veo3.com)" />
+          <input id="apiKey" class="api" type="text" placeholder="Your API Key (Bearer)" />
+          <button id="saveKey"><i class="fa-solid fa-key"></i> Save</button>
+          <div id="keyStatus" class="tag"><i class="fa-regular fa-circle"></i> Not set</div>
+        </div>
+      </div>
+      <div class="hero">
+        <h1>Create AI videos with your own API key</h1>
+        <p>Prompt-to-video and image-conditioned generation. Keys are stored locally in your browser (localStorage).</p>
+      </div>
+    </div>
+  </header>
 
-<!-- Header -->
-<header>
-  <h1>REST API | IBENG</h1>
-  <nav>
-    <a href="#">Beranda</a>
-    <a href="#about">Tentang</a>
-    <a href="#contact">Kontak</a>
-  </nav>
-</header>
+  <main>
+    <div class="container grid">
+      <section class="card">
+        <h2>Generation Settings</h2>
+        <p class="muted">Fill in your prompt and (optionally) upload a reference image. Adjust parameters as needed.</p>
 
-<!-- Main Content -->
-<div class="main">
-  <h2>Solusi API Cepat & Aman</h2>
-  <div class="description">
-    Menyediakan API yang ringan, aman, dan mudah diintegrasikan untuk kebutuhan digital Anda.
-  </div>
-  <a href="https://api.ibeng.my.id/login" target="_blank" class="btn">Coba Sekarang!</a>
+        <label for="prompt">Prompt</label>
+        <textarea id="prompt" placeholder="Describe your video..."></textarea>
+        <div class="hint">Example: Cinematic 4K pirate ship in a storm, dramatic lighting, 24fps, realistic water, intense atmosphere.</div>
 
-  <!-- About -->
-  <div id="about" class="about">
-    <h3>Tentang REST API kami</h3>
-    <p>Kami menyediakan layanan REST API yang dapat mempercepat pengembangan aplikasi Anda dengan keamanan dan keandalan tinggi. Dokumentasi lengkap dan dukungan teknis siap membantu Anda membangun solusi terbaik.</p>
-  </div>
-</div>
+        <div class="row2">
+          <div>
+            <label for="aspect">Aspect Ratio</label>
+            <select id="aspect">
+              <option value="16:9">16:9 (Landscape)</option>
+              <option value="9:16">9:16 (Portrait)</option>
+              <option value="1:1">1:1 (Square)</option>
+            </select>
+          </div>
+          <div>
+            <label for="duration">Duration (sec)</label>
+            <input id="duration" type="number" min="2" max="60" step="1" value="6"/>
+          </div>
+        </div>
 
-<!-- Contact & Location -->
-<div id="contact" class="contact-section">
-  <h3>Kontak Kami</h3>
-  <div class="contact-item">
-    <!-- Icon Lokasi -->
-    <svg width="24" height="24" viewBox="0 0 24 24">
-      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5 14.5 7.62 14.5 9 13.38 11.5 12 11.5z"/>
-    </svg>
-    <span>Kapuas, Kalimantan Tengah, Indonesia</span>
-  </div>
-  <div class="contact-item">
-    <!-- Icon Email -->
-    <svg width="24" height="24" viewBox="0 0 24 24">
-      <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-    </svg>
-    <span>rizkyibeng211@gmail.com</span>
-  </div>
-  <div class="contact-item">
-    <!-- Icon Telepon -->
-    <svg width="24" height="24" viewBox="0 0 24 24">
-      <path d="M17.707 12.293l-2-2A.996.996 0 0015 10c-1.103 0-2 .897-2 2 0 1.103.897 2 2 2 .293 0 .586-.062.854-.183l2 2A.996.996 0 0020 15c0-2.21-1.79-4-4-4-.293 0-.586.062-.854.183z"/>
-    </svg>
-    <span>+62812-5717-2080</span>
-  </div>
-</div>
+        <div class="row2">
+          <div>
+            <label for="steps">Steps</label>
+            <input id="steps" type="number" min="1" max="100" step="1" value="30"/>
+          </div>
+          <div>
+            <label for="cfg">CFG / Guidance</label>
+            <input id="cfg" type="number" min="0" max="20" step="0.5" value="6.5"/>
+          </div>
+        </div>
 
-<!-- Footer -->
-<footer>
-  © 2024 IBENG BOT. All rights reserved.
-</footer>
+        <div class="row2">
+          <div>
+            <label for="seed">Seed (optional)</label>
+            <input id="seed" type="text" placeholder="-1 for random" value="-1"/>
+          </div>
+          <div>
+            <label for="fps">FPS</label>
+            <input id="fps" type="number" min="4" max="60" step="1" value="24"/>
+          </div>
+        </div>
 
+        <label>Reference Image (optional)</label>
+        <div id="drop" class="dropzone">
+          <div>
+            <i class="fa-regular fa-image"></i>
+            <div><strong>Click to upload</strong> or drag & drop</div>
+            <div class="hint">JPEG/PNG, max ~10MB (depends on your API)</div>
+          </div>
+          <input id="imageInput" type="file" accept="image/*" style="display:none"/>
+        </div>
+        <div id="imgPreviewWrap" style="display:none; margin-top:10px">
+          <img id="imgPreview" alt="preview"/>
+          <div class="actions">
+            <button class="btn secondary" id="clearImage"><i class="fa-solid fa-xmark"></i> Remove Image</button>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" id="generate"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate</button>
+          <button class="btn secondary" id="cancel"><i class="fa-solid fa-stop"></i> Cancel</button>
+        </div>
+
+        <div class="progress" aria-hidden="true"><div id="bar" class="bar"></div></div>
+        <div id="log" class="log" aria-live="polite"></div>
+
+        <!-- Tambahkan tombol baru untuk panggil API veo3 -->
+        <div style="margin-top:20px;">
+          <button class="btn" id="veo3Btn"><i class="fa-solid fa-magic"></i> Get Veo3 Result</button>
+        </div>
+      </section>
+
+      <aside class="card">
+        <h2>Result</h2>
+        <div class="preview" id="preview">
+          <span class="muted">Your result will appear here</span>
+        </div>
+        <div class="actions" style="margin-top:12px">
+          <a id="download" class="btn" href="#" download="veo3_result.mp4" style="display:none"><i class="fa-solid fa-download"></i> Download</a>
+          <button id="copyLink" class="btn secondary" style="display:none"><i class="fa-regular fa-copy"></i> Copy Link</button>
+        </div>
+        <p class="hint">If your API returns a direct video URL, it will play here. If it returns a job id, the app will poll until ready.</p>
+
+        <h3 style="margin-top:18px">Connection</h3>
+        <div id="conn" class="small muted">Base URL: <span id="connBase">—</span><br/>Auth: Bearer &lt;your-key&gt;</div>
+      </aside>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container small">
+      <div class="pill warn"><i class="fa-solid fa-triangle-exclamation"></i> Security note</div>
+      Store keys only on devices you trust. This is a pure front‑end demo. In production, proxy requests via your own backend to keep keys private and enable CORS.
+    </div>
+  </footer>
+
+  <script>
+    // =================== Variabel utama tanpa LS_KEY dan LS_BASE ===================
+    // =================== Fungsi call API Veo3 ===================
+    async function callVeo3(query) {
+      const apiUrl = "https://api.ibeng.my.id/api/ai/veo3?query=" + encodeURIComponent(query) + "&apikey=MrsNK32zbG";
+      try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error("API request failed");
+        const result = await response.json();
+
+        if (result.status === "Success" && result.data && result.data.data) {
+          const imageUrl = result.data.data.image_url;
+          const videoUrl = result.data.data.video_url;
+
+          // Tampilkan gambar
+          setPreviewImage(imageUrl);
+          // Atau, jika ingin otomatis mainkan video:
+          setPreviewVideo(videoUrl);
+        } else {
+          log("API response error: " + (result.message || "Unknown error"));
+        }
+      } catch (err) {
+        log("Error calling Veo3 API: " + err.message);
+      }
+    }
+
+    function setPreviewImage(url) {
+      preview.innerHTML = `<img src="${url}" alt="Generated Image"/>`;
+      downloadA.style.display = "none";
+      copyLink.style.display = "none";
+    }
+
+    function setPreviewVideo(url) {
+      preview.innerHTML = `<video controls autoplay playsinline src="${url}"></video>`;
+      downloadA.style.display = "inline-flex";
+      downloadA.href = url;
+      copyLink.style.display = "inline-flex";
+      copyLink.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(url);
+          copyLink.innerHTML = '<i class="fa-regular fa-copy"></i> Copied';
+          setTimeout(() => { copyLink.innerHTML = '<i class="fa-regular fa-copy"></i> Copy Link'; }, 1200);
+        } catch {}
+      };
+    }
+
+    // =================== Panggil API veo3 saat tombol diklik ===================
+    document.getElementById("veo3Btn").addEventListener("click", () => {
+      const promptText = document.getElementById("prompt").value.trim();
+      if (promptText) {
+        callVeo3(promptText);
+      } else {
+        alert("Please enter a prompt to get Veo3 result");
+      }
+    });
+
+    // ======= Sisa kode yang ada sebelumnya =======
+
+    // ======= Elements =======
+    const baseUrlEl = document.getElementById("baseUrl");
+    const apiKeyEl  = document.getElementById("apiKey");
+    const saveKeyBtn= document.getElementById("saveKey");
+    const keyStatus = document.getElementById("keyStatus");
+    const connBase  = document.getElementById("connBase");
+
+    const promptEl  = document.getElementById("prompt");
+    const aspectEl  = document.getElementById("aspect");
+    const durationEl= document.getElementById("duration");
+    const stepsEl   = document.getElementById("steps");
+    const cfgEl     = document.getElementById("cfg");
+    const seedEl    = document.getElementById("seed");
+    const fpsEl     = document.getElementById("fps");
+
+    const drop      = document.getElementById("drop");
+    const imgInput  = document.getElementById("imageInput");
+    const imgPrevW  = document.getElementById("imgPreviewWrap");
+    const imgPrev   = document.getElementById("imgPreview");
+    const clearImg  = document.getElementById("clearImage");
+
+    const genBtn    = document.getElementById("generate");
+    const cancelBtn = document.getElementById("cancel");
+    const logEl     = document.getElementById("log");
+    const barEl     = document.getElementById("bar");
+
+    const preview   = document.getElementById("preview");
+    const downloadA = document.getElementById("download");
+    const copyLink  = document.getElementById("copyLink");
+
+    let abortCtrl = null;
+    let currentJob = null;
+
+    // ======= Load saved config =======
+    function loadSaved() {
+      const savedKey = localStorage.getItem("VEO3_API_KEY") || "";
+      const savedBase= localStorage.getItem("VEO3_BASE_URL") || "";
+      apiKeyEl.value = savedKey;
+      baseUrlEl.value= savedBase;
+      updateKeyStatus();
+      connBase.textContent = savedBase || "—";
+    }
+
+    function updateKeyStatus() {
+      const has = !!apiKeyEl.value.trim();
+      keyStatus.innerHTML = has
+        ? '<i class="fa-regular fa-circle-check"></i> Key set'
+        : '<i class="fa-regular fa-circle"></i> Not set';
+      keyStatus.className = "tag " + (has ? "ok" : "");
+    }
+
+    saveKeyBtn.addEventListener("click", () => {
+      localStorage.setItem("VEO3_API_KEY", apiKeyEl.value.trim());
+      localStorage.setItem("VEO3_BASE_URL", baseUrlEl.value.trim());
+      updateKeyStatus();
+      connBase.textContent = baseUrlEl.value.trim() || "—";
+      log("Saved API key and Base URL.");
+    });
+
+    // ======= Image handling =======
+    function setImage(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        imgPrev.src = reader.result;
+        imgPrevW.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    }
+    drop.addEventListener("click", () => imgInput.click());
+    drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.style.borderColor = "#4776e6"; });
+    drop.addEventListener("dragleave", () => { drop.style.borderColor = ""; });
+    drop.addEventListener("drop", (e) => {
+      e.preventDefault();
+      drop.style.borderColor = "";
+      const file = e.dataTransfer.files?.[0];
+      if (file) setImage(file);
+      imgInput.files = e.dataTransfer.files;
+    });
+    imgInput.addEventListener("change", (e) => setImage(e.target.files?.[0]));
+    clearImg.addEventListener("click", () => {
+      imgInput.value = "";
+      imgPrev.src = "";
+      imgPrevW.style.display = "none";
+    });
+
+    // ======= Helpers =======
+    function log(msg) {
+      const time = new Date().toLocaleTimeString();
+      logEl.textContent += `[${time}] ${msg}\n`;
+    }
+    function setProgress(p) {
+      const pct = Math.max(0, Math.min(100, Math.round(p * 100)));
+      barEl.style.width = pct + "%";
+    }
+    function setPreviewVideo(url) {
+      preview.innerHTML = `<video id="vid" controls playsinline></video>`;
+      const vid = document.getElementById("vid");
+      vid.src = url;
+      vid.load();
+      downloadA.style.display = "inline-flex";
+      downloadA.href = url;
+      copyLink.style.display = "inline-flex";
+      copyLink.onclick = async () => {
+        try { await navigator.clipboard.writeText(url); copyLink.innerHTML = '<i class="fa-regular fa-copy"></i> Copied'; setTimeout(()=>{copyLink.innerHTML='<i class="fa-regular fa-copy"></i> Copy Link';},1200);} catch {}
+      };
+    }
+
+    function setPreviewImage(url) {
+      preview.innerHTML = `<img src="${url}" alt="Generated Image"/>`;
+      downloadA.style.display = "none";
+      copyLink.style.display = "none";
+    }
+
+    function requireConf() {
+      const base = baseUrlEl.value.trim();
+      const key  = apiKeyEl.value.trim();
+      if (!base) { alert("Please set API Base URL"); return null; }
+      if (!key ) { alert("Please set API Key"); return null; }
+      return { base, key };
+    }
+
+    // ======= Generate flow =======
+    async function startGeneration() {
+      const conf = requireConf(); if (!conf) return;
+      const prompt = promptEl.value.trim();
+      if (!prompt) { alert("Please enter a prompt"); return; }
+
+      const fd = new FormData();
+      fd.append("prompt", prompt);
+      fd.append("aspect", aspectEl.value);
+      fd.append("duration", String(durationEl.value));
+      fd.append("steps", String(stepsEl.value));
+      fd.append("cfg", String(cfgEl.value));
+      if (seedEl.value.trim()) fd.append("seed", seedEl.value.trim());
+      fd.append("fps", String(fpsEl.value));
+      if (imgInput.files && imgInput.files[0]) fd.append("image", imgInput.files[0]);
+
+      abortCtrl = new AbortController();
+      setProgress(0);
+      log("Submitting generation job...");
+      genBtn.disabled = true;
+
+      try {
+        const res = await fetch(conf.base.replace(/\/+$/,"") + "/generate", {
+          method: "POST",
+          headers: { "Authorization": "Bearer " + conf.key },
+          body: fd,
+          signal: abortCtrl.signal
+        });
+        if (!res.ok) throw new Error("Request failed: " + res.status + " " + res.statusText);
+        const data = await res.json();
+        log("Response: " + JSON.stringify(data));
+
+        if (data.video_url) {
+          setProgress(1);
+          log("Received direct video URL.");
+          setPreviewVideo(data.video_url);
+        } else if (data.job_id) {
+          currentJob = data.job_id;
+          log("Job accepted. ID: " + currentJob + " — polling status...");
+          await pollJob(conf, currentJob);
+        } else {
+          throw new Error("Unexpected response. Provide either video_url or job_id.");
+        }
+      } catch (err) {
+        if (err.name === "AbortError") {
+          log("Generation cancelled by user.");
+        } else {
+          console.error(err);
+          log("Error: " + err.message);
+          alert("Generation error: " + err.message);
+        }
+      } finally {
+        genBtn.disabled = false;
+        abortCtrl = null;
+      }
+    }
+
+    async function pollJob(conf, jobId) {
+      let done = false;
+      let tries = 0;
+      while (!done && tries < 600) {
+        await new Promise(r => setTimeout(r, 1000));
+        tries++;
+        try {
+          const r = await fetch(conf.base.replace(/\/+$/,"") + "/jobs/" + encodeURIComponent(jobId), {
+            headers: { "Authorization": "Bearer " + conf.key }
+          });
+          if (!r.ok) throw new Error("Status HTTP " + r.status);
+          const j = await r.json();
+          if (typeof j.progress === "number") setProgress(j.progress);
+          if (j.status) log("Status: " + j.status + (j.progress!=null ? ` (${Math.round(j.progress*100)}%)`:""));
+          if (j.status === "succeeded" && j.video_url) {
+            setProgress(1);
+            setPreviewVideo(j.video_url);
+            log("Job completed.");
+            done = true;
+            break;
+          }
+          if (j.status === "failed") {
+            throw new Error(j.error || "Job failed");
+          }
+        } catch (e) {
+          log("Polling error: " + e.message);
+        }
+        if (abortCtrl == null) { log("Polling stopped."); break; }
+      }
+      if (!done && abortCtrl != null) log("Polling timeout or stopped.");
+    }
+
+    // Event listeners
+    document.getElementById("generate").addEventListener("click", startGeneration);
+    document.getElementById("cancel").addEventListener("click", () => {
+      if (abortCtrl) { abortCtrl.abort(); abortCtrl = null; }
+    });
+
+    // =================== Tambahkan ini untuk panggil API Veo3 ===================
+    document.getElementById("veo3Btn").addEventListener("click", () => {
+      const promptText = document.getElementById("prompt").value.trim();
+      if (promptText) {
+        callVeo3(promptText);
+      } else {
+        alert("Please enter a prompt to get Veo3 result");
+      }
+    });
+
+    // Load saved data
+    loadSaved();
+
+  </script>
 </body>
 </html>
