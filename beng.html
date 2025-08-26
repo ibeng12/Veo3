@@ -150,15 +150,8 @@ generateBtn.addEventListener('click', async () => {
         outputContainer.innerHTML = '';
 
         if (mediaUrlResult) {
-            const contentType = response.headers.get('content-type');
-
-            if (contentType && contentType.startsWith('image/')) {
-                const img = document.createElement('img');
-                img.src = mediaUrlResult;
-                img.alt = 'Hasil Gambar';
-                img.className = 'w-full h-auto rounded-lg';
-                outputContainer.appendChild(img);
-            } else if (contentType && contentType.startsWith('video/')) {
+            // Untuk memastikan ini adalah video, cek ekstensi atau tipe
+            if (mediaUrlResult.endsWith('.mp4') || mediaUrlResult.endsWith('.webm') || mediaUrlResult.endsWith('.ogg')) {
                 const video = document.createElement('video');
                 video.src = mediaUrlResult;
                 video.controls = true;
@@ -168,8 +161,12 @@ generateBtn.addEventListener('click', async () => {
                 video.className = 'w-full h-auto rounded-lg';
                 outputContainer.appendChild(video);
             } else {
-                // Kalau tipe tidak dikenali, tampilkan link
-                outputContainer.innerHTML = `<a href="${mediaUrlResult}" target="_blank" class="text-blue-500 underline">Lihat hasil</a>`;
+                // Jika bukan video, tampilkan gambar
+                const img = document.createElement('img');
+                img.src = mediaUrlResult;
+                img.alt = 'Hasil Gambar';
+                img.className = 'w-full h-auto rounded-lg';
+                outputContainer.appendChild(img);
             }
         } else {
             outputContainer.innerHTML = `<p class="text-red-500 p-4">Tidak ditemukan media dalam response.</p>`;
