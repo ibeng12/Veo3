@@ -1,161 +1,215 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Generator AI Gambar & Video</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<style>
-    body {
-        font-family: 'Inter', sans-serif;
-    }
-    /* Spinner sederhana */
-    .loader {
-        border: 4px solid #f3f3f3;
-        border-radius: 50%;
-        border-top: 4px solid #3498db;
-        width: 40px;
-        height: 40px;
-        animation: spin 2s linear infinite;
-    }
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Content Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Animasi spinner sederhana */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+<body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen p-4">
 
-<div class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6 md:p-8">
-    <!-- Header -->
-    <div class="text-center mb-8">
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Generator AI Gambar & Video</h1>
-        <p class="text-gray-500 mt-2">Pilih mode dan masukkan prompt untuk membuat konten.</p>
+    <div class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6 md:p-8">
+        
+        <div class="text-center mb-6">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">AI Content Generator 🚀</h1>
+            <p class="text-gray-500 mt-2">Pilih mode dan masukkan deskripsi untuk membuat konten baru.</p>
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Mode</label>
+            <div class="flex items-center space-x-4 rounded-lg bg-gray-100 p-1">
+                <label class="w-full text-center">
+                    <input type="radio" name="mode" value="image-to-video" class="sr-only" checked>
+                    <span id="mode-img2vid" class="cursor-pointer block w-full px-4 py-2 rounded-md bg-white shadow text-blue-600 font-semibold transition">Image to Video/Image</span>
+                </label>
+                <label class="w-full text-center">
+                    <input type="radio" name="mode" value="text-to-video" class="sr-only">
+                    <span id="mode-txt2vid" class="cursor-pointer block w-full px-4 py-2 rounded-md text-gray-600 font-semibold transition">Text to Video</span>
+                </label>
+            </div>
+        </div>
+
+
+        <div class="space-y-4">
+            <div id="imageUrlContainer">
+                <label for="imageUrl" class="block text-sm font-medium text-gray-700 mb-1">URL Gambar</label>
+                <input type="url" id="imageUrl" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="https://example.com/image.jpg" value="https://files.catbox.moe/kb8s6f.jpeg">
+            </div>
+            <div>
+                <label for="query" class="block text-sm font-medium text-gray-700 mb-1">Deskripsi / Prompt Teks</label>
+                <input type="text" id="query" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Contoh: sedang bermain laptop" value="sedang bermain laptop">
+            </div>
+             <div>
+                <label for="apiKey" class="block text-sm font-medium text-gray-700 mb-1">API Key</label>
+                <input type="text" id="apiKey" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Masukkan API Key Anda" value="ribeng121">
+            </div>
+            <button id="generateBtn" class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 transform hover:scale-105">
+                Buat Sekarang
+            </button>
+        </div>
+
+        <div id="result-container" class="mt-8 text-center">
+            <div id="loader" class="loader mx-auto hidden"></div>
+            <p id="status-text" class="text-gray-500 mt-4 hidden">Sedang memproses, mohon tunggu...</p>
+            <div id="output" class="mt-4 rounded-lg overflow-hidden bg-gray-200 min-h-[200px] flex items-center justify-center">
+                 <p class="text-gray-400">Hasil akan muncul di sini</p>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Mode Pilihan -->
-    <div class="mb-4">
-        <label class="block mb-2 font-semibold">Mode:</label>
-        <select id="mode" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-            <option value="image">Gambar</option>
-            <option value="video">Video</option>
-        </select>
-    </div>
+    <script>
+        // Mendapatkan elemen dari DOM
+        const modeRadios = document.querySelectorAll('input[name="mode"]');
+        const imageUrlContainer = document.getElementById('imageUrlContainer');
+        const imageUrlInput = document.getElementById('imageUrl');
+        const queryInput = document.getElementById('query');
+        const apiKeyInput = document.getElementById('apiKey');
+        const generateBtn = document.getElementById('generateBtn');
+        const loader = document.getElementById('loader');
+        const statusText = document.getElementById('status-text');
+        const outputContainer = document.getElementById('output');
+        const modeImg2VidBtn = document.getElementById('mode-img2vid');
+        const modeTxt2VidBtn = document.getElementById('mode-txt2vid');
 
-    <!-- Form Input -->
-    <div class="space-y-4">
-        <!-- URL Gambar (khusus mode gambar) -->
-        <div id="image-url-group" class="hidden">
-            <label for="imageUrl" class="block text-sm font-medium text-gray-700 mb-1">URL Gambar</label>
-            <input type="url" id="imageUrl" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="https://example.com/image.jpg" />
-        </div>
-        <!-- Prompt -->
-        <div>
-            <label for="query" class="block text-sm font-medium text-gray-700 mb-1">Prompt / Deskripsi</label>
-            <input type="text" id="query" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Contoh: seorang pria di pantai saat matahari terbenam" />
-        </div>
-        <!-- API Key -->
-        <div>
-            <label for="apiKey" class="block text-sm font-medium text-gray-700 mb-1">API Key</label>
-            <input type="text" id="apiKey" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Masukkan API Key Anda" value="ribeng121" />
-        </div>
-        <!-- Tombol Generate -->
-        <button id="generateBtn" class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition">
-            Buat Sekarang
-        </button>
-    </div>
-
-    <!-- Area Hasil -->
-    <div id="result-container" class="mt-8 text-center">
-        <div id="loader" class="loader mx-auto hidden"></div>
-        <p id="status-text" class="text-gray-500 mt-4 hidden">Sedang memproses, mohon tunggu...</p>
-        <div id="output" class="mt-4 rounded-lg bg-gray-200 min-h-[200px] flex items-center justify-center">
-            <p class="text-gray-400">Hasil akan muncul di sini</p>
-        </div>
-    </div>
-</div>
-
-<script>
-const modeSelect = document.getElementById('mode');
-const imageUrlGroup = document.getElementById('image-url-group');
-const imageUrlInput = document.getElementById('imageUrl');
-const queryInput = document.getElementById('query');
-const apiKeyInput = document.getElementById('apiKey');
-const generateBtn = document.getElementById('generateBtn');
-const loader = document.getElementById('loader');
-const statusText = document.getElementById('status-text');
-const outputContainer = document.getElementById('output');
-
-// Tampilkan/ sembunyikan input URL gambar
-modeSelect.addEventListener('change', () => {
-    if (modeSelect.value === 'image') {
-        imageUrlGroup.classList.remove('hidden');
-    } else {
-        imageUrlGroup.classList.add('hidden');
-    }
-});
-if (modeSelect.value === 'image') {
-    imageUrlGroup.classList.remove('hidden');
-} else {
-    imageUrlGroup.classList.add('hidden');
-}
-
-// Event klik generate
-generateBtn.addEventListener('click', async () => {
-    const mode = modeSelect.value;
-    const apiKey = apiKeyInput.value.trim();
-    const prompt = queryInput.value.trim();
-
-    if (!apiKey || !prompt) {
-        outputContainer.innerHTML = `<p class="text-red-500 p-4">Isi API Key dan Prompt.</p>`;
-        return;
-    }
-
-    let mediaUrl = '';
-    if (mode === 'image') {
-        mediaUrl = imageUrlInput.value.trim();
-        if (!mediaUrl) {
-            outputContainer.innerHTML = `<p class="text-red-500 p-4">Isi URL Gambar.</p>`;
-            return;
-        }
-    }
-
-    // Tampilkan loader
-    loader.classList.remove('hidden');
-    statusText.classList.remove('hidden');
-    generateBtn.disabled = true;
-    generateBtn.textContent = 'Memproses...';
-    outputContainer.innerHTML = '<p class="text-gray-400">Menunggu hasil...</p>';
-
-    try {
-        let apiUrl = '';
-        if (mode === 'image') {
-            apiUrl = `https://api.ibeng.my.id/api/ai/txt2img?query=${encodeURIComponent(prompt)}&apikey=${encodeURIComponent(apiKey)}`;
-        } else {
-            apiUrl = `https://api.ibeng.my.id/api/ai/txt2video?query=${encodeURIComponent(prompt)}&apikey=${encodeURIComponent(apiKey)}`;
+        // Fungsi untuk mengupdate tampilan tombol mode
+        function updateModeUI(selectedMode) {
+             if (selectedMode === 'image-to-video') {
+                imageUrlContainer.style.display = 'block';
+                modeImg2VidBtn.classList.add('bg-white', 'shadow', 'text-blue-600');
+                modeTxt2VidBtn.classList.remove('bg-white', 'shadow', 'text-blue-600');
+            } else { // text-to-video
+                imageUrlContainer.style.display = 'none';
+                modeTxt2VidBtn.classList.add('bg-white', 'shadow', 'text-blue-600');
+                modeImg2VidBtn.classList.remove('bg-white', 'shadow', 'text-blue-600');
+            }
         }
 
-        const response = await fetch(apiUrl);
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => response.text());
-            throw new Error(`Gagal: ${response.status} ${response.statusText}`);
+        // Event listener untuk pilihan mode
+        modeRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                updateModeUI(e.target.value);
+            });
+        });
+        
+        // --- LOGIKA UTAMA ---
+        generateBtn.addEventListener('click', async () => {
+            const selectedMode = document.querySelector('input[name="mode"]:checked').value;
+            const query = queryInput.value.trim();
+            const apiKey = apiKeyInput.value.trim();
+            const imageUrl = imageUrlInput.value.trim();
+
+            // Validasi input berdasarkan mode
+            if (selectedMode === 'image-to-video' && (!imageUrl || !query || !apiKey)) {
+                 outputContainer.innerHTML = `<p class="text-red-500 p-4">Mode 'Image to Video/Image' memerlukan URL Gambar, Query, dan API Key.</p>`;
+                 return;
+            }
+            if (selectedMode === 'text-to-video' && (!query || !apiKey)) {
+                outputContainer.innerHTML = `<p class="text-red-500 p-4">Mode 'Text to Video' memerlukan Query dan API Key.</p>`;
+                return;
+            }
+
+            // Menampilkan loading
+            loader.classList.remove('hidden');
+            statusText.classList.remove('hidden');
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Memproses...';
+            outputContainer.innerHTML = '<p class="text-gray-400">Menunggu hasil...</p>';
+
+            try {
+                if (selectedMode === 'text-to-video') {
+                    await handleTextToVideo(query, apiKey);
+                } else {
+                    await handleImageToVideo(imageUrl, query, apiKey);
+                }
+            } catch (error) {
+                 console.error('Terjadi kesalahan:', error);
+                 outputContainer.innerHTML = `<p class="text-red-500 p-4">Gagal memuat hasil. Coba periksa kembali input Anda atau koneksi internet.<br><br><b>Detail Error:</b><br>${error.message}</p>`;
+            } finally {
+                // Menyembunyikan loading
+                loader.classList.add('hidden');
+                statusText.classList.add('hidden');
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Buat Sekarang';
+            }
+        });
+
+        // --- FUNGSI UNTUK MODE BARU: TEXT TO VIDEO ---
+        async function handleTextToVideo(query, apiKey) {
+            const apiUrl = `https://api.ibeng.my.id/api/ai/txt2video?query=${encodeURIComponent(query)}&apikey=${apiKey}`;
+            const response = await fetch(apiUrl);
+            
+            if (!response.ok) {
+                 const errorText = await response.text();
+                 throw new Error(`Gagal mengambil data dari API: ${response.status} - ${errorText}`);
+            }
+
+            const result = await response.json();
+            
+            if (result.status !== "Success" || !result.data || !result.data.url) {
+                throw new Error(result.message || 'Format respons API tidak valid atau terjadi error.');
+            }
+            
+            outputContainer.innerHTML = ''; // Kosongkan kontainer
+            const video = document.createElement('video');
+            video.src = result.data.url;
+            video.controls = true;
+            video.autoplay = true;
+            video.muted = true; // Autoplay seringkali memerlukan muted
+            video.loop = true;
+            video.className = 'w-full h-auto rounded-lg';
+            outputContainer.appendChild(video);
         }
 
-        const json = await response.json();
-        const data = json.data; // objek data
-        const mediaUrlResult = data.url; // URL media
+        // --- FUNGSI UNTUK MODE LAMA: IMAGE TO VIDEO/IMAGE ---
+        async function handleImageToVideo(imageUrl, query, apiKey) {
+            const apiUrl = `https://api.ibeng.my.id/api/ai/veo3luna?url=${encodeURIComponent(imageUrl)}&query=${encodeURIComponent(query)}&apikey=${apiKey}`;
+            const response = await fetch(apiUrl);
 
-        // Bersihkan hasil sebelumnya
-        outputContainer.innerHTML = '';
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => response.text());
+                let errorMessage = `Gagal mengambil data: ${response.status} ${response.statusText}`;
+                 if (typeof errorData === 'object' && errorData.message) {
+                    errorMessage += `<br>${errorData.message}`;
+                } else if (typeof errorData === 'string') {
+                    errorMessage += `<br>${errorData}`;
+                }
+                throw new Error(errorMessage);
+            }
 
-        if (mediaUrlResult) {
-            // Cek ekstensi file untuk menentukan tampilkan sebagai video atau gambar
-            const lowerUrl = mediaUrlResult.toLowerCase();
-            if (lowerUrl.endsWith('.mp4') || lowerUrl.endsWith('.webm') || lowerUrl.endsWith('.ogg')) {
-                // Tampilkan sebagai video
+            const contentType = response.headers.get('content-type');
+            outputContainer.innerHTML = ''; // Kosongkan kontainer
+            const blob = await response.blob();
+            const objectURL = URL.createObjectURL(blob);
+
+            if (contentType && contentType.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = objectURL;
+                img.alt = 'Hasil Gambar';
+                img.className = 'w-full h-auto rounded-lg';
+                outputContainer.appendChild(img);
+            } else if (contentType && contentType.startsWith('video/')) {
                 const video = document.createElement('video');
-                video.src = mediaUrlResult;
+                video.src = objectURL;
                 video.controls = true;
                 video.autoplay = true;
                 video.muted = true;
@@ -163,26 +217,10 @@ generateBtn.addEventListener('click', async () => {
                 video.className = 'w-full h-auto rounded-lg';
                 outputContainer.appendChild(video);
             } else {
-                // Tampilkan sebagai gambar
-                const img = document.createElement('img');
-                img.src = mediaUrlResult;
-                img.alt = 'Hasil Gambar';
-                img.className = 'w-full h-auto rounded-lg';
-                outputContainer.appendChild(img);
+                 throw new Error(`Tipe konten tidak didukung atau tidak dikenali: ${contentType}`);
             }
-        } else {
-            outputContainer.innerHTML = `<p class="text-red-500 p-4">Tidak ditemukan media dalam response.</p>`;
         }
-    } catch (err) {
-        console.error(err);
-        outputContainer.innerHTML = `<p class="text-red-500 p-4">Gagal muat hasil: ${err.message}</p>`;
-    } finally {
-        loader.classList.add('hidden');
-        statusText.classList.add('hidden');
-        generateBtn.disabled = false;
-        generateBtn.textContent = 'Buat Sekarang';
-    }
-});
-</script>
+    </script>
+
 </body>
 </html>
