@@ -1,419 +1,180 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Veo 3 - AI Video Generation (Your API Key)</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <style>
-    :root {
-      --primary: #6e48aa;
-      --secondary: #9d50bb;
-      --accent: #4776e6;
-      --bg: #f5f7fb;
-      --panel: #ffffff;
-      --text: #1f2230;
-      --muted: #60657a;
-      --success: #28a745;
-      --warning: #ffc107;
-      --danger: #dc3545;
-      --border: #e4e7ee;
-    }
-
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; background: var(--bg); color: var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      line-height: 1.6;
-    }
-    header {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: #fff; padding: 28px 18px; box-shadow: 0 10px 30px rgba(0,0,0,.15);
-    }
-    .container { max-width: 1100px; margin: 0 auto; padding: 0 18px; }
-    .row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-
-    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: .3px; }
-    .brand i { color: var(--accent); font-size: 22px; }
-    .brand span { font-size: 20px; }
-
-    .keybar {
-      display: flex; gap: 10px; flex-wrap: wrap;
-      background: rgba(255,255,255,.12);
-      padding: 10px; border-radius: 10px;
-    }
-    .keybar input, .keybar button {
-      border: none; border-radius: 8px; padding: 10px 12px; font-size: 14px;
-    }
-    .keybar input {
-      min-width: 220px; color: #1a1a2e;
-    }
-    .keybar .api, .keybar .baseurl {
-      background: #fff; outline: none;
-    }
-    .keybar button {
-      background: #fff; color: var(--primary); font-weight: 700; cursor: pointer;
-    }
-    .keybar button:hover { filter: brightness(.95); }
-    .tag {
-      padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.18);
-      font-size: 12px; display: inline-flex; align-items: center; gap: 6px;
-    }
-    .tag i { font-size: 12px; }
-
-    .hero {
-      padding: 26px 0 8px;
-      color: #fff;
-    }
-    .hero h1 { margin: 0 0 8px; font-size: 28px; font-weight: 800; }
-    .hero p { margin: 0; opacity: .9; }
-
-    main { padding: 26px 0 60px; }
-    .grid {
-      display: grid; grid-template-columns: 1.2fr .8fr; gap: 22px;
-    }
-    @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
-
-    .card {
-      background: var(--panel); border: 1px solid var(--border);
-      border-radius: 14px; padding: 18px; box-shadow: 0 8px 20px rgba(31,34,48,.04);
-    }
-    .card h2 { margin: 0 0 14px; font-size: 18px; }
-    .muted { color: var(--muted); font-size: 14px; }
-
-    label { display:block; font-weight: 700; margin: 12px 0 6px; font-size: 14px; }
-    input[type="text"], input[type="number"], textarea, select {
-      width: 100%; padding: 12px 12px; border: 1px solid var(--border);
-      border-radius: 10px; font-size: 14px; outline: none;
-      transition: box-shadow .2s, border-color .2s;
-      background: #fff;
-    }
-    textarea { min-height: 120px; resize: vertical; }
-    input:focus, textarea:focus, select:focus { box-shadow: 0 0 0 4px rgba(71,118,230,.12); border-color: var(--accent); }
-
-    .row2 { display:flex; gap: 12px; }
-    .row2 > * { flex: 1; }
-
-    .dropzone {
-      border: 2px dashed var(--border); border-radius: 12px; padding: 18px;
-      display: grid; place-items: center; text-align: center; cursor: pointer; background: #fafbff;
-    }
-    .dropzone:hover { border-color: var(--accent); background: #f2f5ff; }
-
-    .btn {
-      display:inline-flex; align-items:center; gap:8px;
-      background: var(--accent); color:#fff; border:none; border-radius:10px;
-      padding: 12px 16px; font-weight: 800; cursor:pointer; letter-spacing:.3px;
-      box-shadow: 0 6px 18px rgba(71,118,230,.25);
-      transition: transform .08s ease, filter .2s;
-    }
-    .btn.secondary { background: #ffffff; color: var(--accent); border: 1px solid var(--border); box-shadow: none; }
-    .btn:active { transform: translateY(1px); }
-    .btn:hover { filter: brightness(.95); }
-
-    .actions { display:flex; flex-wrap: wrap; gap:10px; margin-top: 14px; }
-
-    .preview {
-      border-radius: 12px; overflow:hidden; background:#0b0b0f; min-height: 180px;
-      display:grid; place-items:center;
-    }
-    video, img { max-width: 100%; border-radius: 8px; }
-
-    .progress {
-      margin-top: 12px; height: 12px; width: 100%; background: #eef1f7; border-radius: 999px; overflow: hidden;
-    }
-    .bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--secondary)); transition: width .4s; }
-
-    .log { margin-top: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px; background: #0e1117; color: #d1d5db; border-radius: 10px; padding: 12px; max-height: 220px; overflow:auto; }
-
-    .pill {
-      display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700;
-    }
-    .ok { background: rgba(40,167,69,.12); color: var(--success); }
-    .bad { background: rgba(220,53,69,.12); color: var(--danger); }
-    .warn{ background: rgba(255,193,7,.14); color: #b08900; }
-    .hint{ font-size: 12px; color: var(--muted); margin-top: 6px; }
-
-    footer { text-align:center; color: var(--muted); padding: 26px 0 40px; }
-    .small { font-size: 12px; }
-
-    /* Loading overlay styles */
-    #loadingOverlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 9999;
-    }
-    #loadingOverlay.show { display: flex; }
-    .loader {
-      border: 8px solid #f3f3f3; /* Light grey */
-      border-top: 8px solid var(--primary); /* Blue */
-      border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Generator Gambar dan Video AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Animasi spinner sederhana */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-<body>
-  <!-- Loading overlay -->
-  <div id="loadingOverlay">
-    <div class="loader"></div>
-  </div>
+<body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen p-4">
 
-  <header>
-    <div class="container">
-      <div class="row">
-        <div class="brand"><i class="fa-solid fa-clapperboard"></i><span>Veo 3 Generator</span></div>
-        <div class="keybar">
-          <input id="baseUrl" class="baseurl" type="text" placeholder="API Base URL (e.g. https://api.ibeng.my.id)" />
-          <input id="apiKey" class="api" type="text" placeholder="Your API Key (Bearer)" />
-          <button id="saveKey"><i class="fa-solid fa-key"></i> Save</button>
-          <div id="keyStatus" class="tag"><i class="fa-regular fa-circle"></i> Not set</div>
+    <div class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6 md:p-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Generator Gambar & Video AI</h1>
+            <p class="text-gray-500 mt-2">Masukkan URL gambar dan deskripsi untuk membuat konten baru.</p>
         </div>
-      </div>
-      <div class="hero">
-        <h1>Create AI videos with your own API key</h1>
-        <p>Prompt-to-video and image-conditioned generation. Keys are stored locally in your browser (localStorage).</p>
-      </div>
+
+        <!-- Form Input -->
+        <div class="space-y-4">
+            <!-- Input URL Gambar -->
+            <div>
+                <label for="imageUrl" class="block text-sm font-medium text-gray-700 mb-1">URL Gambar</label>
+                <input type="url" id="imageUrl" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="https://example.com/image.jpg" value="https://files.catbox.moe/kb8s6f.jpeg" />
+            </div>
+            <!-- Input Query -->
+            <div>
+                <label for="query" class="block text-sm font-medium text-gray-700 mb-1">Deskripsi (Query)</label>
+                <input type="text" id="query" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Contoh: sedang bermain laptop" value="sedang bermain laptop" />
+            </div>
+            <!-- Input API Key -->
+            <div>
+                <label for="apiKey" class="block text-sm font-medium text-gray-700 mb-1">API Key</label>
+                <input type="text" id="apiKey" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Masukkan API Key Anda" value="ribeng121" />
+            </div>
+            <!-- Pilihan Mode -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Mode</label>
+                <select id="mode" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    <option value="image">Gambar</option>
+                    <option value="video">Video</option>
+                </select>
+            </div>
+            <!-- Tombol Generate -->
+            <button id="generateBtn" class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 transform hover:scale-105">
+                Buat Sekarang
+            </button>
+        </div>
+
+        <!-- Area Hasil -->
+        <div id="result-container" class="mt-8 text-center">
+            <div id="loader" class="loader mx-auto hidden"></div>
+            <p id="status-text" class="text-gray-500 mt-4 hidden">Sedang memproses, mohon tunggu...</p>
+            <!-- Hasil gambar/video akan ditampilkan di sini -->
+            <div id="output" class="mt-4 rounded-lg overflow-hidden bg-gray-200 min-h-[200px] flex items-center justify-center">
+                <p class="text-gray-400">Hasil akan muncul di sini</p>
+            </div>
+        </div>
     </div>
-  </header>
 
-  <main>
-    <div class="container grid">
-      <section class="card">
-        <h2>Generation Settings</h2>
-        <p class="muted">Fill in your prompt. Adjust parameters as needed.</p>
+    <script>
+        // Referensi elemen DOM
+        const imageUrlInput = document.getElementById('imageUrl');
+        const queryInput = document.getElementById('query');
+        const apiKeyInput = document.getElementById('apiKey');
+        const modeSelect = document.getElementById('mode');
+        const generateBtn = document.getElementById('generateBtn');
+        const loader = document.getElementById('loader');
+        const statusText = document.getElementById('status-text');
+        const outputContainer = document.getElementById('output');
 
-        <label for="prompt">Prompt</label>
-        <textarea id="prompt" placeholder="Describe your video..."></textarea>
-        <div class="hint">Example: Cinematic 4K pirate ship in a storm, dramatic lighting, 24fps, realistic water, intense atmosphere.</div>
+        generateBtn.addEventListener('click', async () => {
+            const imageUrl = imageUrlInput.value.trim();
+            const query = queryInput.value.trim();
+            const apiKey = apiKeyInput.value.trim();
+            const mode = modeSelect.value; // 'image' atau 'video'
 
-        <div class="row2">
-          <div>
-            <label for="aspect">Aspect Ratio</label>
-            <select id="aspect">
-              <option value="16:9">16:9 (Landscape)</option>
-              <option value="9:16">9:16 (Portrait)</option>
-              <option value="1:1">1:1 (Square)</option>
-            </select>
-          </div>
-          <div>
-            <label for="duration">Duration (sec)</label>
-            <input id="duration" type="number" min="2" max="60" step="1" value="6"/>
-          </div>
-        </div>
+            // Validasi input
+            if (!imageUrl || !query || !apiKey) {
+                outputContainer.innerHTML = `<p class="text-red-500 p-4">Harap isi semua kolom: URL Gambar, Query, dan API Key.</p>`;
+                return;
+            }
 
-        <div class="row2">
-          <div>
-            <label for="steps">Steps</label>
-            <input id="steps" type="number" min="1" max="100" step="1" value="30"/>
-          </div>
-          <div>
-            <label for="cfg">CFG / Guidance</label>
-            <input id="cfg" type="number" min="0" max="20" step="0.5" value="6.5"/>
-          </div>
-        </div>
+            // Tampilkan loader dan beri indikator proses
+            loader.classList.remove('hidden');
+            statusText.classList.remove('hidden');
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Memproses...';
+            outputContainer.innerHTML = '<p class="text-gray-400">Menunggu hasil...</p>';
 
-        <div class="row2">
-          <div>
-            <label for="seed">Seed (optional)</label>
-            <input id="seed" type="text" placeholder="-1 for random" value="-1"/>
-          </div>
-          <div>
-            <label for="fps">FPS</label>
-            <input id="fps" type="number" min="4" max="60" step="1" value="24"/>
-          </div>
-        </div>
+            try {
+                // Pilih endpoint sesuai mode
+                let apiUrl = '';
+                if (mode === 'image') {
+                    apiUrl = `https://api.ibeng.my.id/api/ai/txt2video?query=${encodeURIComponent(query)}&apikey=${encodeURIComponent(apiKey)}`;
+                } else if (mode === 'video') {
+                    apiUrl = `https://api.ibeng.my.id/api/ai/txt2video?query=${encodeURIComponent(query)}&apikey=${encodeURIComponent(apiKey)}`;
+                }
 
-        <!-- Reference Image upload dihapus sesuai permintaan -->
+                // Request ke API
+                const response = await fetch(apiUrl);
 
-        <div class="actions">
-          <button class="btn" id="generate"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate</button>
-          <button class="btn secondary" id="cancel"><i class="fa-solid fa-stop"></i> Cancel</button>
-        </div>
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => response.text());
+                    let errorMsg = `Gagal mengambil data: ${response.status} ${response.statusText}`;
+                    if (typeof errorData === 'object' && errorData.message) {
+                        errorMsg += `<br>${errorData.message}`;
+                    } else if (typeof errorData === 'string') {
+                        errorMsg += `<br>${errorData}`;
+                    }
+                    throw new Error(errorMsg);
+                }
 
-        <div class="progress" aria-hidden="true"><div id="bar" class="bar"></div></div>
-        <div id="log" class="log" aria-live="polite"></div>
-      </section>
+                // Cek Content-Type
+                const contentType = response.headers.get('content-type');
+                console.log('Content-Type:', contentType);
 
-      <aside class="card">
-        <h2>Result</h2>
-        <div class="preview" id="preview">
-          <span class="muted">Your result will appear here</span>
-        </div>
-        <div class="actions" style="margin-top:12px">
-          <a id="download" class="btn" href="#" download="veo3_result.mp4" style="display:none"><i class="fa-solid fa-download"></i> Download</a>
-          <button id="copyLink" class="btn secondary" style="display:none"><i class="fa-regular fa-copy"></i> Copy Link</button>
-        </div>
-        <p class="hint">If your API returns a direct video URL, it will play here. If it returns a job id, the app will poll until ready.</p>
+                // Bersihkan output sebelumnya
+                outputContainer.innerHTML = '';
 
-        <h3 style="margin-top:18px">Connection</h3>
-        <div id="conn" class="small muted">Base URL: <span id="connBase">—</span><br/>Auth: Bearer <your-key></div>
-      </aside>
-    </div>
-  </main>
-
-  <footer>
-    <div class="container small">
-      <div class="pill warn"><i class="fa-solid fa-triangle-exclamation"></i> Security note</div>
-      Store keys only on devices you trust. This is a pure front‑end demo. In production, proxy requests via your own backend to keep keys private and enable CORS.
-    </div>
-  </footer>
-
-  <script>
-    // ======= Config =======
-    const baseUrlInput = document.getElementById("baseUrl");
-    const apiKeyInput  = document.getElementById("apiKey");
-    const saveKeyBtn= document.getElementById("saveKey");
-    const keyStatus = document.getElementById("keyStatus");
-    const connBase  = document.getElementById("connBase");
-
-    const promptEl  = document.getElementById("prompt");
-    const aspectEl  = document.getElementById("aspect");
-    const durationEl= document.getElementById("duration");
-    const stepsEl   = document.getElementById("steps");
-    const cfgEl     = document.getElementById("cfg");
-    const seedEl    = document.getElementById("seed");
-    const fpsEl     = document.getElementById("fps");
-
-    const genBtn    = document.getElementById("generate");
-    const cancelBtn = document.getElementById("cancel");
-    const logEl     = document.getElementById("log");
-    const barEl     = document.getElementById("bar");
-    const loadingOverlay = document.getElementById("loadingOverlay");
-
-    const preview   = document.getElementById("preview");
-    const downloadA = document.getElementById("download");
-    const copyLink  = document.getElementById("copyLink");
-
-    let abortCtrl = null;
-
-    // Load saved API key dan URL
-    function loadSaved() {
-      const savedKey = localStorage.getItem("VEO3_API_KEY") || "";
-      const savedBase= localStorage.getItem("VEO3_BASE_URL") || "";
-      apiKeyInput.value = savedKey;
-      baseUrlInput.value= savedBase;
-      updateKeyStatus();
-      connBase.textContent = savedBase || "—";
-    }
-
-    function updateKeyStatus() {
-      const has = !!apiKeyInput.value.trim();
-      keyStatus.innerHTML = has
-        ? '<i class="fa-regular fa-circle-check"></i> Key set'
-        : '<i class="fa-regular fa-circle"></i> Not set';
-      keyStatus.className = "tag " + (has ? "ok" : "");
-    }
-
-    saveKeyBtn.addEventListener("click", () => {
-      localStorage.setItem("VEO3_API_KEY", apiKeyInput.value.trim());
-      localStorage.setItem("VEO3_BASE_URL", baseUrlInput.value.trim());
-      updateKeyStatus();
-      connBase.textContent = baseUrlInput.value.trim() || "—";
-      log("Saved API key and Base URL.");
-    });
-
-    // Helper functions
-    function log(msg) {
-      const time = new Date().toLocaleTimeString();
-      logEl.textContent += `[${time}] ${msg}\n`;
-      logEl.scrollTop = logEl.scrollHeight;
-    }
-    function setProgress(p) {
-      const pct = Math.max(0, Math.min(100, Math.round(p * 100)));
-      barEl.style.width = pct + "%";
-    }
-    function showLoading(show) {
-      if (show) {
-        loadingOverlay.classList.add("show");
-      } else {
-        loadingOverlay.classList.remove("show");
-      }
-    }
-    function setPreviewVideo(url) {
-      preview.innerHTML = `<video id="vid" controls playsinline></video>`;
-      const vid = document.getElementById("vid");
-      vid.src = url;
-      vid.load();
-      downloadA.style.display = "inline-flex";
-      downloadA.href = url;
-      copyLink.style.display = "inline-flex";
-      copyLink.onclick = async () => {
-        try { await navigator.clipboard.writeText(url); copyLink.innerHTML = '<i class="fa-regular fa-copy"></i> Copied'; setTimeout(()=>copyLink.innerHTML='<i class="fa-regular fa-copy"></i> Copy Link',1200);} catch {}
-      };
-    }
-
-    function requireConf() {
-      const base = baseUrlInput.value.trim();
-      const key  = apiKeyInput.value.trim();
-      if (!base) { alert("Please set API Base URL"); return null; }
-      if (!key ) { alert("Please set API Key"); return null; }
-      return { base, key };
-    }
-
-    async function startGeneration() {
-      const conf = requireConf(); if (!conf) return;
-      const prompt = promptEl.value.trim();
-      if (!prompt) { alert("Please enter a prompt"); return; }
-
-      // Tampilkan loading
-      showLoading(true);
-
-      const payload = {
-        query: prompt,
-        apikey: conf.key,
-        aspect: aspectEl.value,
-        duration: parseInt(durationEl.value),
-        steps: parseInt(stepsEl.value),
-        cfg: parseFloat(cfgEl.value),
-        seed: seedEl.value.trim() || "-1",
-        fps: parseInt(fpsEl.value)
-      };
-
-      abortCtrl = new AbortController();
-      setProgress(0);
-      log("Submitting generation job...");
-      genBtn.disabled = true;
-
-      try {
-        const url = `${conf.base.replace(/\/+$/,"")}/api/ai/veo3?query=${encodeURIComponent(payload.query)}&apikey=${encodeURIComponent(payload.apikey)}`;
-        const res = await fetch(url, { method: "GET", signal: abortCtrl.signal });
-        if (!res.ok) throw new Error("Request failed: " + res.status + " " + res.statusText);
-        const data = await res.json();
-        log("Response: " + JSON.stringify(data));
-
-        // Perbaikan di sini: sesuai struktur respons yang Anda berikan
-        if (data.data && data.data.data && data.data.data.video_url) {
-          setProgress(1);
-          log("Received direct video URL.");
-          setPreviewVideo(data.data.data.video_url);
-        } else {
-          throw new Error("Unexpected response. No video URL found.");
-        }
-      } catch (err) {
-        if (err.name === "AbortError") {
-          log("Generation cancelled by user.");
-        } else {
-          console.error(err);
-          log("Error: " + err.message);
-          alert("Generation error: " + err.message);
-        }
-      } finally {
-        showLoading(false);
-        genBtn.disabled = false;
-        abortCtrl = null;
-      }
-    }
-
-    // Event listener
-    document.getElementById("generate").addEventListener("click", startGeneration);
-    document.getElementById("cancel").addEventListener("click", () => {
-      if (abortCtrl) { abortCtrl.abort(); abortCtrl = null; }
-    });
-
-    // Load config
-    loadSaved();
-  </script>
+                if (contentType && contentType.startsWith('image/')) {
+                    // Jika hasil adalah gambar
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const img = document.createElement('img');
+                    img.src = url;
+                    img.alt = 'Hasil Gambar';
+                    img.className = 'w-full h-auto rounded-lg';
+                    outputContainer.appendChild(img);
+                } else if (contentType && contentType.startsWith('video/')) {
+                    // Jika hasil adalah video
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const video = document.createElement('video');
+                    video.src = url;
+                    video.controls = true;
+                    video.autoplay = true;
+                    video.muted = true;
+                    video.loop = true;
+                    video.className = 'w-full h-auto rounded-lg';
+                    outputContainer.appendChild(video);
+                } else if (contentType && contentType.includes('application/json')) {
+                    // Jika API mengembalikan JSON (pesan error)
+                    const errorJson = await response.json();
+                    const errorMsg = errorJson.message || JSON.stringify(errorJson);
+                    outputContainer.innerHTML = `<p class="text-red-500 p-4">API mengembalikan pesan: ${errorMsg}</p>`;
+                } else {
+                    outputContainer.innerHTML = `<p class="text-red-500 p-4">Tipe konten tidak didukung atau tidak dikenali. Diterima: ${contentType}</p>`;
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                outputContainer.innerHTML = `<p class="text-red-500 p-4">Gagal memuat hasil. Periksa kembali URL, API Key, atau koneksi internet.<br><br><b>Detail Error:</b><br>${err.message}</p>`;
+            } finally {
+                loader.classList.add('hidden');
+                statusText.classList.add('hidden');
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Buat Sekarang';
+            }
+        });
+    </script>
 </body>
 </html>
