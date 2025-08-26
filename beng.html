@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Generator AI - Gambar & Video</title>
+    <title>Generator AI Gambar & Video</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <style>
@@ -70,7 +70,7 @@
         <div id="result-container" class="mt-8 text-center">
             <div id="loader" class="loader mx-auto hidden"></div>
             <p id="status-text" class="text-gray-500 mt-4 hidden">Sedang memproses, mohon tunggu...</p>
-            <!-- Hasil gambar/video muncul di sini -->
+            <!-- Hasil media muncul di sini -->
             <div id="output" class="mt-4 rounded-lg overflow-hidden bg-gray-200 min-h-[200px] flex items-center justify-center">
                 <p class="text-gray-400">Hasil akan muncul di sini</p>
             </div>
@@ -88,7 +88,7 @@
         const statusText = document.getElementById('status-text');
         const outputContainer = document.getElementById('output');
 
-        // Fungsi untuk mengubah tampilan berdasarkan mode
+        // Tampilkan/ sembunyikan input URL gambar berdasarkan mode
         modeSelect.addEventListener('change', () => {
             if (modeSelect.value === 'image') {
                 imageUrlGroup.classList.remove('hidden');
@@ -96,7 +96,6 @@
                 imageUrlGroup.classList.add('hidden');
             }
         });
-
         // Inisialisasi tampilan
         if (modeSelect.value === 'image') {
             imageUrlGroup.classList.remove('hidden');
@@ -104,7 +103,6 @@
             imageUrlGroup.classList.add('hidden');
         }
 
-        // Event klik generate
         generateBtn.addEventListener('click', async () => {
             const mode = modeSelect.value;
             const apiKey = apiKeyInput.value.trim();
@@ -115,7 +113,6 @@
                 return;
             }
 
-            // Jika mode gambar, pastikan URL gambar diisi
             let imageUrl = '';
             if (mode === 'image') {
                 imageUrl = imageUrlInput.value.trim();
@@ -125,7 +122,7 @@
                 }
             }
 
-            // Tampilkan loader
+            // Tampilkan loader dan reset output
             loader.classList.remove('hidden');
             statusText.classList.remove('hidden');
             generateBtn.disabled = true;
@@ -146,47 +143,45 @@
 
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => response.text());
-                    let errorMessage = `Gagal mengambil data: ${response.status} ${response.statusText}`;
+                    let errorMsg = `Gagal mengambil data: ${response.status} ${response.statusText}`;
                     if (typeof errorData === 'object' && errorData.message) {
-                        errorMessage += `<br>${errorData.message}`;
+                        errorMsg += `<br>${errorData.message}`;
                     } else if (typeof errorData === 'string') {
-                        errorMessage += `<br>${errorData}`;
+                        errorMsg += `<br>${errorData}`;
                     }
-                    throw new Error(errorMessage);
+                    throw new Error(errorMsg);
                 }
 
+                const jsonResponse = await response.json();
+                const data = jsonResponse.data;
+                const mediaUrl = data.url; // URL hasil media
+
                 const contentType = response.headers.get('content-type');
-                //console.log('Content-Type:', contentType);
 
                 outputContainer.innerHTML = '';
 
-                if (contentType && contentType.startsWith('image/')) {
-                    const blob = await response.blob();
-                    const url = URL.createObjectURL(blob);
-                    const img = document.createElement('img');
-                    img.src = url;
-                    img.alt = 'Hasil Gambar';
-                    img.className = 'w-full h-auto rounded-lg';
-                    outputContainer.appendChild(img);
-                } else if (contentType && contentType.startsWith('video/')) {
-                    const blob = await response.blob();
-                    const url = URL.createObjectURL(blob);
-                    const video = document.createElement('video');
-                    video.src = url;
-                    video.controls = true;
-                    video.autoplay = true;
-                    video.muted = true;
-                    video.loop = true;
-                    video.className = 'w-full h-auto rounded-lg';
-                    outputContainer.appendChild(video);
-                } else if (contentType && contentType.includes('application/json')) {
-                    const errorJson = await response.json();
-                    const errorMsg = errorJson.message || JSON.stringify(errorJson);
-                    outputContainer.innerHTML = `<p class="text-red-500 p-4">API mengembalikan pesan: ${errorMsg}</p>`;
+                if (mediaUrl) {
+                    if (contentType.startsWith('image/')) {
+                        const img = document.createElement('img');
+                        img.src = mediaUrl;
+                        img.alt = 'Hasil Gambar';
+                        img.className = 'w-full h-auto rounded-lg';
+                        outputContainer.appendChild(img);
+                    } else if (contentType.startsWith('video/')) {
+                        const video = document.createElement('video');
+                        video.src = mediaUrl;
+                        video.controls = true;
+                        video.autoplay = true;
+                        video.muted = true;
+                        video.loop = true;
+                        video.className = 'w-full h-auto rounded-lg';
+                        outputContainer.appendChild(video);
+                    } else {
+                        outputContainer.innerHTML = `<p class="text-red-500 p-4">Tipe media tidak dikenali: ${contentType}</p>`;
+                    }
                 } else {
-                    outputContainer.innerHTML = `<p class="text-red-500 p-4">Tipe konten tidak didukung: ${contentType}</p>`;
+                    outputContainer.innerHTML = `<p class="text-red-500 p-4">URL media tidak ditemukan dalam response.</p>`;
                 }
-
             } catch (error) {
                 console.error('Error:', error);
                 outputContainer.innerHTML = `<p class="text-red-500 p-4">Gagal memuat hasil. Periksa koneksi dan input Anda.<br><br><b>Detail:</b> ${error.message}</p>`;
