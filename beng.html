@@ -150,8 +150,10 @@ generateBtn.addEventListener('click', async () => {
         outputContainer.innerHTML = '';
 
         if (mediaUrlResult) {
-            // Untuk memastikan ini adalah video, cek ekstensi atau tipe
-            if (mediaUrlResult.endsWith('.mp4') || mediaUrlResult.endsWith('.webm') || mediaUrlResult.endsWith('.ogg')) {
+            // Cek ekstensi file untuk menentukan tampilkan sebagai video atau gambar
+            const lowerUrl = mediaUrlResult.toLowerCase();
+            if (lowerUrl.endsWith('.mp4') || lowerUrl.endsWith('.webm') || lowerUrl.endsWith('.ogg')) {
+                // Tampilkan sebagai video
                 const video = document.createElement('video');
                 video.src = mediaUrlResult;
                 video.controls = true;
@@ -161,7 +163,7 @@ generateBtn.addEventListener('click', async () => {
                 video.className = 'w-full h-auto rounded-lg';
                 outputContainer.appendChild(video);
             } else {
-                // Jika bukan video, tampilkan gambar
+                // Tampilkan sebagai gambar
                 const img = document.createElement('img');
                 img.src = mediaUrlResult;
                 img.alt = 'Hasil Gambar';
