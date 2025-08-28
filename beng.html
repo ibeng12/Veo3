@@ -1,226 +1,129 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Content Generator</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Siveo AI Chat</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-        }
-        /* Animasi spinner sederhana */
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 4px solid #3498db;
-            width: 40px;
-            height: 40px;
-            animation: spin 2s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen p-4">
-
-    <div class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6 md:p-8">
-        
-        <div class="text-center mb-6">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">AI Content Generator 🚀</h1>
-            <p class="text-gray-500 mt-2">Pilih mode dan masukkan deskripsi untuk membuat konten baru.</p>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-2xl bg-white rounded-xl shadow-2xl p-6 md:p-10 flex flex-col space-y-6">
+        <div class="text-center">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800">Siveo AI Chat</h1>
+            <p class="mt-2 text-gray-500">Tanyakan apa pun dan dapatkan jawaban dari AI.</p>
         </div>
 
-        <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Mode</label>
-            <div class="flex items-center space-x-4 rounded-lg bg-gray-100 p-1">
-                <label class="w-full text-center">
-                    <input type="radio" name="mode" value="image-to-video" class="sr-only" checked>
-                    <span id="mode-img2vid" class="cursor-pointer block w-full px-4 py-2 rounded-md bg-white shadow text-blue-600 font-semibold transition">Image to Video/Image</span>
-                </label>
-                <label class="w-full text-center">
-                    <input type="radio" name="mode" value="text-to-video" class="sr-only">
-                    <span id="mode-txt2vid" class="cursor-pointer block w-full px-4 py-2 rounded-md text-gray-600 font-semibold transition">Text to Video</span>
-                </label>
-            </div>
-        </div>
-
-
-        <div class="space-y-4">
-            <div id="imageUrlContainer">
-                <label for="imageUrl" class="block text-sm font-medium text-gray-700 mb-1">URL Gambar</label>
-                <input type="url" id="imageUrl" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="https://example.com/image.jpg" value="https://files.catbox.moe/kb8s6f.jpeg">
-            </div>
-            <div>
-                <label for="query" class="block text-sm font-medium text-gray-700 mb-1">Deskripsi / Prompt Teks</label>
-                <input type="text" id="query" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Contoh: sedang bermain laptop" value="sedang bermain laptop">
-            </div>
-             <div>
-                <label for="apiKey" class="block text-sm font-medium text-gray-700 mb-1">API Key</label>
-                <input type="text" id="apiKey" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Masukkan API Key Anda" value="ribeng121">
-            </div>
-            <button id="generateBtn" class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 transform hover:scale-105">
-                Buat Sekarang
+        <!-- Input Area -->
+        <div class="flex flex-col space-y-4">
+            <textarea
+                id="promptInput"
+                class="w-full h-32 md:h-40 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                placeholder="Masukkan prompt Anda di sini..."
+            ></textarea>
+            <!-- Action Button -->
+            <button
+                id="submitButton"
+                class="w-full px-6 py-3 text-lg font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+                Kirim
             </button>
         </div>
 
-        <div id="result-container" class="mt-8 text-center">
-            <div id="loader" class="loader mx-auto hidden"></div>
-            <p id="status-text" class="text-gray-500 mt-4 hidden">Sedang memproses, mohon tunggu...</p>
-            <div id="output" class="mt-4 rounded-lg overflow-hidden bg-gray-200 min-h-[200px] flex items-center justify-center">
-                 <p class="text-gray-400">Hasil akan muncul di sini</p>
-            </div>
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="hidden text-center text-blue-600">
+            <svg class="animate-spin h-8 w-8 text-blue-600 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="mt-2">Memuat jawaban...</p>
         </div>
 
+        <!-- Response Display Area -->
+        <div id="responseDisplay" class="bg-gray-50 p-6 rounded-lg border border-gray-200 min-h-[150px] overflow-auto">
+            <p class="text-gray-700 leading-relaxed">Jawaban akan muncul di sini.</p>
+        </div>
     </div>
 
     <script>
-        // Mendapatkan elemen dari DOM
-        const modeRadios = document.querySelectorAll('input[name="mode"]');
-        const imageUrlContainer = document.getElementById('imageUrlContainer');
-        const imageUrlInput = document.getElementById('imageUrl');
-        const queryInput = document.getElementById('query');
-        const apiKeyInput = document.getElementById('apiKey');
-        const generateBtn = document.getElementById('generateBtn');
-        const loader = document.getElementById('loader');
-        const statusText = document.getElementById('status-text');
-        const outputContainer = document.getElementById('output');
-        const modeImg2VidBtn = document.getElementById('mode-img2vid');
-        const modeTxt2VidBtn = document.getElementById('mode-txt2vid');
+        const promptInput = document.getElementById('promptInput');
+        const submitButton = document.getElementById('submitButton');
+        const responseDisplay = document.getElementById('responseDisplay');
+        const loadingIndicator = document.getElementById('loadingIndicator');
 
-        // Fungsi untuk mengupdate tampilan tombol mode
-        function updateModeUI(selectedMode) {
-             if (selectedMode === 'image-to-video') {
-                imageUrlContainer.style.display = 'block';
-                modeImg2VidBtn.classList.add('bg-white', 'shadow', 'text-blue-600');
-                modeTxt2VidBtn.classList.remove('bg-white', 'shadow', 'text-blue-600');
-            } else { // text-to-video
-                imageUrlContainer.style.display = 'none';
-                modeTxt2VidBtn.classList.add('bg-white', 'shadow', 'text-blue-600');
-                modeImg2VidBtn.classList.remove('bg-white', 'shadow', 'text-blue-600');
-            }
-        }
+        const API_URL = 'https://api.ibeng.my.id/api/ai/siveo3?prompt=';
 
-        // Event listener untuk pilihan mode
-        modeRadios.forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                updateModeUI(e.target.value);
-            });
-        });
-        
-        // --- LOGIKA UTAMA ---
-        generateBtn.addEventListener('click', async () => {
-            const selectedMode = document.querySelector('input[name="mode"]:checked').value;
-            const query = queryInput.value.trim();
-            const apiKey = apiKeyInput.value.trim();
-            const imageUrl = imageUrlInput.value.trim();
-
-            // Validasi input berdasarkan mode
-            if (selectedMode === 'image-to-video' && (!imageUrl || !query || !apiKey)) {
-                 outputContainer.innerHTML = `<p class="text-red-500 p-4">Mode 'Image to Video/Image' memerlukan URL Gambar, Query, dan API Key.</p>`;
-                 return;
-            }
-            if (selectedMode === 'text-to-video' && (!query || !apiKey)) {
-                outputContainer.innerHTML = `<p class="text-red-500 p-4">Mode 'Text to Video' memerlukan Query dan API Key.</p>`;
+        submitButton.addEventListener('click', async () => {
+            const prompt = promptInput.value.trim();
+            if (prompt === '') {
+                responseDisplay.innerHTML = '<p class="text-red-500">Mohon masukkan prompt terlebih dahulu.</p>';
                 return;
             }
 
-            // Menampilkan loading
-            loader.classList.remove('hidden');
-            statusText.classList.remove('hidden');
-            generateBtn.disabled = true;
-            generateBtn.textContent = 'Memproses...';
-            outputContainer.innerHTML = '<p class="text-gray-400">Menunggu hasil...</p>';
+            // Tampilkan loading dan reset tampilan
+            loadingIndicator.classList.remove('hidden');
+            responseDisplay.innerHTML = '';
+            submitButton.disabled = true;
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => {
+                controller.abort();
+            }, 15000); // timeout 15 detik
 
             try {
-                if (selectedMode === 'text-to-video') {
-                    await handleTextToVideo(query, apiKey);
+                const encodedPrompt = encodeURIComponent(prompt);
+                const response = await fetch(`${API_URL}${encodedPrompt}`, { signal: controller.signal });
+
+                if (!response.ok) {
+                    throw new Error(`Kesalahan HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Response dari API yang Anda berikan memiliki struktur:
+                // { message, status: { data: {...} } }
+                if (data && data.status && data.status.data) {
+                    const resultData = data.status.data;
+                    // Pastikan data memiliki url dan message
+                    if (resultData.url) {
+                        responseDisplay.innerHTML = `
+                            <h3 class="text-lg font-bold text-gray-800 mb-2">Video Selesai Diproses:</h3>
+                            <video controls class="w-full rounded-md shadow-md mb-4">
+                                <source src="${resultData.url}" type="video/mp4" />
+                                Browser Anda tidak mendukung tag video.
+                            </video>
+                            <p class="text-gray-700">URL Video: <a href="${resultData.url}" target="_blank" class="text-blue-500 underline">${resultData.url}</a></p>
+                        `;
+                    } else {
+                        // Jika tidak ada URL video, tampilkan pesan
+                        responseDisplay.innerHTML = `<p class="text-gray-700">Tidak ditemukan video untuk prompt ini.</p>`;
+                    }
                 } else {
-                    await handleImageToVideo(imageUrl, query, apiKey);
+                    responseDisplay.innerHTML = `<p class="text-red-500">Respons API tidak valid.</p>`;
                 }
             } catch (error) {
-                 console.error('Terjadi kesalahan:', error);
-                 outputContainer.innerHTML = `<p class="text-red-500 p-4">Gagal memuat hasil. Coba periksa kembali input Anda atau koneksi internet.<br><br><b>Detail Error:</b><br>${error.message}</p>`;
+                console.error('Error:', error);
+                if (error.name === 'AbortError') {
+                    responseDisplay.innerHTML = `<p class="text-red-500">Permintaan habis waktu. API mungkin sibuk. Sila cuba lagi dengan prompt yang lebih pendek.</p>`;
+                } else {
+                    responseDisplay.innerHTML = `<p class="text-red-500">Terjadi kesalahan: ${error.message}</p>`;
+                }
             } finally {
-                // Menyembunyikan loading
-                loader.classList.add('hidden');
-                statusText.classList.add('hidden');
-                generateBtn.disabled = false;
-                generateBtn.textContent = 'Buat Sekarang';
+                loadingIndicator.classList.add('hidden');
+                submitButton.disabled = false;
+                clearTimeout(timeoutId);
             }
         });
-
-        // --- FUNGSI UNTUK MODE BARU: TEXT TO VIDEO ---
-        async function handleTextToVideo(query, apiKey) {
-            const apiUrl = `https://api.ibeng.my.id/api/ai/txt2video?query=${encodeURIComponent(query)}&apikey=${apiKey}`;
-            const response = await fetch(apiUrl);
-            
-            if (!response.ok) {
-                 const errorText = await response.text();
-                 throw new Error(`Gagal mengambil data dari API: ${response.status} - ${errorText}`);
-            }
-
-            const result = await response.json();
-            
-            if (result.status !== "Success" || !result.data || !result.data.url) {
-                throw new Error(result.message || 'Format respons API tidak valid atau terjadi error.');
-            }
-            
-            outputContainer.innerHTML = ''; // Kosongkan kontainer
-            const video = document.createElement('video');
-            video.src = result.data.url;
-            video.controls = true;
-            video.autoplay = true;
-            video.muted = true; // Autoplay seringkali memerlukan muted
-            video.loop = true;
-            video.className = 'w-full h-auto rounded-lg';
-            outputContainer.appendChild(video);
-        }
-
-        // --- FUNGSI UNTUK MODE LAMA: IMAGE TO VIDEO/IMAGE ---
-        async function handleImageToVideo(imageUrl, query, apiKey) {
-            const apiUrl = `https://api.ibeng.my.id/api/ai/veo3luna?url=${encodeURIComponent(imageUrl)}&query=${encodeURIComponent(query)}&apikey=${apiKey}`;
-            const response = await fetch(apiUrl);
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => response.text());
-                let errorMessage = `Gagal mengambil data: ${response.status} ${response.statusText}`;
-                 if (typeof errorData === 'object' && errorData.message) {
-                    errorMessage += `<br>${errorData.message}`;
-                } else if (typeof errorData === 'string') {
-                    errorMessage += `<br>${errorData}`;
-                }
-                throw new Error(errorMessage);
-            }
-
-            const contentType = response.headers.get('content-type');
-            outputContainer.innerHTML = ''; // Kosongkan kontainer
-            const blob = await response.blob();
-            const objectURL = URL.createObjectURL(blob);
-
-            if (contentType && contentType.startsWith('image/')) {
-                const img = document.createElement('img');
-                img.src = objectURL;
-                img.alt = 'Hasil Gambar';
-                img.className = 'w-full h-auto rounded-lg';
-                outputContainer.appendChild(img);
-            } else if (contentType && contentType.startsWith('video/')) {
-                const video = document.createElement('video');
-                video.src = objectURL;
-                video.controls = true;
-                video.autoplay = true;
-                video.muted = true;
-                video.loop = true;
-                video.className = 'w-full h-auto rounded-lg';
-                outputContainer.appendChild(video);
-            } else {
-                 throw new Error(`Tipe konten tidak didukung atau tidak dikenali: ${contentType}`);
-            }
-        }
     </script>
-
 </body>
 </html>
