@@ -95,7 +95,7 @@ async function prosesVideo(prompt) {
             let videoUrl = resultData.url;
             let isFinished = !!videoUrl;
             let pollingCount = 0;
-            const maxPolling = 20; // batas maksimal polling
+            const maxPolling = 60; // batas maksimal polling
 
             while (!isFinished && pollingCount < maxPolling) {
                 await delay(3000); // tunggu 3 detik
